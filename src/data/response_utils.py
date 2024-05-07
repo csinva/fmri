@@ -1,4 +1,4 @@
-# from huth.data.npp import mcorr
+# from src.data.npp import mcorr
 # from typing import List
 # import json
 from os.path import join, dirname
@@ -14,8 +14,8 @@ import logging
 import numpy as np
 import joblib
 import os
-import huth.features
-import huth.config as config
+import src.features
+import src.config as config
 # import random
 
 
@@ -84,7 +84,7 @@ def get_resps_full(
 
         resp_train = pca.transform(resp_train)
         resp_test = pca.transform(resp_test)
-        logging.info(f'reps_train.shape (after pca) {resp_train.shape}')
+        logging.info(f'resp_train.shape (after pca) {resp_train.shape}')
         scaler_train = StandardScaler().fit(resp_train)
         scaler_test = StandardScaler().fit(resp_test)
         resp_train = scaler_train.transform(resp_train)
@@ -102,7 +102,7 @@ def get_resp_distilled(args, story_names):
 
     model_params = joblib.load(
         join(args.distill_model_path, 'model_params.pkl'))
-    features_delayed_distill = huth.features.get_features_full(
+    features_delayed_distill = src.features.get_features_full(
         args_distill, args_distill.qa_embedding_model, story_names)
     preds_distilled = features_delayed_distill @ model_params['weights_pc']
     return preds_distilled

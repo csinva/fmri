@@ -26,8 +26,7 @@ required_pypi = [
 ]
 
 setuptools.setup(
-    # name="huth",
-    name="huth",
+    name="src",
     version="0.01",
     author="Huth lab modified by Chandan Singh",
     author_email="",

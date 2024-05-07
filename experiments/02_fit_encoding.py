@@ -11,15 +11,15 @@ import argparse
 import numpy as np
 import joblib
 import os
-from huth.data import response_utils
-from huth.features import feature_utils
-import huth.config as config
-from huth.encoding.ridge import bootstrap_ridge, gen_temporal_chunk_splits
+from src.data import response_utils
+from src.features import feature_utils
+import src.config as config
+from src.encoding.ridge import bootstrap_ridge, gen_temporal_chunk_splits
 import imodelsx.cache_save_utils
-import huth.data.story_names as story_names
+import src.data.story_names as story_names
 import random
 import time
-from huth.encoding.eval import nancorr, evaluate_pc_model_on_each_voxel, add_summary_stats
+from src.encoding.eval import nancorr, evaluate_pc_model_on_each_voxel, add_summary_stats
 
 # get path to current file
 path_to_repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,7 +35,7 @@ def add_main_args(parser):
                         choices=['UTS01', 'UTS02', 'UTS03'],
                         help='top3 concatenates responses for S01-S03, useful for feature selection')
     parser.add_argument('--pc_components', type=int, default=-1,
-                        help='''number of principal components to use for reducing output(-1 doesnt use PCA at all).
+                        help='''number of principal components to use for reducing output (-1 doesnt use PCA at all).
                         Note, use_test_setup alters this to 100.''')
     parser.add_argument("--distill_model_path", type=str,
                         default=None,
@@ -55,7 +55,17 @@ def add_main_args(parser):
                         '''
                         )
     parser.add_argument('--num_stories', type=int, default=-1,
-                        help='number of stories to use (-1 for all). Note: use_test_setup alters this. Pass 0 to load shared stories (used for shared feature selection).')
+                        help='''number of stories to use (-1 for all).
+                        Stories are selected from huge list unless use_test_setup
+                        ''')
+    parser.add_argument('--use_huge', type=int, default=1,
+                        help='''Whether to use huge list of stories
+                        (if use_test_setup or not UTS01-03, this will automatically be set to 0)''')
+    parser.add_argument('--use_shared_feature_selection', type=int, default=1,
+                        help='''Whether to use shared feature selection across 3 subjects (otherwise just use one subject)
+                        If true, running this will save the feature selection object,
+                        then need to set this to false (to use all stories) & rerun sweeping over feature_selection_alpha_index
+                        ''')
     parser.add_argument("--feature_selection_alpha_index", type=int,
                         default=-1,
                         help='in range(0, 100) - larger is more regularization')
@@ -97,7 +107,7 @@ def add_main_args(parser):
     # basic params
     parser.add_argument('--seed', type=int, default=1)
     parser.add_argument('--use_test_setup', type=int, default=1,
-                        help='For fast testing - train/test on single story with 2 nboots.')
+                        help='For fast testing - train/test on a couple stories with few nboots.')
     return parser
 
 
@@ -136,42 +146,96 @@ def add_computational_args(parser):
 
 
 def get_story_names(args):
-    # Story names
     if args.use_test_setup:
-        # train_stories = ['sloth']
-        args.nboots = 3
+        args.nboots = 2
         args.use_extract_only = 0
+        # args.use_huge = 0
         story_names_train = ['sloth', 'adollshouse']
-        # story_names_train = ['sloth']
-        # story_names_train = story_names.get_story_names(args.subject, 'train')
-        # story_names_train = [
-        # 'adollshouse', 'adventuresinsayingyes', 'afatherscover', 'againstthewind', 'alternateithicatom', 'avatar',
-        # 'backsideofthestorm', 'becomingindian', 'beneaththemushroomcloud',
-        # ]
-        # test_stories = ['sloth', 'fromboyhoodtofatherhood']
         story_names_test = ['fromboyhoodtofatherhood']
         args.pc_components = 100
-        # 'onapproachtopluto']  # , 'onapproachtopluto']
-        # random.shuffle(story_names_test)
-    # special case where we load shared stories
-    elif args.num_stories == 0:
-        story_names_train = story_names.get_story_names(
-            'shared', 'train')
-        story_names_test = story_names.get_story_names(
-            'shared', 'test')
 
+    # special case where we load shared stories
+    elif args.use_shared_feature_selection:
+        story_names_train = story_names.get_story_names(
+            'shared', 'train', use_huge=args.use_huge)
+        story_names_test = story_names.get_story_names(
+            'shared', 'test', use_huge=args.use_huge)
     elif args.num_stories > 0:
         story_names_train = story_names.get_story_names(
-            args.subject, 'train')[:args.num_stories]
+            args.subject, 'train', use_huge=args.use_huge)[:args.num_stories]
         story_names_test = story_names.get_story_names(
-            args.subject, 'test')
+            args.subject, 'test', use_huge=args.use_huge)[:args.num_stories]
     else:
-        story_names_train = story_names.get_story_names(args.subject, 'train')
-        story_names_test = story_names.get_story_names(args.subject, 'test')
+        story_names_train = story_names.get_story_names(
+            args.subject, 'train', use_huge=args.use_huge)
+        story_names_test = story_names.get_story_names(
+            args.subject, 'test', use_huge=args.use_huge)
 
     rng = np.random.default_rng(args.seed_stories)
     rng.shuffle(story_names_train)
     return story_names_train, story_names_test
+
+
+def select_features(args, r, stim_train_delayed, stim_test_delayed, story_names_train, story_names_test):
+    # remove delays from stim
+    stim_train = stim_train_delayed[:,
+                                    :stim_train_delayed.shape[1] // args.ndelays]
+
+    # coefs is (n_targets, n_features, n_alphas)
+    if args.use_shared_feature_selection:
+        cache_dir = join(config.root_dir, 'qa', 'sparse_feats_shared')
+        if args.use_test_setup:
+            alpha_range = (0, -1, 2)
+        else:
+            alpha_range = (0, -3, 20)
+        cache_file = join(cache_dir, args.qa_questions_version + '_' +
+                          args.qa_embedding_model.replace('/', '-') + '_' + str(alpha_range) + '.joblib')
+    else:
+        # use hard-coded feature selection result from S03
+        cache_dir = join(config.root_dir, 'qa', 'sparse_feats')
+        alpha_range = (0, -3, 15)
+        cache_file = join(
+            cache_dir, 'v3_boostexamples_mistralai-Mistral-7B-Instruct-v0.2_(0, -3, 15).joblib')
+        # 'v3_boostexamples_(0, -3, 15).joblib'
+        # 'v3_boostexamples_mistralai-Mistral-7B-Instruct-v0.2_(0, -3, 15).joblib'
+    os.makedirs(cache_dir, exist_ok=True)
+
+    if os.path.exists(cache_file):
+        alphas_enet, coefs_enet = joblib.load(cache_file)
+        print('Loaded from cache:', cache_file)
+    else:
+        print('Couldn\'t find cache file:', cache_file, 'fitting now...')
+        # get special resps by concatenating across subjects
+        resp_train_shared = response_utils.get_resps_full(
+            args, 'shared', story_names_train, story_names_test)
+        alphas_enet, coefs_enet, _ = enet_path(
+            stim_train,
+            resp_train_shared,
+            l1_ratio=0.9,
+            alphas=np.logspace(*alpha_range),
+            verbose=3,
+            max_iter=5000,  # defaults to 1000
+            random_state=args.seed,
+        )
+        joblib.dump((alphas_enet, coefs_enet), cache_file)
+        logging.info(
+            f"Succesfully completed feature selection {(time.time() - t0)/60:0.1f} minutes. Saved to {cache_file}")
+
+    # pick the coefs
+    coef_enet = coefs_enet[:, :, args.feature_selection_alpha_index]
+    coef_nonzero = np.any(np.abs(coef_enet) > 0, axis=0)
+    r['alpha'] = alphas_enet[args.feature_selection_alpha_index]
+    r['weights_enet'] = coef_enet
+    r['weight_enet_mask'] = coef_nonzero
+    r['weight_enet_mask_num_nonzero'] = coef_nonzero.sum()
+
+    # mask stim_delayed based on nonzero coefs (need to repeat by args.ndelays)
+    coef_nonzero_rep = np.tile(
+        coef_nonzero.flatten(), args.ndelays).flatten()
+    stim_train_delayed = stim_train_delayed[:, coef_nonzero_rep]
+    stim_test_delayed = stim_test_delayed[:, coef_nonzero_rep]
+
+    return r, stim_train_delayed, stim_test_delayed
 
 
 def fit_regression(args, r, features_train_delayed, resp_train, features_test_delayed, resp_test):
@@ -248,8 +312,6 @@ if __name__ == "__main__":
     parser = add_computational_args(
         deepcopy(parser_without_computational_args))
     args = parser.parse_args()
-    assert not (args.num_stories == 0 and args.feature_selection_alpha_index <
-                0), 'num_stories == 0 should only be used during feature selection!'
 
     # set up logging
     logger = logging.getLogger()
@@ -289,78 +351,24 @@ if __name__ == "__main__":
     stim_train_delayed = feature_utils.get_features_full(
         args, args.qa_embedding_model, story_names_train)
 
-    print('loading resps...')
-    if not args.num_stories == 0:  # 0 is a special case which loads shared stories
-        if args.pc_components <= 0:
-            resp_train, resp_test = response_utils.get_resps_full(
-                args, args.subject, story_names_train, story_names_test)
-        else:
-            resp_train, resp_test, pca, scaler_train, scaler_test = response_utils.get_resps_full(
-                args, args.subject, story_names_train, story_names_test)
-
-        # overwrite resp_train with distill model predictions
-        if args.distill_model_path is not None:
-            resp_train = response_utils.get_resp_distilled(
-                args, story_names_train)
-
-    # select features
     if args.feature_selection_alpha_index >= 0:
-        print('selecting sparse feats...')
-        # remove delays from stim
-        stim_train = stim_train_delayed[:,
-                                        :stim_train_delayed.shape[1] // args.ndelays]
+        print('selecting features...')
+        r, stim_train_delayed, stim_test_delayed = select_features(
+            args, r, stim_train_delayed, stim_test_delayed,
+            story_names_train, story_names_test)
 
-        # coefs is (n_targets, n_features, n_alphas)
-        if args.num_stories == 0:
-            cache_dir = join(config.root_dir, 'qa', 'sparse_feats_all_subj')
-            alpha_range = (0, -3, 20)
-            cache_file = join(cache_dir, args.qa_questions_version + '_' +
-                              args.qa_embedding_model.replace('/', '-') + '_' + str(alpha_range) + '.joblib')
-        else:
-            # use hard-coded feature selection result from S03
-            cache_dir = join(config.root_dir, 'qa', 'sparse_feats')
-            alpha_range = (0, -3, 15)
-            cache_file = join(
-                cache_dir, 'v3_boostexamples_mistralai-Mistral-7B-Instruct-v0.2_(0, -3, 15).joblib')
-            # 'v3_boostexamples_(0, -3, 15).joblib'
-            # 'v3_boostexamples_mistralai-Mistral-7B-Instruct-v0.2_(0, -3, 15).joblib'
-        os.makedirs(cache_dir, exist_ok=True)
+    print('loading resps...')
+    if args.pc_components <= 0:
+        resp_train, resp_test = response_utils.get_resps_full(
+            args, args.subject, story_names_train, story_names_test)
+    else:
+        resp_train, resp_test, pca, scaler_train, scaler_test = response_utils.get_resps_full(
+            args, args.subject, story_names_train, story_names_test)
 
-        if os.path.exists(cache_file):
-            alphas_enet, coefs_enet = joblib.load(cache_file)
-            print('Loaded from cache:', cache_file)
-        else:
-            print('Couldn\'t find cache file:', cache_file, 'fitting now...')
-            # get special resps by concatenating across subjects
-            resp_train_shared = response_utils.get_resps_full(
-                args, 'shared', story_names_train, story_names_test)
-            alphas_enet, coefs_enet, _ = enet_path(
-                stim_train,
-                resp_train_shared,
-                l1_ratio=0.9,
-                alphas=np.logspace(*alpha_range),
-                verbose=3,
-                max_iter=5000,  # defaults to 1000
-                random_state=args.seed,
-            )
-            joblib.dump((alphas_enet, coefs_enet), cache_file)
-            logging.info(
-                f"Succesfully completed feature selection {(time.time() - t0)/60:0.1f} minutes")
-            exit(0)
-
-        # pick the coefs
-        coef_enet = coefs_enet[:, :, args.feature_selection_alpha_index]
-        coef_nonzero = np.any(np.abs(coef_enet) > 0, axis=0)
-        r['alpha'] = alphas_enet[args.feature_selection_alpha_index]
-        r['weights_enet'] = coef_enet
-        r['weight_enet_mask'] = coef_nonzero
-        r['weight_enet_mask_num_nonzero'] = coef_nonzero.sum()
-
-        # mask stim_delayed based on nonzero coefs (need to repeat by args.ndelays)
-        coef_nonzero_rep = np.tile(
-            coef_nonzero.flatten(), args.ndelays).flatten()
-        stim_train_delayed = stim_train_delayed[:, coef_nonzero_rep]
-        stim_test_delayed = stim_test_delayed[:, coef_nonzero_rep]
+    # overwrite resp_train with distill model predictions
+    if args.distill_model_path is not None:
+        resp_train = response_utils.get_resp_distilled(
+            args, story_names_train)
 
     # fit model
     print('fitting regression...')

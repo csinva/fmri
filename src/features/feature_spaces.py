@@ -7,20 +7,20 @@ import numpy as np
 import json
 from os.path import join, dirname
 from functools import partial
-import huth.features.qa_questions as qa_questions
-from huth.data.data_sequence import DataSequence
+import src.features.qa_questions as qa_questions
+from src.data.data_sequence import DataSequence
 from typing import Dict, List
 from tqdm import tqdm
-from huth.data.interp_data import lanczosinterp2D, expinterp2D
-from huth.data.semantic_model import SemanticModel
-from huth.data.utils_ds import apply_model_to_words
+from src.data.interp_data import lanczosinterp2D, expinterp2D
+from src.data.semantic_model import SemanticModel
+from src.data.utils_ds import apply_model_to_words
 
 from transformers import pipeline
 import logging
 import imodelsx.llm
-from huth.features.qa_embedder import QuestionEmbedder, FinetunedQAEmbedder
-import huth.config as config
-from huth.features.stim_utils import load_story_wordseqs
+from src.features.qa_embedder import QuestionEmbedder, FinetunedQAEmbedder
+import src.config as config
+from src.features.stim_utils import load_story_wordseqs, load_story_wordseqs_huge
 
 
 def downsample_word_vectors(stories, word_vectors, wordseqs, strategy='lanczos'):
@@ -212,7 +212,7 @@ def get_ngrams_list_main(ds, num_trs_context, num_secs_context_per_word, num_ngr
 
 
 def get_llm_vectors(
-        allstories,
+        story_names,
         checkpoint='bert-base-uncased',
         num_ngrams_context=10,
         num_trs_context=None,
@@ -222,6 +222,7 @@ def get_llm_vectors(
         qa_questions_version='v1',
         downsample='lanczos',
         use_cache=True,
+        use_huge=False,
 ) -> Dict[str, np.ndarray]:
     """Get llm embedding vectors
     """
@@ -245,7 +246,10 @@ def get_llm_vectors(
     assert not (
         num_trs_context and num_secs_context_per_word), 'num_trs_context and num_secs_context_per_word are mutually exclusive'
     logging.info(f'getting wordseqs..')
-    wordseqs = load_story_wordseqs(allstories)
+    if use_huge:
+        wordseqs = load_story_wordseqs_huge(story_names)
+    else:
+        wordseqs = load_story_wordseqs(story_names)
     vectors = {}
     ngrams_list_dict = {}
     embedding_model = None  # only initialize if needed
@@ -257,7 +261,7 @@ def get_llm_vectors(
     else:
         logging.info(f'extracting {checkpoint} {qa_questions_version} embs...')
 
-    for story_num, story in enumerate(allstories):
+    for story_num, story in enumerate(story_names):
         args_cache = {'story': story, 'model': checkpoint, 'ngram_size': num_ngrams_context,
                       'qa_embedding_model': qa_embedding_model, 'qa_questions_version': qa_questions_version,
                       'num_trs_context': num_trs_context, 'num_secs_context_per_word': num_secs_context_per_word}
@@ -269,7 +273,7 @@ def get_llm_vectors(
         loaded_from_cache = False
         if os.path.exists(cache_file) and use_cache:
             logging.info(
-                f'Loading cached {story_num}/{len(allstories)}: {story}')
+                f'Loading cached {story_num}/{len(story_names)}: {story}')
             try:
                 vectors[story] = joblib.load(cache_file)
                 loaded_from_cache = True
@@ -290,7 +294,7 @@ def get_llm_vectors(
                 embedding_model = _get_embedding_model(
                     checkpoint, qa_questions_version, qa_embedding_model)
             if 'qa_embedder' in checkpoint:
-                print(f'Extracting {story_num}/{len(allstories)}: {story}')
+                print(f'Extracting {story_num}/{len(story_names)}: {story}')
                 embs = embedding_model(ngrams_list, verbose=False)
             elif checkpoint.startswith('finetune_'):
                 embs = embedding_model.get_embs_from_text_list(ngrams_list)
@@ -323,10 +327,10 @@ def get_llm_vectors(
     if num_trs_context is not None:
         return vectors
     elif not downsample:
-        return allstories, vectors, wordseqs, ngrams_list_dict
+        return story_names, vectors, wordseqs, ngrams_list_dict
     else:
         return downsample_word_vectors(
-            allstories, vectors, wordseqs, strategy=downsample)
+            story_names, vectors, wordseqs, strategy=downsample)
 
 
 ############################################

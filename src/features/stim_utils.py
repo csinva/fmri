@@ -1,12 +1,13 @@
 import numpy as np
-import huth.config as config
-from huth.data.textgrid import TextGrid
-from huth.data.data_sequence import DataSequence
-from huth.data.utils_ds import make_word_ds
+import src.config as config
+from src.data.textgrid import TextGrid
+from src.data.data_sequence import DataSequence
+from src.data.utils_ds import make_word_ds
 import json
 from typing import Dict, List
 import os
 from os.path import join, dirname
+import joblib
 
 
 def load_story_wordseqs(stories) -> Dict[str, DataSequence]:
@@ -22,6 +23,16 @@ def load_story_wordseqs(stories) -> Dict[str, DataSequence]:
         respdict = json.load(f)
     trfiles = load_simulated_trfiles(respdict)
     wordseqs = make_word_ds(grids, trfiles)
+    return wordseqs
+
+
+def load_story_wordseqs_huge(stories) -> Dict[str, DataSequence]:
+    trfiles = joblib.load(join(config.root_dir, 'data',
+                               'huge_data', 'trfiles_huge.jbl'))
+    grids = joblib.load(join(config.root_dir, 'data',
+                             'huge_data', 'grids_huge.jbl'))
+    wordseqs = make_word_ds(grids, trfiles)
+    wordseqs = {k: v for k, v in wordseqs.items() if k in stories}
     return wordseqs
 
 
