@@ -8,6 +8,13 @@ def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=Fals
         'adollshouse', 'gpsformylostidentity', 'singlewomanseekingmanwich', 'adventuresinsayingyes', 'hangtime', 'sloth', 'afatherscover', 'haveyoumethimyet', 'souls', 'againstthewind', 'howtodraw', 'stagefright', 'alternateithicatom', 'ifthishaircouldtalk', 'stumblinginthedark', 'avatar', 'inamoment', 'superheroesjustforeachother', 'backsideofthestorm', 'itsabox', 'sweetaspie', 'becomingindian', 'jugglingandjesus', 'swimmingwithastronauts', 'beneaththemushroomcloud', 'kiksuya', 'thatthingonmyarm', 'birthofanation', 'leavingbaghdad', 'theadvancedbeginner', 'bluehope', 'legacy', 'theclosetthatateeverything', 'breakingupintheageofgoogle', 'lifeanddeathontheoregontrail', 'thecurse', 'buck', 'life', 'thefreedomridersandme', 'catfishingstrangerstofindmyself', 'lifereimagined', 'theinterview',
         'cautioneating', 'listo', 'thepostmanalwayscalls', 'christmas1940', 'mayorofthefreaks', 'theshower', 'cocoonoflove', 'metsmagic', 'thetiniestbouquet', 'comingofageondeathrow', 'mybackseatviewofagreatromance', 'thetriangleshirtwaistconnection', 'exorcism', 'myfathershands', 'threemonths', 'eyespy', 'myfirstdaywiththeyankees', 'thumbsup', 'firetestforlove', 'naked', 'tildeath', 'food', 'notontheusualtour', 'treasureisland', 'forgettingfear', 'odetostepfather', 'undertheinfluence', 'onlyonewaytofindout', 'vixenandtheussr', 'gangstersandcookies', 'penpal', 'waitingtogo', 'goingthelibertyway', 'quietfire', 'whenmothersbullyback', 'goldiethegoldfish', 'reachingoutbetweenthebars', 'golfclubbing', 'shoppinginchina', 'wildwomenanddancingqueens'
     ]
+    TRAIN_04_PUBLIC = ['adollshouse', 'adventuresinsayingyes', 'alternateithicatom', 'avatar', 'buck', 'exorcism', 'eyespy', 'hangtime', 'haveyoumethimyet', 'howtodraw', 'inamoment', 'itsabox', 'legacy',
+                       'myfirstdaywiththeyankees', 'naked', 'odetostepfather', 'sloth', 'souls', 'stagefright', 'swimmingwithastronauts', 'thatthingonmyarm', 'theclosetthatateeverything', 'tildeath', 'undertheinfluence']
+    TRAIN_05_PUBLIC = ['adollshouse', 'adventuresinsayingyes', 'alternateithicatom', 'avatar', 'buck', 'exorcism', 'eyespy', 'hangtime', 'haveyoumethimyet', 'howtodraw', 'inamoment', 'itsabox', 'legacy',
+                       'life', 'myfirstdaywiththeyankees', 'naked', 'odetostepfather', 'sloth', 'souls', 'stagefright', 'swimmingwithastronauts', 'thatthingonmyarm', 'theclosetthatateeverything', 'tildeath', 'undertheinfluence']
+    TRAIN_06_PUBLIC = TRAIN_05_PUBLIC
+    TRAIN_07_PUBLIC = TRAIN_05_PUBLIC
+    TRAIN_08_PUBLIC = TRAIN_05_PUBLIC
     TEST_PUBLIC = [
         "wheretheressmoke", "fromboyhoodtofatherhood"
     ]
@@ -26,13 +33,16 @@ def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=Fals
             "UTS01": TRAIN_01_PUBLIC,
             "UTS02": TRAIN_02_PUBLIC,
             "UTS03": TRAIN_03_PUBLIC,
+            'UTS04': TRAIN_04_PUBLIC,
+            'UTS05': TRAIN_05_PUBLIC,
+            'UTS06': TRAIN_06_PUBLIC,
+            'UTS07': TRAIN_07_PUBLIC,
+            'UTS08': TRAIN_08_PUBLIC,
             'shared': list(set(TRAIN_01_PUBLIC).intersection(TRAIN_02_PUBLIC, TRAIN_03_PUBLIC))
         },
         'test': {
-            "UTS01": TEST_PUBLIC,
-            "UTS02": TEST_PUBLIC,
-            "UTS03": TEST_PUBLIC,
-            'shared': TEST_PUBLIC
+            k: TEST_PUBLIC
+            for k in ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08', 'shared']
         }
     }
     DICT_HUGE = {
@@ -50,7 +60,7 @@ def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=Fals
         }
     }
 
-    if use_huge:
+    if use_huge and subject in DICT_HUGE['train'].keys():
         story_names = DICT_HUGE[train_or_test][subject]
     else:
         story_names = DICT_PUBLIC[train_or_test][subject]

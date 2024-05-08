@@ -18,6 +18,7 @@ from src.encoding.ridge import bootstrap_ridge, gen_temporal_chunk_splits
 import imodelsx.cache_save_utils
 import src.data.story_names as story_names
 import random
+import warnings
 import time
 from src.encoding.eval import nancorr, evaluate_pc_model_on_each_voxel, add_summary_stats
 
@@ -32,7 +33,7 @@ def add_main_args(parser):
     """
     # data arguments
     parser.add_argument("--subject", type=str, default='UTS03',
-                        choices=['UTS01', 'UTS02', 'UTS03'],
+                        choices=[f'UTS0{k}' for k in range(1, 9)],
                         help='top3 concatenates responses for S01-S03, useful for feature selection')
     parser.add_argument('--pc_components', type=int, default=-1,
                         help='''number of principal components to use for reducing output (-1 doesnt use PCA at all).
@@ -155,7 +156,7 @@ def get_story_names(args):
     if args.use_test_setup:
         args.nboots = 2
         args.use_extract_only = 0
-        # args.use_huge = 0
+        args.use_huge = 0
         story_names_train = ['sloth', 'adollshouse']
         story_names_test = ['fromboyhoodtofatherhood']
         # story_names_test = ['onapproachtopluto']
@@ -311,6 +312,18 @@ def fit_regression(args, r, features_train_delayed, resp_train, features_test_de
     return r, model_params_to_save
 
 
+def _check_args(args):
+    if args.feature_space == 'qa_embedder' or args.feature_space.startswith('finetune_'):
+        assert args.embedding_layer == - \
+            1, f'embedding_layer only used for HF models but {args.feature_space} passed'
+
+    if args.subject not in ['UTS01', 'UTS02', 'UTS03'] and args.use_huge:
+        args.use_huge = 0
+        warnings.warn(
+            f'Not using huge list of stories for subject {args.subject}')
+    return args
+
+
 if __name__ == "__main__":
     # get args
     parser = argparse.ArgumentParser()
@@ -318,10 +331,7 @@ if __name__ == "__main__":
     parser = add_computational_args(
         deepcopy(parser_without_computational_args))
     args = parser.parse_args()
-
-    if args.feature_space == 'qa_embedder' or args.feature_space.startswith('finetune_'):
-        assert args.embedding_layer == - \
-            1, f'embedding_layer only used for HF models but {args.feature_space} passed'
+    args = _check_args(args)
 
     # set up logging
     logger = logging.getLogger()

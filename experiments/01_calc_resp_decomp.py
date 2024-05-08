@@ -1,46 +1,43 @@
-from sklearn.decomposition import PCA, NMF, FastICA, DictionaryLearning
+from sklearn.decomposition import PCA, NMF, FastICA, DictionaryLearning, IncrementalPCA
 import numpy as np
 import pickle as pkl
-import src.features.feature_spaces as feature_spaces
 from src.data import response_utils
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-import sys
+import traceback
 from os.path import join
 import os
 import src.data.story_names as story_names
 import joblib
+import src.config
+from tqdm import tqdm
 path_to_file = os.path.dirname(os.path.abspath(__file__))
 
 
-# def cache_resps(cache_fmri_resps_dir='/home/chansingh/cache_fmri_resps'):
-#     for subject in ['UTS03', 'UTS02', 'UTS01']:
-#         print('caching', subject)
-#         train_stories = story_names.get_story_names(subject, 'train')
-#         zRresp = encoding_utils.get_response(
-#             train_stories, subject)  # shape (27449, 95556)
-#         joblib.dump(zRresp, join(cache_fmri_resps_dir, f'{subject}.pkl'))
-
-
-def calc_decomp(out_dir, subject, subsample_input=None):
+def calc_decomp(out_dir, subject, subsample_input=None, run_mini_test=False):
     print('loading responses...')
-    train_stories = story_names.get_story_names(subject, 'train')
-    zRresp = response_utils.get_response(
-        train_stories, subject)  # shape (27449, 95556)
-    print('num nans', np.sum(np.isnan(zRresp)))
+    train_stories = story_names.get_story_names(
+        subject, 'train', use_huge=True)
+    if run_mini_test:
+        resp_train = response_utils.load_response(
+            ['sloth', 'life', 'adollshouse', 'wheretheressmoke', 'fromboyhoodtofatherhood'], subject)
+    else:
+        if subject in ['UTS01', 'UTS02', 'UTS03']:
+            resp_train = response_utils.load_response_huge(
+                train_stories, subject)  # shape (27449, 95556)
+        else:
+            resp_train = response_utils.load_response(
+                train_stories, subject)  # shape (27449, 95556)
+    print('num nans', np.sum(np.isnan(resp_train)))
     # fill nan with mean
-    zRresp[np.isnan(zRresp)] = np.nanmean(zRresp)
-    # zRresp = joblib.load(
-    # join('/home/chansingh/cache_fmri_resps', f'{subject}.pkl'))
+    resp_train[np.isnan(resp_train)] = np.nanmean(resp_train)
 
-    print('loaded shape', zRresp.shape)
+    print('loaded shape', resp_train.shape)
     if subsample_input:
-        zRresp = zRresp[::subsample_input]
-        print('shape after subsampling', zRresp.shape)
+        resp_train = resp_train[::subsample_input]
+        print('shape after subsampling', resp_train.shape)
 
     print('calculating mean/std...')
-    means = np.mean(zRresp, axis=0)
-    stds = np.std(zRresp, axis=0)
+    means = np.mean(resp_train, axis=0)
+    stds = np.std(resp_train, axis=0)
 
     os.makedirs(out_dir, exist_ok=True)
     out_file = join(out_dir, 'resps_means_stds.pkl')
@@ -49,20 +46,21 @@ def calc_decomp(out_dir, subject, subsample_input=None):
     print('fitting PCA...')
     out_file = join(out_dir, 'resps_pca.pkl')
     # if not os.path.exists(out_file):
-    pca = PCA().fit(zRresp)
+    # pca = PCA().fit(resp_train)
+    pca = IncrementalPCA(n_components=1000).fit(resp_train)
     joblib.dump(pca, out_file)
 
     # print('fitting ICA...')
     # out_file = join(out_dir, 'resps_ica.pkl')
     # if not os.path.exists(out_file):
-    #     ica = FastICA().fit(zRresp)
+    #     ica = FastICA().fit(resp_train)
     #     pkl.dump({'ica': ica}, open(out_file, 'wb'))
 
     # print('fitting NMF...')
     # try:
     #     out_file = join(out_dir, 'resps_nmf.pkl')
     #     if not os.path.exists(out_file):
-    #         nmf = NMF(n_components=1000).fit(zRresp - zRresp.min())
+    #         nmf = NMF(n_components=1000).fit(resp_train - resp_train.min())
     #         pkl.dump({'nmf': nmf}, open(out_file, 'wb'))
     # except:
     #     print('failed nmf!')
@@ -72,26 +70,10 @@ def calc_decomp(out_dir, subject, subsample_input=None):
     #     out_file = join(out_dir, 'resps_sc.pkl')
     #     if not os.path.exists(out_file):
     #         sc = DictionaryLearning(n_components=1000).fit(
-    #             zRresp - zRresp.min())
+    #             resp_train - resp_train.min())
     #         pkl.dump({'sc': sc}, open(out_file, 'wb'))
     # except:
     #     print('failed sc!')
-
-
-def viz_decomp(out_dir):
-    # decomp_dir = join(path_to_file, 'decomps')
-    # os.makedirs(decomp_dir, exist_ok=True)
-    sys.path.append(join(path_to_file, '..'))
-    # viz_cortex = __import__('03_viz_cortex')
-    for k in ['pca', 'nmf', 'ica']:  # , 'sc']:
-        print('visualizing', k)
-        decomp = pkl.load(open(join(out_dir, f'resps_{k}.pkl'), 'rb'))
-        for i in tqdm(range(10)):
-            # (n_components, n_features)
-            viz_cortex.quickshow(decomp[k].components_[i])
-            plt.savefig(join(out_dir, f'{k}_component_{i}.pdf'))
-            plt.savefig(join(out_dir, f'{k}_component_{i}.png'))
-            plt.close()
 
 
 def save_mini_pca(out_dir, pc_components=100):
@@ -100,13 +82,39 @@ def save_mini_pca(out_dir, pc_components=100):
         : pc_components]
     joblib.dump(pca, join(out_dir, f'resps_pca_{pc_components}.pkl'))
 
+# def viz_decomp(out_dir):
+#     # decomp_dir = join(path_to_file, 'decomps')
+#     # os.makedirs(decomp_dir, exist_ok=True)
+#     sys.path.append(join(path_to_file, '..'))
+#     # viz_cortex = __import__('03_viz_cortex')
+#     for k in ['pca', 'nmf', 'ica']:  # , 'sc']:
+#         print('visualizing', k)
+#         decomp = pkl.load(open(join(out_dir, f'resps_{k}.pkl'), 'rb'))
+#         for i in tqdm(range(10)):
+#             # (n_components, n_features)
+#             viz_cortex.quickshow(decomp[k].components_[i])
+#             plt.savefig(join(out_dir, f'{k}_component_{i}.pdf'))
+#             plt.savefig(join(out_dir, f'{k}_component_{i}.png'))
+#             plt.close()
+
 
 if __name__ == '__main__':
     # cache_resps()
-    for subject in ['UTS01', 'UTS02', 'UTS03']:  # 'UTS03',
+    run_mini_test = False
+    subjects = [f'UTS0{k}' for k in range(1, 9)]
+    if run_mini_test:
+        subjects = ['UTS01']
+    for subject in tqdm(subjects):
         print(subject)
-        out_dir = join(feature_spaces.resp_processing_dir, subject)
+        out_dir = join(src.config.resp_processing_dir, subject)
         os.makedirs(out_dir, exist_ok=True)
-        # calc_decomp(out_dir, subject, subsample_input=2)
+        try:
+            calc_decomp(out_dir, subject, subsample_input=None,
+                        run_mini_test=run_mini_test)
+
+            save_mini_pca(out_dir, pc_components=100)
+        except:
+            print('failed', subject)
+            # full traceback
+            traceback.print_exc()
         # viz_decomp(out_dir)
-        save_mini_pca(out_dir, pc_components=100)

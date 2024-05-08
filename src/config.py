@@ -8,7 +8,7 @@ else:
 
 root_dir = join(mnt_dir, 'deep-fMRI')
 cache_embs_dir = join(root_dir, 'qa', 'cache_embs')
-resp_processing_dir = join(root_dir, 'qa', 'resp_processing')
+resp_processing_dir = join(root_dir, 'qa', 'resp_processing_full')
 
 # eng1000 data, download from [here](https://github.com/HuthLab/deep-fMRI-dataset)
 em_data_dir = join(root_dir, 'data', 'eng1000')
