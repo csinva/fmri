@@ -16,6 +16,7 @@ skorch
 nltk
 fire
 dict_hash
+ridge_utils # utilities for huthlab
 # imodelsx should be installed from source
 # improved parallelization
 # vllm

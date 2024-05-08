@@ -48,7 +48,8 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False)
             feature_space=args.feature_space,
             story_names=story_names,
             qa_embedding_model=qa_embedding_model,
-            use_huge=args.use_huge,
+            # use_huge=args.use_huge,
+            use_huge=True,  # always use_huge, since it's just faster
             # use_cache=False,
             **kwargs)
         # n_time_points x n_features

@@ -186,7 +186,7 @@ def get_llm_vectors(
     qa_questions_version='v1',
     downsample='lanczos',
     use_cache=True,
-    use_huge=False,
+    **kwargs
 ) -> Dict[str, np.ndarray]:
     """Get llm embedding vectors
     """
@@ -197,7 +197,7 @@ def get_llm_vectors(
             questions = qa_questions.get_questions(
                 version=qa_questions_version)
             return QuestionEmbedder(
-                checkpoint=qa_embedding_model, questions=questions)
+                checkpoint=qa_embedding_model, questions=questions, use_cache=False)  # dont cache calls locally
         elif checkpoint.startswith('finetune_'):
             return FinetunedQAEmbedder(
                 checkpoint.replace('finetune_', '').replace('_binary', ''), qa_questions_version=qa_questions_version)
@@ -311,10 +311,9 @@ def _get_kwargs_extra(args):
 
 def get_features(args, feature_space, **kwargs):
     kwargs_extra = _get_kwargs_extra(args)
-    # print('kwargs', kwargs)
-
     logging.info(f'getting wordseqs..')
     if kwargs['use_huge']:
+        # this is usually faster...
         wordseqs = load_story_wordseqs_huge(kwargs['story_names'])
     else:
         wordseqs = load_story_wordseqs(kwargs['story_names'])

@@ -33,7 +33,7 @@ params_shared_dict = {
     # 'ndelays': [8],
 
     # cluster
-    'seed_stories': range(4),
+    # 'seed_stories': range(4),
     # 'pc_components': [100],
     # 'ndelays': [4],
 
@@ -46,13 +46,14 @@ params_shared_dict = {
 params_coupled_dict = {
     ('feature_space', 'qa_questions_version', 'qa_embedding_model', 'embedding_layer'):
 
-    # [
-    #     # # baselines
-    #     # ('bert-base-uncased', 'v1', MIST7B, -1),
-    #     ('eng1000', 'v1', MIST7B, -1),
-    #     # ('finetune_roberta-base-10', 'v1', MIST7B, -1),
-    #     # ('finetune_roberta-base_binary-10', 'v1', MIST7B, -1),
-    # ] + \
+    [
+        #     # # baselines
+        ('bert-base-uncased', 'v1', MIST7B, -1),
+        # ('eng1000', 'v1', MIST7B, -1),
+        #     # ('finetune_roberta-base-10', 'v1', MIST7B, -1),
+        #     # ('finetune_roberta-base_binary-10', 'v1', MIST7B, -1),
+    ]
+    +
 
     # llama versions
     [
@@ -60,20 +61,23 @@ params_coupled_dict = {
         for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
         for embedding_layer in [6, 12, 18, 24, 30]
         for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
-    ] + \
+    ]
+    # +
     # [
     #     (llama, version, MIST7B, embedding_layer)
-    #     for llama in ['llama2-70B_lay12-10']
+    #     for llama in ['meta-llama/Llama-2-70b-hf']
     #     for embedding_layer in [6, 12, 18, 24, 30]
-    #     for version in ['v1', 'v2', 'v3_boostexamples', 'v3']] + \
+    #     for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
+    # ]
+    # +
 
     # qa versions
-    [
-        ('qa_embedder', version, model, -1)
-        # ensemble1, v4, v5, v6, v4_boostexamples
-        for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
-        for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
-    ]
+    # [
+    #     ('qa_embedder', version, model, -1)
+    #     # ensemble1, v4, v5, v6, v4_boostexamples
+    #     for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
+    #     for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
+    # ]
 
 }
 # Args list is a list of dictionaries
@@ -88,8 +92,8 @@ amlt_kwargs = {
     'amlt_file': join(repo_dir, 'scripts', 'launch.yaml'),
     # [64G16-MI200-IB-xGMI, 64G16-MI200-xGMI
     # 'sku': '64G8-MI200-xGMI',
-    # 'sku': '64G4-MI200-xGMI',
-    'sku': '64G2-MI200-xGMI',
+    'sku': '64G4-MI200-xGMI',
+    # 'sku': '64G2-MI200-xGMI',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 amlt_kwargs_cpu = {
@@ -103,7 +107,7 @@ submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    amlt_kwargs=amlt_kwargs,
+    # amlt_kwargs=amlt_kwargs,
     # amlt_kwargs=amlt_kwargs_cpu,
     # n_cpus=9,
     # n_cpus=3,

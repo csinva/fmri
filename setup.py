@@ -10,7 +10,7 @@ required_pypi = [
     'numpy',
     'scikit-learn',
     'pandas',
-    # 'ridge_utils',  # for data loading
+    'ridge_utils',  # for data loading
     'tqdm',
     'dict_hash',  # required for caching
     'transformers',

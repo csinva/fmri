@@ -31,7 +31,7 @@ def add_main_args(parser):
     Changing the default arg an argument will break cache compatibility with previous runs.
     """
     # data arguments
-    parser.add_argument("--subject", type=str, default='UTS02',
+    parser.add_argument("--subject", type=str, default='UTS03',
                         choices=['UTS01', 'UTS02', 'UTS03'],
                         help='top3 concatenates responses for S01-S03, useful for feature selection')
     parser.add_argument('--pc_components', type=int, default=-1,
@@ -50,7 +50,7 @@ def add_main_args(parser):
 
     # encoding
     parser.add_argument("--feature_space", type=str,
-                        default='eng1000',
+                        default='qa_embedder',
                         choices=['qa_embedder', 'eng1000', 'finetune_roberta-base', 'finetune_roberta-base_binary',
                                  'bert-base-uncased', 'distilbert-base-uncased',  'roberta-base',
                                  'meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-8B',],
@@ -94,7 +94,7 @@ def add_main_args(parser):
                         # default='randomforest'
                         )
     parser.add_argument("--ndelays", type=int, default=4)
-    parser.add_argument("--nboots", type=int, default=50)
+    parser.add_argument("--nboots", type=int, default=5)
     parser.add_argument("--chunklen", type=int, default=40,
                         help='try to get nchunks * chunklen to ~20% of training data')
     parser.add_argument("--nchunks", type=int, default=125)

@@ -54,7 +54,7 @@ def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=Fals
         story_names = DICT_HUGE[train_or_test][subject]
     else:
         story_names = DICT_PUBLIC[train_or_test][subject]
-    story_names = [s for s in story_names if not 'canplanetearth' in s]
+    # story_names = [s for s in story_names if not 'canplanetearth' in s]
     return story_names
 
 

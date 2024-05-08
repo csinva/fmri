@@ -27,11 +27,13 @@ def load_story_wordseqs(stories) -> Dict[str, DataSequence]:
 
 
 def load_story_wordseqs_huge(stories) -> Dict[str, DataSequence]:
-    trfiles = joblib.load(join(config.root_dir, 'data',
-                               'huge_data', 'trfiles_huge.jbl'))
-    grids = joblib.load(join(config.root_dir, 'data',
-                             'huge_data', 'grids_huge.jbl'))
-    wordseqs = make_word_ds(grids, trfiles)
+    wordseqs = joblib.load(join(config.root_dir, 'data',
+                                'huge_data', 'wordseqs.joblib'))
+    # trfiles = joblib.load(join(config.root_dir, 'data',
+    #                            'huge_data', 'trfiles_huge.jbl'))
+    # grids = joblib.load(join(config.root_dir, 'data',
+    #                          'huge_data', 'grids_huge.jbl'))
+    # wordseqs = make_word_ds(grids, trfiles)
     wordseqs = {k: v for k, v in wordseqs.items() if k in stories}
     return wordseqs
 
