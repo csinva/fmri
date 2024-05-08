@@ -31,12 +31,18 @@ def add_main_args(parser):
     Changing the default arg an argument will break cache compatibility with previous runs.
     """
     # data arguments
-    parser.add_argument("--subject", type=str, default='UTS03',
+    parser.add_argument("--subject", type=str, default='UTS02',
                         choices=['UTS01', 'UTS02', 'UTS03'],
                         help='top3 concatenates responses for S01-S03, useful for feature selection')
     parser.add_argument('--pc_components', type=int, default=-1,
                         help='''number of principal components to use for reducing output (-1 doesnt use PCA at all).
                         Note, use_test_setup alters this to 100.''')
+    parser.add_argument('--use_huge', type=int, default=1,
+                        help='''Whether to use huge list of stories
+                        (if use_test_setup or not UTS01-03, this will automatically be set to 0)''')
+    parser.add_argument('--num_stories', type=int, default=-1,
+                        help='''number of stories to use (-1 for all).
+                        Stories are selected from huge list unless use_test_setup''')
     parser.add_argument("--distill_model_path", type=str,
                         default=None,
                         # default='/home/chansingh/mntv1/deep-fMRI/encoding/results_apr7/68936a10a548e2b4ce895d14047ac49e7a56c3217e50365134f78f990036c5f7',
@@ -44,23 +50,24 @@ def add_main_args(parser):
 
     # encoding
     parser.add_argument("--feature_space", type=str,
-                        default='qa_embedder-10',
-                        # choices=['qa_embedder-10', 'finetune_roberta-base-10'],
-                        help='''Overloaded this argument.
-                        qa_embedder-10 will run with ngram_context of 10 ngrams
-                        qa_embedder-tr2 will run with tr_context of 2 TRs
-                        qa_embedder-sec4 will run with ngram_context of 4 secs leading up to each word
-                        distil-bert-10 will extract embeddings from distil-bert
-                        finetune_roberta-base-10 will run finetuned roberta model with 10 ngram_context
-                        '''
-                        )
-    parser.add_argument('--num_stories', type=int, default=-1,
-                        help='''number of stories to use (-1 for all).
-                        Stories are selected from huge list unless use_test_setup
+                        default='eng1000',
+                        choices=['qa_embedder', 'eng1000', 'finetune_roberta-base', 'finetune_roberta-base_binary',
+                                 'bert-base-uncased', 'distilbert-base-uncased',  'roberta-base',
+                                 'meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-8B',],
+                        help='''Passing a standard HF model name will compute embeddings from that model.
+                        Models starting with "finetune_" load custom models
+                        qa_embedder computes qa embeddings with the checkpoint in args.qa_embedding_model
                         ''')
-    parser.add_argument('--use_huge', type=int, default=1,
-                        help='''Whether to use huge list of stories
-                        (if use_test_setup or not UTS01-03, this will automatically be set to 0)''')
+    parser.add_argument('--embedding_layer', type=int, default=-1,
+                        help='''If args.feature_space is a HF model, which layer to use for embeddings (-1 for default layer)''')
+    parser.add_argument('--input_chunking_type', type=str, default='ngram',
+                        choices=['ngram', 'tr', 'sec'],
+                        help='''Type of chunking to use for input features.
+                        ngram chunks are number of words
+                        tr chunks by TRs (and does not compute features per-word, so is faster but less accurate)
+                        sec chunks by seconds leading up to each word''')
+    parser.add_argument('--input_chunking_size', type=int, default=10,
+                        help='Number of input chunks (corresponding to input_chunking_type)')
     parser.add_argument('--use_shared_feature_selection', type=int, default=1,
                         help='''Whether to use shared feature selection across 3 subjects (otherwise just use one subject)
                         If true, running this will save the feature selection object,
@@ -68,17 +75,17 @@ def add_main_args(parser):
                         ''')
     parser.add_argument("--feature_selection_alpha_index", type=int,
                         default=-1,
-                        help='in range(0, 100) - larger is more regularization')
+                        help='Runs feature selection if >= 0. Index of alpha to use for feature selection.')
 
     # qa features
     parser.add_argument("--qa_embedding_model", type=str,
                         default='mistralai/Mistral-7B-Instruct-v0.2',
-                        # default='ensemble1',
                         help='Model to use for QA embedding, if feature_space is qa_embedder',
                         )
     parser.add_argument("--qa_questions_version", type=str,
                         default='v1',
-                        # default='v3_boostexamples',
+                        choices=['v1', 'v2', 'v3', 'v3_boostexamples',
+                                 'v4_boostexamples', 'v4', 'v5'],
                         help='Which set of QA questions to use, if feature_space is qa_embedder')
 
     # linear modeling
@@ -86,7 +93,6 @@ def add_main_args(parser):
                         default='ridge',
                         # default='randomforest'
                         )
-
     parser.add_argument("--ndelays", type=int, default=4)
     parser.add_argument("--nboots", type=int, default=50)
     parser.add_argument("--chunklen", type=int, default=40,
@@ -152,24 +158,24 @@ def get_story_names(args):
         # args.use_huge = 0
         story_names_train = ['sloth', 'adollshouse']
         story_names_test = ['fromboyhoodtofatherhood']
+        # story_names_test = ['onapproachtopluto']
         args.pc_components = 100
 
     # special case where we load shared stories
-    elif args.use_shared_feature_selection:
+    elif args.use_shared_feature_selection and args.feature_selection_alpha_index >= 0:
         story_names_train = story_names.get_story_names(
             'shared', 'train', use_huge=args.use_huge)
         story_names_test = story_names.get_story_names(
             'shared', 'test', use_huge=args.use_huge)
-    elif args.num_stories > 0:
-        story_names_train = story_names.get_story_names(
-            args.subject, 'train', use_huge=args.use_huge)[:args.num_stories]
-        story_names_test = story_names.get_story_names(
-            args.subject, 'test', use_huge=args.use_huge)[:args.num_stories]
-    else:
-        story_names_train = story_names.get_story_names(
-            args.subject, 'train', use_huge=args.use_huge)
-        story_names_test = story_names.get_story_names(
-            args.subject, 'test', use_huge=args.use_huge)
+
+    story_names_train = story_names.get_story_names(
+        args.subject, 'train', use_huge=args.use_huge)
+    story_names_test = story_names.get_story_names(
+        args.subject, 'test', use_huge=args.use_huge)
+
+    if args.num_stories > 0:
+        story_names_train = story_names_train[:args.num_stories]
+        story_names_test = story_names_test[:args.num_stories]
 
     rng = np.random.default_rng(args.seed_stories)
     rng.shuffle(story_names_train)
@@ -312,6 +318,10 @@ if __name__ == "__main__":
     parser = add_computational_args(
         deepcopy(parser_without_computational_args))
     args = parser.parse_args()
+
+    if args.feature_space == 'qa_embedder' or args.feature_space.startswith('finetune_'):
+        assert args.embedding_layer == - \
+            1, f'embedding_layer only used for HF models but {args.feature_space} passed'
 
     # set up logging
     logger = logging.getLogger()

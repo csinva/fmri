@@ -24,7 +24,9 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False)
         features_delayed_list = []
         for qa_embedding_model in ['mistralai/Mistral-7B-Instruct-v0.2', 'meta-llama/Meta-Llama-3-8B-Instruct', 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot']:
             features_delayed = get_features_full(
-                args, qa_embedding_model, story_names)
+                args,
+                qa_embedding_model,
+                story_names)
             features_delayed_list.append(features_delayed)
         features_delayed_avg = np.mean(features_delayed_list, axis=0)
         # features_delayed_avg = features_delayed_avg / \
@@ -42,7 +44,8 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False)
     features_downsampled_list = []
     for kwargs in kwargs_list:
         features_downsampled_dict = feature_spaces.get_features(
-            args.feature_space,
+            args=args,
+            feature_space=args.feature_space,
             story_names=story_names,
             qa_embedding_model=qa_embedding_model,
             use_huge=args.use_huge,

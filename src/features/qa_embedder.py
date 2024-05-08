@@ -73,8 +73,7 @@ class FinetunedQAEmbedder:
                 outputs = self.model(**{k: v[i:i+batch_size]
                                         for k, v in inputs.items()})
                 answer_predictions.append(outputs.cpu().detach().numpy())
-            answer_predictions = answer_predictions[self.question_idxs[0]
-                :self.question_idxs[1]]
+            answer_predictions = answer_predictions[self.question_idxs[0]                                                    :self.question_idxs[1]]
             answer_predictions = np.vstack(answer_predictions)
             answer_predictions = scipy.special.softmax(
                 answer_predictions, axis=-1)
@@ -103,21 +102,20 @@ class QuestionEmbedder:
             else:
                 self.prompt = '<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a concise, helpful assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nInput text: {example}\nQuestion: {question}\nAnswer with yes or no, then give an explanation.<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n'
                 self.checkpoint = checkpoint
-
-            # set batch_size
-            if '8B' in checkpoint:
-                if 'fewshot' in checkpoint:
-                    self.batch_size = 16
-                else:
-                    self.batch_size = 64
-            elif '70B' in checkpoint:
-                if 'fewshot' in checkpoint:
-                    self.batch_size = 64
-                else:
-                    self.batch_size = 128  # requires 8 GPUs
-
         else:
             self.prompt = 'Input: {example}\nQuestion: {question} Answer yes or no.\nAnswer:'
+
+        # set batch_size
+        if '8B' or '7B' in checkpoint:
+            if 'fewshot' in checkpoint:
+                self.batch_size = 16
+            else:
+                self.batch_size = 64
+        elif '70B' in checkpoint:
+            if 'fewshot' in checkpoint:
+                self.batch_size = 64
+            else:
+                self.batch_size = 128  # requires 8 GPUs
 
         # self.llm = guidance.models.Transformers("meta-llama/Llama-2-13b-hf")
         # print('PROMPT', self.prompt)

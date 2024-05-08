@@ -34,6 +34,12 @@ def load_response(stories, subject):
     return np.array(resp)
 
 
+def load_response_huge(stories, subject):
+    resps = joblib.load(join(config.root_dir, 'data',
+                             'huge_data', f'{subject}_responses.jbl'))
+    return np.vstack([resps[story] for story in stories])
+
+
 def load_pca(subject, pc_components=None):
     if pc_components == 100:
         pca_filename = join(config.resp_processing_dir,
@@ -56,19 +62,20 @@ def get_resps_full(
         n_time_points x n_voxels
     '''
     if subject == 'shared':
-        resp_train, _, _, _, _ = get_resps_full(
-            args, 'UTS01', story_names_train, story_names_test)
-        resp_train2, _, _, _, _ = get_resps_full(
-            args, 'UTS02', story_names_train, story_names_test)
-        resp_train3, _, _, _, _ = get_resps_full(
-            args, 'UTS03', story_names_train, story_names_test)
-        resp_train = np.hstack([resp_train, resp_train2, resp_train3])
+        resp_train = np.hstack([
+            get_resps_full(args, s, story_names_train, story_names_test)[0]
+            for s in ['UTS01', 'UTS02', 'UTS03']])
         return resp_train
-
-    resp_test = load_response(
-        story_names_test, subject)
-    resp_train = load_response(
-        story_names_train, subject)
+    if args.use_huge:
+        resp_test = load_response_huge(
+            story_names_test, subject)
+        resp_train = load_response_huge(
+            story_names_train, subject)
+    else:
+        resp_test = load_response(
+            story_names_test, subject)
+        resp_train = load_response(
+            story_names_train, subject)
 
     if args.pc_components <= 0:
         return resp_train, resp_test

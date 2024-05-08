@@ -54,73 +54,46 @@ def downsample_word_vectors(stories, word_vectors, wordseqs, strategy='lanczos')
     return downsampled_semanticseqs
 
 
-def get_wordrate_vectors(allstories, downsample=True, **kwargs):
+def get_wordrate_vectors(wordseqs, story_names: List[str], downsample=True, **kwargs):
     """Get wordrate vectors for specified stories.
-    Params
-    ------
-    allstories: List of stories to obtain vectors for.
-
     Returns
     -------
     Dictionary of {story: downsampled vectors}
     """
-    wordseqs = load_story_wordseqs(allstories)
+    # wordseqs = load_story_wordseqs(story_names)
     vectors = {}
-    for story in allstories:
+    for story in story_names:
         nwords = len(wordseqs[story].data)
         vectors[story] = np.ones([nwords, 1])
     if downsample:
-        return downsample_word_vectors(allstories, vectors, wordseqs)
+        return downsample_word_vectors(story_names, vectors, wordseqs)
     else:
-        return allstories, vectors, wordseqs
+        return story_names, vectors, wordseqs
 
 
-def get_eng1000_vectors(allstories, downsample='lanczos', **kwargs):
+def get_eng1000_vectors(wordseqs, story_names: List[str], downsample='lanczos', **kwargs):
     """Get Eng1000 vectors (985-d) for specified stories.
-
-    Args:
-            allstories: List of stories to obtain vectors for.
-
-    Returns:
-            Dictionary of {story: downsampled vectors}
+    Returns
+    -------
+    Dictionary of {story: downsampled vectors}
     """
     eng1000 = SemanticModel.load(join(config.em_data_dir, "english1000sm.hf5"))
-    wordseqs = load_story_wordseqs(allstories)
+    # wordseqs = load_story_wordseqs(story_names)
     vectors = {}
-    for story in allstories:
+    for story in story_names:
         sm = apply_model_to_words(wordseqs[story], eng1000, 985)
         vectors[story] = sm.data
     if downsample:
-        return downsample_word_vectors(allstories, vectors, wordseqs, strategy=downsample)
+        return downsample_word_vectors(story_names, vectors, wordseqs, strategy=downsample)
     else:
-        return allstories, vectors, wordseqs
-
-
-# def get_glove_vectors(allstories, **kwargs):
-#     """Get glove vectors (300-d) for specified stories.
-
-#     Args:
-#             allstories: List of stories to obtain vectors for.
-
-#     Returns:
-#             Dictionary of {story: downsampled vectors}
-#     """
-#     glove = SemanticModel.load_np(join(nlp_utils_dir, 'glove'))
-#     wordseqs = get_story_wordseqs(allstories)
-#     vectors = {}
-#     for story in allstories:
-#         sm = apply_model_to_words(wordseqs[story], glove, 300)
-#         vectors[story] = sm.data
-#     return downsample_word_vectors(allstories, vectors, wordseqs)
+        return story_names, vectors, wordseqs
 
 
 def get_embs_from_text_list(text_list: List[str], embedding_function) -> List[np.ndarray]:
     """
-
     Params
     ------
-    embedding_function
-        ngram -> fixed size vector
+    embedding_function (ngram -> fixed size vector)
 
     Returns
     -------
@@ -133,14 +106,6 @@ def get_embs_from_text_list(text_list: List[str], embedding_function) -> List[np
     def get_emb(x):
         return {'emb': embedding_function(x['text'])}
     embs_list = text.map(get_emb)['emb']  # embedding_function(text)
-
-    # This allows for parallelization when passing batch_size, but sometimes throws "Killed" error
-    """
-    embs_list = []
-    for out in tqdm(embedding_function(KeyDataset(text, "text")),
-                    total=len(text)):  # , truncation="only_first"):
-        embs_list.append(out)
-    """
 
     # Convert to np array by averaging over len
     # Embeddings are already the same size
@@ -171,8 +136,6 @@ def get_ngrams_list_main(ds, num_trs_context, num_secs_context_per_word, num_ngr
     def _get_ngrams_list_from_chunks(chunks, num_trs=2):
         ngrams_list = []
         for i in range(len(chunks)):
-            # print(chunks[i - num_trs:i])
-            # sum(chunks[i - num_trs:i], [])
             chunk_block = chunks[i - num_trs:i]
             if len(chunk_block) == 0:
                 ngrams_list.append('')
@@ -212,24 +175,25 @@ def get_ngrams_list_main(ds, num_trs_context, num_secs_context_per_word, num_ngr
 
 
 def get_llm_vectors(
-        story_names,
-        checkpoint='bert-base-uncased',
-        num_ngrams_context=10,
-        num_trs_context=None,
-        num_secs_context_per_word=None,
-        layer_idx=None,
-        qa_embedding_model='mistralai/Mistral-7B-v0.1',
-        qa_questions_version='v1',
-        downsample='lanczos',
-        use_cache=True,
-        use_huge=False,
+    wordseqs,
+    story_names,
+    checkpoint='bert-base-uncased',
+    num_ngrams_context=10,
+    num_trs_context=None,
+    num_secs_context_per_word=None,
+    layer_idx=None,
+    qa_embedding_model='mistralai/Mistral-7B-v0.1',
+    qa_questions_version='v1',
+    downsample='lanczos',
+    use_cache=True,
+    use_huge=False,
 ) -> Dict[str, np.ndarray]:
     """Get llm embedding vectors
     """
 
     def _get_embedding_model(checkpoint, qa_questions_version, qa_embedding_model):
         print('loading embedding_model...')
-        if 'qa_embedder' in checkpoint:
+        if checkpoint == 'qa_embedder':
             questions = qa_questions.get_questions(
                 version=qa_questions_version)
             return QuestionEmbedder(
@@ -237,7 +201,7 @@ def get_llm_vectors(
         elif checkpoint.startswith('finetune_'):
             return FinetunedQAEmbedder(
                 checkpoint.replace('finetune_', '').replace('_binary', ''), qa_questions_version=qa_questions_version)
-        if not 'qa_embedder' in checkpoint:
+        if not checkpoint == 'qa_embedder':
             if 'bert' in checkpoint.lower():
                 return pipeline("feature-extraction", model=checkpoint, device=0)
             elif layer_idx is not None:
@@ -245,17 +209,12 @@ def get_llm_vectors(
 
     assert not (
         num_trs_context and num_secs_context_per_word), 'num_trs_context and num_secs_context_per_word are mutually exclusive'
-    logging.info(f'getting wordseqs..')
-    if use_huge:
-        wordseqs = load_story_wordseqs_huge(story_names)
-    else:
-        wordseqs = load_story_wordseqs(story_names)
     vectors = {}
     ngrams_list_dict = {}
     embedding_model = None  # only initialize if needed
     # print('checkpoint', checkpoint, 'qa_questions_version',
     #   qa_questions_version, 'qa_embedding_model', qa_embedding_model)
-    if 'qa_embedder' in checkpoint:
+    if checkpoint == 'qa_embedder':
         logging.info(
             f'extracting {checkpoint} {qa_questions_version} {qa_embedding_model} embs...')
     else:
@@ -286,6 +245,7 @@ def get_llm_vectors(
                 print('Error loading', cache_file)
 
         if not loaded_from_cache:
+            # print('didnt load with args', args_cache)
             ngrams_list = get_ngrams_list_main(
                 wordseqs[story], num_trs_context, num_secs_context_per_word, num_ngrams_context)
 
@@ -293,7 +253,7 @@ def get_llm_vectors(
             if embedding_model is None:
                 embedding_model = _get_embedding_model(
                     checkpoint, qa_questions_version, qa_embedding_model)
-            if 'qa_embedder' in checkpoint:
+            if checkpoint == 'qa_embedder':
                 print(f'Extracting {story_num}/{len(story_names)}: {story}')
                 embs = embedding_model(ngrams_list, verbose=False)
             elif checkpoint.startswith('finetune_'):
@@ -333,76 +293,35 @@ def get_llm_vectors(
             story_names, vectors, wordseqs, strategy=downsample)
 
 
-############################################
-########## Feature Space Creation ##########
-############################################
-_FEATURE_VECTOR_FUNCTIONS = {
-    "wordrate": get_wordrate_vectors,
-    "eng1000": get_eng1000_vectors,
-    # 'glove': get_glove_vectors,
-}
-_FEATURE_CHECKPOINTS = {
-    'qa_embedder': 'qa_embedder',
+def _get_kwargs_extra(args):
+    kwargs = {}
+    if args.input_chunking_type == 'ngram':
+        kwargs['num_ngrams_context'] = args.input_chunking_size
+    elif args.input_chunking_type == 'tr':
+        kwargs['num_trs_context'] = args.input_chunking_size
+    elif args.input_chunking_type == 'sec':
+        kwargs['num_secs_context_per_word'] = args.input_chunking_size
+    kwargs['checkpoint'] = args.feature_space
+
+    # also pass layer
+    if args.embedding_layer >= 0:
+        kwargs['layer_idx'] = args.embedding_layer
+    return kwargs
 
 
-    # embedding models (used when not qa_embedder)
-    'bert': 'bert-base-uncased',
-    'distil-bert': 'distilbert-base-uncased',
-    'roberta': 'roberta-large',
-    'bert-sst2': 'textattack/bert-base-uncased-SST-2',
-    'llama2-7B': 'meta-llama/Llama-2-7b-hf',
-    'llama2-13B': 'meta-llama/Llama-2-13b-hf',
-    'llama2-70B': 'meta-llama/Llama-2-70b-hf',
-    'llama3-8B': 'meta-llama/Meta-Llama-3-8B',
-    'finetune_roberta-base': 'finetune_roberta-base',
-    'finetune_roberta-base_binary': 'finetune_roberta-base_binary',
-}
-BASE_KEYS = list(_FEATURE_CHECKPOINTS.keys())
-for context_length in [2, 3, 4, 5, 10, 20, 25, 50, 75]:
-    for k in BASE_KEYS:
-        # context length by ngrams
-        _FEATURE_VECTOR_FUNCTIONS[f'{k}-{context_length}'] = partial(
-            get_llm_vectors,
-            num_ngrams_context=context_length,
-            checkpoint=_FEATURE_CHECKPOINTS[k])
-        _FEATURE_CHECKPOINTS[f'{k}-{context_length}'] = _FEATURE_CHECKPOINTS.get(
-            k, k)
+def get_features(args, feature_space, **kwargs):
+    kwargs_extra = _get_kwargs_extra(args)
+    # print('kwargs', kwargs)
 
-        # llama-2: 7B has 32 layers, 13B has 40 layers, best model is likely between 20%-50% of layers
-        # llama-3: 8B has 32 layers
-        for layer_idx in [0, 6, 12, 18, 24, 30, 36, 48, 60]:
+    logging.info(f'getting wordseqs..')
+    if kwargs['use_huge']:
+        wordseqs = load_story_wordseqs_huge(kwargs['story_names'])
+    else:
+        wordseqs = load_story_wordseqs(kwargs['story_names'])
 
-            # pass with layer
-            _FEATURE_VECTOR_FUNCTIONS[f'{k}_lay{layer_idx}-{context_length}'] = partial(
-                get_llm_vectors,
-                num_ngrams_context=context_length,
-                checkpoint=_FEATURE_CHECKPOINTS[k],
-                layer_idx=layer_idx,
-            )
-            _FEATURE_CHECKPOINTS[f'{k}_lay{layer_idx}-{context_length}'] = _FEATURE_CHECKPOINTS.get(
-                k)
-
-        # context length by TRs
-        _FEATURE_VECTOR_FUNCTIONS[f'{k}-tr{context_length}'] = partial(
-            get_llm_vectors,
-            num_trs_context=context_length,
-            checkpoint=_FEATURE_CHECKPOINTS[k])
-        _FEATURE_CHECKPOINTS[f'{k}-tr{context_length}'] = _FEATURE_CHECKPOINTS.get(
-            k, k)
-
-        # context length by seconds
-        _FEATURE_VECTOR_FUNCTIONS[f'{k}-sec{context_length}'] = partial(
-            get_llm_vectors,
-            num_secs_context_per_word=context_length,
-            checkpoint=_FEATURE_CHECKPOINTS[k])
-        _FEATURE_CHECKPOINTS[f'{k}-sec{context_length}'] = _FEATURE_CHECKPOINTS.get(
-            k, k)
-
-
-def get_features(feature, **kwargs):
-    return _FEATURE_VECTOR_FUNCTIONS[feature](**kwargs)
-
-
-if __name__ == '__main__':
-    # feats = get_feature_space('bert-5', ['sloth'])
-    print('configs', _FEATURE_VECTOR_FUNCTIONS.keys())
+    if feature_space == 'eng1000':
+        return get_eng1000_vectors(wordseqs, **kwargs)
+    elif feature_space == 'wordrate':
+        return get_wordrate_vectors(wordseqs, **kwargs)
+    else:
+        return get_llm_vectors(wordseqs, **kwargs, **kwargs_extra)
