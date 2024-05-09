@@ -69,11 +69,15 @@ def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=Fals
 
 
 if __name__ == "__main__":
-    for subject in ["UTS01", "UTS02", "UTS03", "shared"]:
+    for subject in ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08', 'shared']:
         print(f"Subject: {subject}")
         print(
             f'\tTrain public len: {len(get_story_names(subject, "train", use_huge=False))}')
         print(
             f'\tTrain huge len: {len(get_story_names(subject, "train", use_huge=True))}')
-        print(f'num in {subject} but not in UTS03', len(
-            set(get_story_names(subject, "train")) - set(get_story_names("UTS03", "train"))))
+        print(f'\tnum in {subject} (huge) but not in UTS03 (public)', len(
+            set(get_story_names(subject, "train", use_huge=True)) - set(get_story_names("UTS03", "train", use_huge=False))))
+        print(f'\tnum in {subject} (huge) but not in UTS03 (huge)', len(
+            set(get_story_names(subject, "train", use_huge=True)) - set(get_story_names("UTS03", "train", use_huge=True))))
+        print(f'\tnum in {subject} (huge) but not in UTS05', len(
+            set(get_story_names(subject, "train", use_huge=True)) - set(get_story_names("UTS05", "train", use_huge=False))))

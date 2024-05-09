@@ -1,8 +1,8 @@
 import re
 import json
-from src.features.questions.qa_questions_base import *
-from src.features.questions.qa_questions_data_boost import *
-from src.features.questions.qa_questions_llama_boost import *
+from neuro.features.questions.qa_questions_base import *
+from neuro.features.questions.qa_questions_data_boost import *
+from neuro.features.questions.qa_questions_llama_boost import *
 from os.path import join, dirname
 path_to_file = dirname(__file__)
 

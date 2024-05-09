@@ -1,10 +1,10 @@
 from copy import deepcopy
 import torch
 import numpy as np
-import src.features.feature_spaces as feature_spaces
+import neuro.features.feature_spaces as feature_spaces
 import os
-import src.features.qa_questions as qa_questions
-from src.data.npp import zscore
+import neuro.features.qa_questions as qa_questions
+from neuro.data.npp import zscore
 
 
 def get_features_full(args, qa_embedding_model, story_names, extract_only=False):

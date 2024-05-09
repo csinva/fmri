@@ -16,6 +16,7 @@ required_pypi = [
     'transformers',
     'torch',
     'imodelsx',
+    'fire',
     'langchain',
     'openai',
     'accelerate',
@@ -26,7 +27,7 @@ required_pypi = [
 ]
 
 setuptools.setup(
-    name="src",
+    name="neuro",
     version="0.01",
     author="Huth lab modified by Chandan Singh",
     author_email="",

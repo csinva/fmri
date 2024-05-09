@@ -1,8 +1,8 @@
 import numpy as np
-import src.config as config
-from src.data.textgrid import TextGrid
-from src.data.data_sequence import DataSequence
-from src.data.utils_ds import make_word_ds
+import neuro.config as config
+from neuro.data.textgrid import TextGrid
+from neuro.data.data_sequence import DataSequence
+from neuro.data.utils_ds import make_word_ds
 import json
 from typing import Dict, List
 import os

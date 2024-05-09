@@ -7,20 +7,20 @@ import numpy as np
 import json
 from os.path import join, dirname
 from functools import partial
-import src.features.qa_questions as qa_questions
-from src.data.data_sequence import DataSequence
+import neuro.features.qa_questions as qa_questions
+from neuro.data.data_sequence import DataSequence
 from typing import Dict, List
 from tqdm import tqdm
-from src.data.interp_data import lanczosinterp2D, expinterp2D
-from src.data.semantic_model import SemanticModel
-from src.data.utils_ds import apply_model_to_words
+from neuro.data.interp_data import lanczosinterp2D, expinterp2D
+from neuro.data.semantic_model import SemanticModel
+from neuro.data.utils_ds import apply_model_to_words
 
 from transformers import pipeline
 import logging
 import imodelsx.llm
-from src.features.qa_embedder import QuestionEmbedder, FinetunedQAEmbedder
-import src.config as config
-from src.features.stim_utils import load_story_wordseqs, load_story_wordseqs_huge
+from neuro.features.qa_embedder import QuestionEmbedder, FinetunedQAEmbedder
+import neuro.config as config
+from neuro.features.stim_utils import load_story_wordseqs, load_story_wordseqs_huge
 
 
 def downsample_word_vectors(stories, word_vectors, wordseqs, strategy='lanczos'):

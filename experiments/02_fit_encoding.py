@@ -11,16 +11,16 @@ import argparse
 import numpy as np
 import joblib
 import os
-from src.data import response_utils
-from src.features import feature_utils
-import src.config as config
-from src.encoding.ridge import bootstrap_ridge, gen_temporal_chunk_splits
+from neuro.data import response_utils
+from neuro.features import feature_utils
+import neuro.config as config
+from neuro.encoding.ridge import bootstrap_ridge, gen_temporal_chunk_splits
 import imodelsx.cache_save_utils
-import src.data.story_names as story_names
+import neuro.data.story_names as story_names
 import random
 import warnings
 import time
-from src.encoding.eval import nancorr, evaluate_pc_model_on_each_voxel, add_summary_stats
+from neuro.encoding.eval import nancorr, evaluate_pc_model_on_each_voxel, add_summary_stats
 
 # get path to current file
 path_to_repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -313,14 +313,17 @@ def fit_regression(args, r, features_train_delayed, resp_train, features_test_de
 
 
 def _check_args(args):
-    if args.feature_space == 'qa_embedder' or args.feature_space.startswith('finetune_'):
-        assert args.embedding_layer == - \
-            1, f'embedding_layer only used for HF models but {args.feature_space} passed'
-
     if args.subject not in ['UTS01', 'UTS02', 'UTS03'] and args.use_huge:
         args.use_huge = 0
         warnings.warn(
             f'Not using huge list of stories for subject {args.subject}')
+
+    if args.embedding_layer >= 0:
+        assert not args.feature_space in ['qa_embedder', 'eng1000', 'finetune_roberta-base',
+                                          'finetune_roberta-base_binary'], f'embedding_layer only used for HF models but {args.feature_space} passed'
+        assert args.qa_questions_version == 'v1', 'embedding_layer only used with v1'
+        assert args.qa_embedding_model == 'mistralai/Mistral-7B-Instruct-v0.2', 'embedding_layer only used with dfeault (mistral) qa_embedding_model'
+
     return args
 
 

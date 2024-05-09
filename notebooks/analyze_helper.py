@@ -1,4 +1,3 @@
-from huth.data.response_utils import load_pca
 import imodelsx.process_results
 import viz
 import dvu
@@ -14,7 +13,7 @@ import sys
 sys.path.append('../experiments')
 dvu.set_style()
 fit_encoding = __import__('02_fit_encoding')
-best_results_dir = '/home/chansingh/mntv1/deep-fMRI/qa/results/results_apr7'
+best_results_dir = '/home/chansingh/mntv1/deep-fMRI/encoding/may7'
 
 
 def load_results(save_dir):
@@ -57,7 +56,7 @@ def load_clean_results(results_dir, experiment_filename='../experiments/02_fit_e
     }.get(row['qa_embedding_model'], row['qa_embedding_model']) if 'qa_emb' in row['feature_space'] else '', axis=1)
     r['subject'] = r['subject'].str.replace('UTS', 'S')
     r['qa_questions_version'] = r.apply(
-        lambda row: row['qa_questions_version'] if 'qa_emb' in row['feature_space'] else 'eng1000', axis=1)
+        lambda row: row['qa_questions_version'] if 'qa_emb' in row['feature_space'] else '', axis=1)
     mets = [c for c in r.columns if 'corrs' in c and (
         'mean' in c or 'frac' in c)]
     cols_varied = imodelsx.process_results.get_experiment_keys(
@@ -67,19 +66,3 @@ def load_clean_results(results_dir, experiment_filename='../experiments/02_fit_e
         lambda x: np.std(x) / np.sqrt(len(x)))
     mets.append('corrs_test_mean_sem')
     return r, cols_varied, mets
-
-
-def add_corrs_tune_pc_weighted(r):
-    if not 'corrs_tune_pc_weighted_mean' in r.columns:
-        r['corrs_tune_pc_weighted_mean'] = np.nan
-    for subject in ['S01', 'S02', 'S03']:
-        pca = load_pca('UT' + subject, pc_components=100)
-        explained_var_weight = pca.explained_variance_[:100]
-        explained_var_weight = explained_var_weight / \
-            explained_var_weight.sum() * len(explained_var_weight)
-
-        for i, row in r[r.subject == subject].iterrows():
-            corrs = row['corrs_tune_pc']
-            corrs_weighted = corrs * explained_var_weight
-            r.loc[i, 'corrs_tune_pc_weighted_mean'] = corrs_weighted.sum()
-    return r

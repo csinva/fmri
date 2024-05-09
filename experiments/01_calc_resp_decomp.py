@@ -1,13 +1,14 @@
 from sklearn.decomposition import PCA, NMF, FastICA, DictionaryLearning, IncrementalPCA
 import numpy as np
 import pickle as pkl
-from src.data import response_utils
+from neuro.data import response_utils
 import traceback
 from os.path import join
 import os
-import src.data.story_names as story_names
+import neuro.data.story_names as story_names
 import joblib
-import src.config
+import neuro.config
+import fire
 from tqdm import tqdm
 path_to_file = os.path.dirname(os.path.abspath(__file__))
 
@@ -47,7 +48,8 @@ def calc_decomp(out_dir, subject, subsample_input=None, run_mini_test=False):
     out_file = join(out_dir, 'resps_pca.pkl')
     # if not os.path.exists(out_file):
     # pca = PCA().fit(resp_train)
-    pca = IncrementalPCA(n_components=1000).fit(resp_train)
+    # pca = IncrementalPCA(n_components=500, batch_size=resp_train.shape[1]).fit(resp_train)
+    pca = IncrementalPCA(n_components=300).fit(resp_train)
     joblib.dump(pca, out_file)
 
     # print('fitting ICA...')
@@ -98,23 +100,25 @@ def save_mini_pca(out_dir, pc_components=100):
 #             plt.close()
 
 
-if __name__ == '__main__':
-    # cache_resps()
+def main(subject):
     run_mini_test = False
-    subjects = [f'UTS0{k}' for k in range(1, 9)]
-    if run_mini_test:
-        subjects = ['UTS01']
-    for subject in tqdm(subjects):
-        print(subject)
-        out_dir = join(src.config.resp_processing_dir, subject)
-        os.makedirs(out_dir, exist_ok=True)
-        try:
-            calc_decomp(out_dir, subject, subsample_input=None,
-                        run_mini_test=run_mini_test)
+    print(subject)
+    out_dir = join(neuro.config.resp_processing_dir, subject)
+    os.makedirs(out_dir, exist_ok=True)
+    try:
+        calc_decomp(out_dir, subject, subsample_input=None,
+                    run_mini_test=run_mini_test)
 
-            save_mini_pca(out_dir, pc_components=100)
-        except:
-            print('failed', subject)
-            # full traceback
-            traceback.print_exc()
-        # viz_decomp(out_dir)
+        save_mini_pca(out_dir, pc_components=100)
+    except:
+        print('failed', subject)
+        # full traceback
+        traceback.print_exc()
+    # viz_decomp(out_dir)
+
+
+if __name__ == '__main__':
+    # subjects = [f'UTS0{k}' for k in range(1, 9)]
+    # for subject in tqdm(subjects):
+    #     main(subject)
+    fire.Fire(main)
