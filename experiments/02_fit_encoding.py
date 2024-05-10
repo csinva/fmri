@@ -54,7 +54,7 @@ def add_main_args(parser):
                         default='qa_embedder',
                         choices=['qa_embedder', 'eng1000', 'finetune_roberta-base', 'finetune_roberta-base_binary',
                                  'bert-base-uncased', 'distilbert-base-uncased',  'roberta-base',
-                                 'meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-8B',],
+                                 'meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-8B', 'meta-llama/Meta-Llama-3-70B'],
                         help='''Passing a standard HF model name will compute embeddings from that model.
                         Models starting with "finetune_" load custom models
                         qa_embedder computes qa embeddings with the checkpoint in args.qa_embedding_model
@@ -364,7 +364,7 @@ if __name__ == "__main__":
     # get data
     story_names_train, story_names_test = get_story_names(args)
     if args.use_extract_only:
-        all_stories = story_names_train + story_names_test
+        all_stories = story_names.get_story_names(all=True)
         random.shuffle(all_stories)
         feature_utils.get_features_full(args, args.qa_embedding_model,
                                         all_stories, extract_only=True)

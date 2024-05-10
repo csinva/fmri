@@ -1,5 +1,5 @@
 
-def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=False):
+def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=False, all=False):
     TRAIN_01_PUBLIC = ['adollshouse', 'gpsformylostidentity', 'singlewomanseekingmanwich', 'adventuresinsayingyes', 'hangtime', 'sloth', 'afatherscover', 'haveyoumethimyet', 'souls', 'againstthewind', 'howtodraw', 'stagefright', 'alternateithicatom', 'ifthishaircouldtalk', 'stumblinginthedark', 'avatar', 'inamoment', 'superheroesjustforeachother', 'backsideofthestorm', 'itsabox', 'sweetaspie', 'becomingindian', 'jugglingandjesus', 'swimmingwithastronauts', 'beneaththemushroomcloud', 'kiksuya', 'thatthingonmyarm', 'birthofanation', 'leavingbaghdad', 'theadvancedbeginner', 'bluehope', 'legacy', 'theclosetthatateeverything', 'breakingupintheageofgoogle', 'lifeanddeathontheoregontrail', 'thecurse', 'buck', 'life', 'thefreedomridersandme', 'catfishingstrangerstofindmyself',
                        'lifereimagined', 'theinterview', 'cautioneating', 'listo', 'thepostmanalwayscalls', 'christmas1940', 'mayorofthefreaks', 'theshower', 'cocoonoflove', 'metsmagic', 'thetiniestbouquet', 'comingofageondeathrow', 'mybackseatviewofagreatromance', 'thetriangleshirtwaistconnection', 'exorcism', 'myfathershands', 'threemonths', 'eyespy', 'myfirstdaywiththeyankees', 'thumbsup', 'firetestforlove', 'naked', 'tildeath', 'food', 'notontheusualtour', 'treasureisland', 'forgettingfear', 'odetostepfather', 'undertheinfluence', 'onlyonewaytofindout', 'vixenandtheussr', 'gangstersandcookies', 'penpal', 'waitingtogo', 'goingthelibertyway', 'quietfire', 'whenmothersbullyback', 'goldiethegoldfish', 'reachingoutbetweenthebars', 'golfclubbing', 'shoppinginchina', 'wildwomenanddancingqueens']
     TRAIN_02_PUBLIC = ['adollshouse', 'hangtime', 'sloth', 'adventuresinsayingyes', 'haveyoumethimyet', 'souls', 'afatherscover', 'howtodraw', 'stagefright', 'againstthewind', 'ifthishaircouldtalk', 'stumblinginthedark', 'alternateithicatom', 'inamoment', 'superheroesjustforeachother', 'avatar', 'itsabox', 'sweetaspie', 'backsideofthestorm', 'jugglingandjesus', 'swimmingwithastronauts', 'becomingindian', 'kiksuya', 'thatthingonmyarm', 'beneaththemushroomcloud', 'leavingbaghdad', 'theadvancedbeginner', 'birthofanation', 'legacy', 'theclosetthatateeverything', 'breakingupintheageofgoogle', 'lifeanddeathontheoregontrail', 'thecurse', 'buck', 'life', 'thefreedomridersandme', 'catfishingstrangerstofindmyself', 'lifereimagined', 'theinterview', 'cautioneating', 'listo',
@@ -65,6 +65,16 @@ def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=Fals
     else:
         story_names = DICT_PUBLIC[train_or_test][subject]
     # story_names = [s for s in story_names if not 'canplanetearth' in s]
+    if all:
+        # get set of all stories
+        all_stories = []
+        for k in ['train', 'test']:
+            for k2 in DICT_PUBLIC[k]:
+                all_stories += DICT_PUBLIC[k][k2]
+            for k2 in DICT_HUGE[k]:
+                all_stories += DICT_HUGE[k][k2]
+        story_names = list(set(all_stories))
+
     return story_names
 
 
@@ -81,3 +91,4 @@ if __name__ == "__main__":
             set(get_story_names(subject, "train", use_huge=True)) - set(get_story_names("UTS03", "train", use_huge=True))))
         print(f'\tnum in {subject} (huge) but not in UTS05', len(
             set(get_story_names(subject, "train", use_huge=True)) - set(get_story_names("UTS05", "train", use_huge=False))))
+    print('all_stories', len(get_story_names(all=True)))
