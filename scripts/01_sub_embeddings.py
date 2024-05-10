@@ -26,23 +26,31 @@ params_shared_dict = {
     'subject': ['UTS05'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
 
-    'seed_stories': range(2),
+    # 'seed_stories': range(2),
 }
 
 params_coupled_dict = {
     ('feature_space', 'qa_questions_version', 'qa_embedding_model', 'embedding_layer'):
 
+    # baselines
+    [
+        ('bert-base-uncased', 'v1', MIST7B, -1),
+        # ('finetune_roberta-base-10', 'v1', MIST7B, -1),
+        # ('finetune_roberta-base_binary-10', 'v1', MIST7B, -1),
+    ]
+    +
+
     # llama versions
     [
-        # (llama, 'v1', MIST7B, embedding_layer)
-        # for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
-        # for embedding_layer in [6, 12, 18, 24, 30]
+        (llama, 'v1', MIST7B, embedding_layer)
+        for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
+        for embedding_layer in [6, 12, 18, 24, 30]
     ]
     +
     [
-        (llama, 'v1', MIST7B, embedding_layer)
-        for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
-        for embedding_layer in [12, 24, 36, 48, 60]
+        # (llama, 'v1', MIST7B, embedding_layer)
+        # for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
+        # for embedding_layer in [12, 24, 36, 48, 60]
     ]
     +
 
@@ -76,20 +84,20 @@ amlt_kwargs = {
     'amlt_file': join(repo_dir, 'scripts', 'launch.yaml'),
     # [64G16-MI200-IB-xGMI, 64G16-MI200-xGMI
     # 'sku': '64G8-MI200-xGMI',
-    'sku': '64G4-MI200-xGMI',
-    # 'sku': '64G2-MI200-xGMI',
+    # 'sku': '64G4-MI200-xGMI',
+    'sku': '64G2-MI200-xGMI',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    amlt_kwargs=amlt_kwargs,
+    # amlt_kwargs=amlt_kwargs,
     # gpu_ids=[0, 1],
-    # gpu_ids=[0, 1, 2, 3],
+    gpu_ids=[0, 1, 2, 3],
     # gpu_ids=[[0, 1], [2, 3]],
     # gpu_ids=[[0, 1, 2, 3]],
     # actually_run=False,
-    shuffle=True,
+    # shuffle=True,
     cmd_python=f'export HF_TOKEN={open(expanduser("~/.HF_TOKEN"), "r").read().strip()}; python',
 )

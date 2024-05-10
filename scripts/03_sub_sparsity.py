@@ -3,6 +3,7 @@
 import os
 from os.path import dirname, join, expanduser
 import sys
+import numpy as np
 from imodelsx import submit_utils
 path_to_file = os.path.dirname(os.path.abspath(__file__))
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
@@ -21,35 +22,28 @@ params_shared_dict = {
     'use_cache': [1],
     'nboots': [5],
     'use_test_setup': [0],
-    'encoding_model': ['ridge'],
-    'subject': ['UTS03'],
-    # 'subject': ['UTS02'],
-    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
-    # 'distill_model_path': [BEST_RUN],
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/results_apr7'],
-    # 'ndelays': [4, 8, 12],
-    'ndelays': [8],
+    'use_extract_only': [0],
+    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
     'pc_components': [100],
+    'feature_selection_frac': [0.5],
 
     # feature selection...
-    'num_stories': [0],  # this is used to get shared stories, only u
-    'feature_selection_alpha_index': [1],
-    # 'feature_selection_alpha_index': range(2, 10),
-    # 'feature_selection_alpha_index': range(3, 11),
+    'subject': ['shared'],  # first run with shared
+    # 'seed': range(5),
+    'feature_selection_alpha': np.logspace(0, -3, 20),  # 1
 
-    # local
-    # 'seed': [1],
-    # 'pc_components': [1000, 100, -1],
-    'use_extract_only': [0],
+    # run with feature selection...
+    # 'subject': ['UTS01', 'UTS02', 'UTS03'], # afterwards run with susbjects
+    # 'feature_selection_alpha': [1],
+
+
 }
 
 params_coupled_dict = {
     ('feature_space', 'qa_questions_version', 'qa_embedding_model'): [
-        # new
-        ('bert-10', 'v1', MIST7B),
-        ('eng1000', 'v1', MIST7B),  # need to rerun sparsity for this...
-        # run this with num_stories not 0 for old
-        ('qa_embedder-10', 'v3_boostexamples', 'ensemble1'),
+        ('eng1000', 'v1', MIST7B),
+        ('bert-base-uncased', 'v1', MIST7B),
+        # ('qa_embedder', 'v3_boostexamples', 'ensemble1')
     ],
 }
 # Args list is a list of dictionaries
@@ -77,9 +71,8 @@ amlt_kwargs = {
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
-    # unique_seeds='seed_stories',
-    amlt_kwargs=amlt_kwargs,
-    # n_cpus=9,
+    # amlt_kwargs=amlt_kwargs,
+    n_cpus=6,
     # n_cpus=2,
     # gpu_ids=[0, 1],
     # gpu_ids=[0, 1, 2, 3],

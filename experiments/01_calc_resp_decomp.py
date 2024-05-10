@@ -49,7 +49,9 @@ def calc_decomp(out_dir, subject, subsample_input=None, run_mini_test=False):
     # if not os.path.exists(out_file):
     # pca = PCA().fit(resp_train)
     # pca = IncrementalPCA(n_components=500, batch_size=resp_train.shape[1]).fit(resp_train)
-    pca = IncrementalPCA(n_components=300).fit(resp_train)
+    # pca = IncrementalPCA(n_components=300).fit(resp_train)
+    pca = PCA(n_components=200, svd_solver='randomized',
+              random_state=42).fit(resp_train)
     joblib.dump(pca, out_file)
 
     # print('fitting ICA...')

@@ -18,7 +18,7 @@ BEST_RUN = '/home/chansingh/mntv1/deep-fMRI/encoding/results_apr7/68936a10a548e2
 
 params_shared_dict = {
     'use_cache': [1],
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/single_question_may6'],
+    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
     'subject': ['UTS03'],
     'feature_space': ['qa_embedder-10'],
     'qa_embedding_model': ['ensemble1'],  # [MIST7B, LLAMA8B, 'ensemble1'],

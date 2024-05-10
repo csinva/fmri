@@ -26,9 +26,11 @@ params_shared_dict = {
     'use_test_setup': [0],
     'use_extract_only': [0],
 
-    'subject': ['UTS05'],
-    # 'subject': ['UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08'],
-    # 'subject': ['UTS03', 'UTS02', 'UTS01'],
+    # 'subject': [f'UTS0{k}' for k in range(1, 9)],
+    # 'subject': [f'UTS0{k}' for k in range(1, 4)],
+    # 'subject': [f'UTS0{k}' for k in range(4, 9)],
+    'subject': ['UTS03'],
+
     # ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08']
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
     # 'ndelays': [4, 8],
@@ -36,10 +38,6 @@ params_shared_dict = {
 
     # cluster
     'pc_components': [100],
-
-    # local
-    # 'seed': range(5),
-    # 'pc_components': [1000, 100, -1],
 }
 
 params_coupled_dict = {
@@ -47,8 +45,8 @@ params_coupled_dict = {
 
     [
         # baselines
-        # ('bert-base-uncased', 'v1', MIST7B, -1),
-        # ('eng1000', 'v1', MIST7B, -1),
+        ('eng1000', 'v1', MIST7B, -1),
+        ('bert-base-uncased', 'v1', MIST7B, -1),
         # ('finetune_roberta-base-10', 'v1', MIST7B, -1),
         # ('finetune_roberta-base_binary-10', 'v1', MIST7B, -1),
     ]
@@ -70,10 +68,10 @@ params_coupled_dict = {
 
     # qa versions
     [
+        # ensemble1, v4, v5, v6, v4_boostexamples
         ('qa_embedder', version, model, -1)
-        #     # ensemble1, v4, v5, v6, v4_boostexamples
-        for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
-        for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
+        for version in ['v1', 'v2', 'v3']  # 'v3_boostexamples', 'v3']
+        for model in [MIST7B, LLAMA8B]  # LLAMA8B_fewshot
     ]
 
     +
@@ -98,7 +96,8 @@ amlt_kwargs_cpu = {
     'amlt_file': join(repo_dir, 'scripts', 'launch_cpu.yaml'),
     # E4ads_v5 (30 GB), E8ads_v5 (56 GB), E16ads_v5 (120GB), E32ads_v5 (240GB), E64ads_v5 (480 GB)
     # 'sku': 'E64ads_v5',
-    'sku': 'E32ads_v5',
+    # 'sku': 'E32ads_v5',
+    'sku': 'E8ads_v5',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
@@ -106,7 +105,7 @@ submit_utils.run_args_list(
     script_name=script_name,
     unique_seeds='seed_stories',
     # amlt_kwargs=amlt_kwargs_cpu,
-    # n_cpus=9,
+    n_cpus=9,
     # n_cpus=3,
     # actually_run=False,
     repeat_failed_jobs=True,

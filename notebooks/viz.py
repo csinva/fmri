@@ -13,6 +13,7 @@ def feature_space_rename(x):
     }
     if x in FEATURE_SPACE_RENAME:
         return FEATURE_SPACE_RENAME[x]
+    x = str(x)
     x = x.replace('-10', '')
     x = x.replace('llama2-70B', 'LLaMA-2 (70B)')
     x = x.replace('llama2-7B', 'LLaMA-2 (7B)')
