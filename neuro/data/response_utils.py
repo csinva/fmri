@@ -40,6 +40,13 @@ def load_response_huge(stories, subject):
     return np.vstack([resps[story] for story in stories])
 
 
+def load_response_wrapper(args, stories, subject):
+    if args.use_huge:
+        return load_response_huge(stories, subject)
+    else:
+        return load_response(stories, subject)
+
+
 def load_pca(subject, pc_components=None):
     if pc_components == 100:
         pca_filename = join(config.resp_processing_dir,
@@ -66,16 +73,10 @@ def get_resps_full(
             get_resps_full(args, s, story_names_train, story_names_test)[0]
             for s in ['UTS01', 'UTS02', 'UTS03']])
         return resp_train
-    if args.use_huge:
-        resp_test = load_response_huge(
-            story_names_test, subject)
-        resp_train = load_response_huge(
-            story_names_train, subject)
-    else:
-        resp_test = load_response(
-            story_names_test, subject)
-        resp_train = load_response(
-            story_names_train, subject)
+    resp_test = load_response_wrapper(
+        args, story_names_test, subject)
+    resp_train = load_response_wrapper(
+        args, story_names_train, subject)
 
     if args.pc_components <= 0:
         return resp_train, resp_test

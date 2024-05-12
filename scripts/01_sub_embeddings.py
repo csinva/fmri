@@ -26,7 +26,7 @@ params_shared_dict = {
     'subject': ['UTS05'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
 
-    # 'seed_stories': range(2),
+    'seed_stories': range(15),
 }
 
 params_coupled_dict = {
@@ -34,21 +34,21 @@ params_coupled_dict = {
 
     # baselines
     [
-        ('bert-base-uncased', 'v1', MIST7B, -1),
-        # ('finetune_roberta-base-10', 'v1', MIST7B, -1),
-        # ('finetune_roberta-base_binary-10', 'v1', MIST7B, -1),
+        # ('bert-base-uncased', None, None, None),
+        # ('finetune_roberta-base-10', None, None, None),
+        # ('finetune_roberta-base_binary-10', None, None, None),
     ]
     +
 
     # llama versions
     [
-        (llama, 'v1', MIST7B, embedding_layer)
-        for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
-        for embedding_layer in [6, 12, 18, 24, 30]
+        # (llama, None, None, embedding_layer)
+        # for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
+        # for embedding_layer in [6, 12, 18, 24, 30]
     ]
     +
     [
-        # (llama, 'v1', MIST7B, embedding_layer)
+        # (llama, None. None, embedding_layer)
         # for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
         # for embedding_layer in [12, 24, 36, 48, 60]
     ]
@@ -56,9 +56,11 @@ params_coupled_dict = {
 
     # qa versions
     [
-        # ('qa_embedder', version, model, -1)
-        # #     # ensemble1, v4, v5, v6, v4_boostexamples
+        # ('qa_embedder', version, model, None)
+        # ensemble1, v4, v5, v6, v4_boostexamples
+        # for version in ['v3_boostexamples']
         # for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
+        # for model in [LLAMA8B_fewshot]  # , LLAMA8B, LLAMA8B_fewshot]
         # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
     ]
 
@@ -66,9 +68,9 @@ params_coupled_dict = {
 
     # qa 70B
     [
-        # ('qa_embedder', version, model, -1)
-        # for version in ['v1', 'v2']
-        # for model in [LLAMA70B]
+        ('qa_embedder', version, model, None)
+        for version in ['v2']  # 'v1', 'v2', 'v3_boostexamples'
+        for model in [LLAMA70B]
     ]
 
 
@@ -83,16 +85,16 @@ amlt_kwargs = {
     # change this to run a cpu job
     'amlt_file': join(repo_dir, 'scripts', 'launch.yaml'),
     # [64G16-MI200-IB-xGMI, 64G16-MI200-xGMI
-    # 'sku': '64G8-MI200-xGMI',
+    'sku': '64G8-MI200-xGMI',
     # 'sku': '64G4-MI200-xGMI',
-    'sku': '64G2-MI200-xGMI',
+    # 'sku': '64G2-MI200-xGMI',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    # amlt_kwargs=amlt_kwargs,
+    amlt_kwargs=amlt_kwargs,
     # gpu_ids=[0, 1],
     gpu_ids=[0, 1, 2, 3],
     # gpu_ids=[[0, 1], [2, 3]],

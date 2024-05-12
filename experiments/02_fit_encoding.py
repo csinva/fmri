@@ -243,8 +243,8 @@ def fit_regression(args, r, features_train_delayed, resp_train, features_test_de
 def _check_args(args):
     if args.subject not in ['UTS01', 'UTS02', 'UTS03'] and args.use_huge:
         args.use_huge = 0
-        warnings.warn(
-            f'Not using huge list of stories for subject {args.subject}')
+        # warnings.warn(
+        # f'Not using huge list of stories for subject {args.subject}')
 
     if args.embedding_layer >= 0:
         assert not args.feature_space in ['qa_embedder', 'eng1000', 'finetune_roberta-base',
@@ -328,8 +328,8 @@ if __name__ == "__main__":
 
     # evaluate per voxel
     if args.pc_components > 0:
-        resp_test = response_utils.load_response(
-            story_names_test, args.subject)
+        resp_test = response_utils.load_response_wrapper(
+            args, story_names_test, args.subject)
         r['corrs_test'] = evaluate_pc_model_on_each_voxel(
             args, stim_test_delayed, resp_test,
             model_params_to_save, pca, scaler_test)

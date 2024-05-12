@@ -25,7 +25,7 @@ def select_features(args, r, stim_train_delayed, stim_test_delayed, story_names_
     cache_file = join(
         cache_dir,
         f"{args.feature_space.replace('/', '-')}___qa_questions_version={args.qa_questions_version}___{args.qa_embedding_model.replace('/','-')}",
-        f'seed={args.seed}___feature_selection_frac={args.feature_selection_frac:.2f}___feature_selection_alpha={args.feature_selection_alpha:.2f}.joblib')
+        f'seed={args.seed}___feature_selection_frac={args.feature_selection_frac:.2f}___feature_selection_alpha={args.feature_selection_alpha:.2e}.joblib')
     os.makedirs(dirname(cache_file), exist_ok=True)
 
     if os.path.exists(cache_file):

@@ -47,6 +47,8 @@ def load_clean_results(results_dir, experiment_filename='../experiments/02_fit_e
     for k in ['save_dir', 'save_dir_unique']:
         r[k] = r[k].map(lambda x: x if x.startswith('/home')
                         else x.replace('/mntv1', '/home/chansingh/mntv1'))
+    if 'use_huge' in r.columns:
+        r = r.drop(columns=['use_huge'])
     r['qa_embedding_model'] = r.apply(lambda row: {
         'mistralai/Mistral-7B-Instruct-v0.2': 'mist-7B',
         'mistralai/Mixtral-8x7B-Instruct-v0.1': 'mixt-moe',

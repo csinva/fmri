@@ -6,8 +6,10 @@ MODELS_RENAME = {
 
 def feature_space_rename(x):
     FEATURE_SPACE_RENAME = {
-        'bert-10': 'BERT',
+        'bert-base-uncased': 'BERT',
         'eng1000': 'Eng1000',
+        'qa_embedder': 'QA-Emb',
+        'llama': 'LLaMA',
         'finetune_roberta-base-10': 'QA-Emb (distill, probabilistic)',
         'finetune_roberta-base_binary-10': 'QA-Emb (distill, binary)',
     }

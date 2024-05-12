@@ -27,13 +27,13 @@ params_shared_dict = {
     'use_extract_only': [0],
 
     # 'subject': [f'UTS0{k}' for k in range(1, 9)],
-    # 'subject': [f'UTS0{k}' for k in range(1, 4)],
+    'subject': [f'UTS0{k}' for k in range(1, 4)],
     # 'subject': [f'UTS0{k}' for k in range(4, 9)],
-    'subject': ['UTS03'],
+    # 'subject': ['UTS03'],
 
     # ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08']
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
-    # 'ndelays': [4, 8],
+    'ndelays': [4, 8],
     # 'ndelays': [8],
 
     # cluster
@@ -45,22 +45,22 @@ params_coupled_dict = {
 
     [
         # baselines
-        ('eng1000', 'v1', MIST7B, -1),
-        ('bert-base-uncased', 'v1', MIST7B, -1),
-        # ('finetune_roberta-base-10', 'v1', MIST7B, -1),
-        # ('finetune_roberta-base_binary-10', 'v1', MIST7B, -1),
+        # ('eng1000', None, None, None),
+        # ('bert-base-uncased', None, None, None),
+        # ('finetune_roberta-base-10', None, None, None),
+        # ('finetune_roberta-base_binary-10', None, None, None),
     ]
     +
 
     # llama versions
     [
-        # (llama, 'v1', MIST7B, embedding_layer)
+        # (llama, None, None, embedding_layer)
         # for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
         # for embedding_layer in [6, 12, 18, 24, 30]
     ]
     +
     [
-        # (llama, 'v1', MIST7B, embedding_layer)
+        # (llama, None. None, embedding_layer)
         # for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
         # for embedding_layer in [12, 24, 36, 48, 60]
     ]
@@ -69,16 +69,20 @@ params_coupled_dict = {
     # qa versions
     [
         # ensemble1, v4, v5, v6, v4_boostexamples
-        ('qa_embedder', version, model, -1)
-        for version in ['v1', 'v2', 'v3']  # 'v3_boostexamples', 'v3']
-        for model in [MIST7B, LLAMA8B]  # LLAMA8B_fewshot
+        ('qa_embedder', version, model, None)
+        # 'v3_boostexamples', 'v3']
+        # for version in ['v1', 'v2', 'v3_boostexamples']
+        # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]  #
+
+        for version in ['v3_boostexamples']
+        for model in ['ensemble1']
     ]
 
     +
 
     # qa 70B
     [
-        # ('qa_embedder', version, model, -1)
+        # ('qa_embedder', version, model, None)
         # for version in ['v1', 'v2']
         # for model in [LLAMA70B]
     ]
@@ -97,7 +101,8 @@ amlt_kwargs_cpu = {
     # E4ads_v5 (30 GB), E8ads_v5 (56 GB), E16ads_v5 (120GB), E32ads_v5 (240GB), E64ads_v5 (480 GB)
     # 'sku': 'E64ads_v5',
     # 'sku': 'E32ads_v5',
-    'sku': 'E8ads_v5',
+    'sku': 'E16ads_v5',
+    # 'sku': 'E8ads_v5',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
@@ -105,8 +110,7 @@ submit_utils.run_args_list(
     script_name=script_name,
     unique_seeds='seed_stories',
     # amlt_kwargs=amlt_kwargs_cpu,
-    n_cpus=9,
-    # n_cpus=3,
+    # n_cpus=9,
     # actually_run=False,
     repeat_failed_jobs=True,
     shuffle=True,
