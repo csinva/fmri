@@ -67,12 +67,19 @@ def add_main_args(parser):
                         sec chunks by seconds leading up to each word''')
     parser.add_argument('--input_chunking_size', type=int, default=10,
                         help='Number of input chunks (corresponding to input_chunking_type)')
-    parser.add_argument("--feature_selection_alpha", type=float, default=-1,
+    parser.add_argument("--feature_selection_alpha", type=float,
+                        default=-1,
                         help='Alpha to use when running feature selection (if >= 0). Alpha to use for feature selection.')
     parser.add_argument("--feature_selection_frac", type=float,
                         default=0.5,
                         help='''Randomly bootsraps data to this fraction of examples.
                         Applies if feature_selection_alpha >= 0.''')
+    parser.add_argument("--feature_selection_stability_seeds", type=int,
+                        default=-1,
+                        help='''Number of seeds to use for stability selection (only keeps a feature if it was selected in all seeds).
+                        Applies if feature_selection_alpha >= 0.
+                        Note: needs to run feature-selection with this many different seeds (slow, good to run in parallel before calling this)
+                        ''')
 
     # qa features
     parser.add_argument("--qa_embedding_model", type=str,
@@ -157,7 +164,7 @@ def get_story_names(args):
         story_names_test = ['fromboyhoodtofatherhood']
         # story_names_test = ['onapproachtopluto']
         args.pc_components = 100
-        args.feature_selection_frac = 0.2
+        # args.feature_selection_frac = 0.2
     else:
         story_names_train = story_names.get_story_names(
             args.subject, 'train', use_huge=args.use_huge)

@@ -5,11 +5,12 @@ from os.path import dirname, join, expanduser
 import sys
 import numpy as np
 from imodelsx import submit_utils
+from neuro.features.feat_select import get_alphas
 path_to_file = os.path.dirname(os.path.abspath(__file__))
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 sys.path.append(repo_dir)
 # python /home/chansingh/fmri/01_fit_encoding.py
-
+ALPHAS = np.logspace(0, -3, 20)
 params_shared_dict = {
     # things to average over
     'use_cache': [1],
@@ -23,13 +24,13 @@ params_shared_dict = {
     # feature selection...
     'subject': ['shared'],  # first run with shared
     'seed': range(5),
-    'feature_selection_alpha': np.logspace(0, -3, 20),  # 1
+    # 'feature_selection_alpha': get_alphas('qa_embedder'),
+    'feature_selection_alpha': get_alphas('eng1000'),
+
 
     # run with feature selection...
     # 'subject': ['UTS01', 'UTS02', 'UTS03'], # afterwards run with subjects
-    # 'feature_selection_alpha': [1],
-
-
+    # 'feature_selection_stability_seeds': [5],
 }
 
 params_coupled_dict = {
