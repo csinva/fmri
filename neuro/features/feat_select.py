@@ -82,7 +82,6 @@ def get_selected_coef(args, feature_selection_stability_seeds: int, seed: int,
 
     # coef_enet: (n_targets, n_features)
     coef_nonzero = np.any(np.abs(coef_enet) > 0, axis=0).squeeze()
-
     print('nonzero', coef_nonzero.sum(), cache_file)
 
     return coef_nonzero

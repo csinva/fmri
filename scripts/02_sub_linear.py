@@ -45,8 +45,8 @@ params_coupled_dict = {
 
     [
         # baselines
-        # ('eng1000', None, None, None),
-        # ('bert-base-uncased', None, None, None),
+        ('eng1000', None, None, None),
+        ('bert-base-uncased', None, None, None),
         # ('finetune_roberta-base-10', None, None, None),
         # ('finetune_roberta-base_binary-10', None, None, None),
     ]
@@ -110,7 +110,7 @@ submit_utils.run_args_list(
     script_name=script_name,
     unique_seeds='seed_stories',
     # amlt_kwargs=amlt_kwargs_cpu,
-    # n_cpus=9,
+    n_cpus=9,
     # actually_run=False,
     repeat_failed_jobs=True,
     shuffle=True,
