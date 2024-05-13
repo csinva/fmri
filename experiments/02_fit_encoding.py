@@ -40,7 +40,7 @@ def add_main_args(parser):
                         help='''Whether to use huge list of stories
                         (if use_test_setup or not UTS01-03, this will automatically be set to 0)''')
     parser.add_argument('--num_stories', type=int, default=-1,
-                        help='''number of stories to use (-1 for all).
+                        help='''number of stories to use for training (-1 for all).
                         Stories are selected from huge list unless use_test_setup''')
     parser.add_argument("--distill_model_path", type=str,
                         default=None,

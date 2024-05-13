@@ -36,6 +36,9 @@ params_shared_dict = {
     'ndelays': [4, 8],
     # 'ndelays': [8],
 
+    # default is -1, SO4-SO8 have 24 or 25 stories
+    'num_stories': [5, 10, 15, 20],
+
     # cluster
     'pc_components': [100],
 }
@@ -60,7 +63,7 @@ params_coupled_dict = {
     ]
     +
     [
-        # (llama, None. None, embedding_layer)
+        # (llama, None, None, embedding_layer)
         # for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
         # for embedding_layer in [12, 24, 36, 48, 60]
     ]
@@ -68,18 +71,13 @@ params_coupled_dict = {
 
     # qa versions
     [
-        # ensemble1, v4, v5, v6, v4_boostexamples
-        ('qa_embedder', version, model, None)
-        # 'v3_boostexamples', 'v3']
-        # for version in ['v1', 'v2', 'v3_boostexamples']
-        # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]  #
-
-        for version in ['v3_boostexamples']
+        # ensemble1
+        # questions: v4, v5, v6, v4_boostexamples, v1, v2, v3_boostexamples, v3
+        ('qa_embedder', 'v3_boostexamples', model, None)
+        # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot, 'ensemble1']  #
         for model in ['ensemble1']
     ]
-
     +
-
     # qa 70B
     [
         # ('qa_embedder', version, model, None)
@@ -101,16 +99,16 @@ amlt_kwargs_cpu = {
     # E4ads_v5 (30 GB), E8ads_v5 (56 GB), E16ads_v5 (120GB), E32ads_v5 (240GB), E64ads_v5 (480 GB)
     # 'sku': 'E64ads_v5',
     # 'sku': 'E32ads_v5',
-    'sku': 'E16ads_v5',
-    # 'sku': 'E8ads_v5',
+    # 'sku': 'E16ads_v5',
+    'sku': 'E8ads_v5',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    # amlt_kwargs=amlt_kwargs_cpu,
-    n_cpus=9,
+    amlt_kwargs=amlt_kwargs_cpu,
+    # n_cpus=9,
     # actually_run=False,
     repeat_failed_jobs=True,
     shuffle=True,
