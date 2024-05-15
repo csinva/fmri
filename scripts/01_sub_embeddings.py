@@ -26,7 +26,7 @@ params_shared_dict = {
     'subject': ['UTS05'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
 
-    'seed_stories': range(15),
+    'seed_stories': range(25),
 }
 
 params_coupled_dict = {
@@ -41,12 +41,6 @@ params_coupled_dict = {
     +
 
     # llama versions
-    [
-        # (llama, None, None, embedding_layer)
-        # for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
-        # for embedding_layer in [6, 12, 18, 24, 30]
-    ]
-    +
     [
         # (llama, None. None, embedding_layer)
         # for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
@@ -69,10 +63,16 @@ params_coupled_dict = {
     # qa 70B
     [
         ('qa_embedder', version, model, None)
-        for version in ['v2']  # 'v1', 'v2', 'v3_boostexamples'
+        for version in ['v3_boostexamples']  # 'v1', 'v2', 'v3_boostexamples'
         for model in [LLAMA70B]
     ]
 
+    # let's just skip llama 7B/8B
+    # [
+        # (llama, None, None, embedding_layer)
+        # for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
+        # for embedding_layer in [6, 12, 18, 24, 30]
+    # ]
 
 }
 
@@ -96,7 +96,7 @@ submit_utils.run_args_list(
     unique_seeds='seed_stories',
     amlt_kwargs=amlt_kwargs,
     # gpu_ids=[0, 1],
-    gpu_ids=[0, 1, 2, 3],
+    # gpu_ids=[0, 1, 2, 3],
     # gpu_ids=[[0, 1], [2, 3]],
     # gpu_ids=[[0, 1, 2, 3]],
     # actually_run=False,

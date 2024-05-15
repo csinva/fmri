@@ -66,5 +66,8 @@ def load_clean_results(results_dir, experiment_filename='../experiments/02_fit_e
     print('experiment varied these params:', cols_varied)
     r['corrs_test_mean_sem'] = r['corrs_test'].apply(
         lambda x: np.std(x) / np.sqrt(len(x)))
+    r['feature_space_simplified'] = r['feature_space'].apply(
+        lambda x: 'llama' if 'llama' in x else x
+    )
     mets.append('corrs_test_mean_sem')
     return r, cols_varied, mets

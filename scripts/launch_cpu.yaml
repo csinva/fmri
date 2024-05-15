@@ -2,7 +2,7 @@
 # amlt --pdb run launch.yaml
 # amlt run launch.yaml
 
-description: fMRI embedding extraction
+description: fMRI linear fit
 environment:
   image: amlt-sing/acpt-2.2.1-py3.10-cuda12.1
   setup:

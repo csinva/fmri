@@ -10,7 +10,6 @@ path_to_file = os.path.dirname(os.path.abspath(__file__))
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 sys.path.append(repo_dir)
 # python /home/chansingh/fmri/01_fit_encoding.py
-ALPHAS = np.logspace(0, -3, 20)
 params_shared_dict = {
     # things to average over
     'use_cache': [1],
@@ -19,18 +18,31 @@ params_shared_dict = {
     'use_extract_only': [0],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
     'pc_components': [100],
-    'feature_selection_frac': [0.5],
 
-    # feature selection...
+    # first run to perform and save feature selection #######################################
     # 'subject': ['shared'],  # first run with shared
     # 'seed': range(5),
-    'feature_selection_alpha': get_alphas('qa_embedder'),
+    # 'feature_selection_alpha': get_alphas('qa_embedder'),
     # 'feature_selection_alpha': get_alphas('eng1000'),
 
 
-    # run with feature selection...
-    'subject': ['UTS01', 'UTS02', 'UTS03'],  # afterwards run with subjects
+    # next, we can use selected featuers to fit ridge #######################################
+    # 'ndelays': [4, 8],
+    # 'ndelays': [8],
+    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
+    # 'feature_selection_stability_seeds': [5],
+    # 'feature_selection_alpha': get_alphas('qa_embedder'),
+    # 'feature_selection_alpha': get_alphas('eng1000'),
+
+    # we can also use selected features with subsampling #######################################
+    'ndelays': [8],
+    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
+    'subject': [f'UTS0{k}' for k in range(1, 9)],
     'feature_selection_stability_seeds': [5],
+    'feature_selection_alpha': [get_alphas('qa_embedder')[3]],
+    'num_stories': [10],
+    # 'num_stories': [-1, 5, 10, 15, 20],
+    # 'feature_selection_alpha': get_alphas('eng1000'),
 }
 
 params_coupled_dict = {
@@ -59,8 +71,9 @@ amlt_kwargs = {
     'amlt_file': join(repo_dir, 'scripts', 'launch_cpu.yaml'),
     # E4ads_v5 (30 GB), E8ads_v5 (56 GB), E16ads_v5 (120GB), E32ads_v5 (240GB), E64ads_v5 (480 GB)
     # 'sku': 'E64ads_v5',
-    'sku': 'E32ads_v5',
+    # 'sku': 'E32ads_v5',
     # 'sku': 'E16ads_v5',
+    'sku': 'E8ads_v5',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
@@ -69,11 +82,8 @@ submit_utils.run_args_list(
     amlt_kwargs=amlt_kwargs,
     # n_cpus=6,
     # n_cpus=2,
-    # gpu_ids=[0, 1],
     # gpu_ids=[0, 1, 2, 3],
-    # gpu_ids=[[0, 1], [2, 3]],
-    # gpu_ids=[[0, 1, 2, 3]],
-    actually_run=True,
+    # actually_run=False,
     repeat_failed_jobs=True,
     shuffle=True,
     cmd_python=f'export HF_TOKEN={open(expanduser("~/.HF_TOKEN"), "r").read().strip()}; python',

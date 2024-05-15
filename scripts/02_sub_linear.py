@@ -25,22 +25,20 @@ params_shared_dict = {
     # 'encoding_model': ['ridge'],
     'use_test_setup': [0],
     'use_extract_only': [0],
+    'pc_components': [100],
 
     # 'subject': [f'UTS0{k}' for k in range(1, 9)],
-    'subject': [f'UTS0{k}' for k in range(1, 4)],
+    # 'subject': [f'UTS0{k}' for k in range(1, 4)],
     # 'subject': [f'UTS0{k}' for k in range(4, 9)],
-    # 'subject': ['UTS03'],
+    'subject': ['UTS04'],
 
     # ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08']
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
-    'ndelays': [4, 8],
-    # 'ndelays': [8],
+    # 'ndelays': [4, 8],
+    'ndelays': [8],
 
     # default is -1, SO4-SO8 have 24 or 25 stories
-    'num_stories': [5, 10, 15, 20],
-
-    # cluster
-    'pc_components': [100],
+    # 'num_stories': [-1, 5, 10, 15, 20],
 }
 
 params_coupled_dict = {
@@ -48,8 +46,8 @@ params_coupled_dict = {
 
     [
         # baselines
-        ('eng1000', None, None, None),
-        ('bert-base-uncased', None, None, None),
+        # ('eng1000', None, None, None),
+        # ('bert-base-uncased', None, None, None),
         # ('finetune_roberta-base-10', None, None, None),
         # ('finetune_roberta-base_binary-10', None, None, None),
     ]
@@ -57,15 +55,9 @@ params_coupled_dict = {
 
     # llama versions
     [
-        # (llama, None, None, embedding_layer)
-        # for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
-        # for embedding_layer in [6, 12, 18, 24, 30]
-    ]
-    +
-    [
-        # (llama, None, None, embedding_layer)
-        # for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
-        # for embedding_layer in [12, 24, 36, 48, 60]
+        (llama, None, None, embedding_layer)
+        for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
+        for embedding_layer in [12, 24, 36, 48, 60]
     ]
     +
 
@@ -73,18 +65,27 @@ params_coupled_dict = {
     [
         # ensemble1
         # questions: v4, v5, v6, v4_boostexamples, v1, v2, v3_boostexamples, v3
-        ('qa_embedder', 'v3_boostexamples', model, None)
+        # ('qa_embedder', 'v3_boostexamples', model, None)
         # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot, 'ensemble1']  #
-        for model in ['ensemble1']
+        # for model in ['ensemble1']
     ]
     +
     # qa 70B
     [
         # ('qa_embedder', version, model, None)
         # for version in ['v1', 'v2']
+        # for version in ['v3_boostexamples']
         # for model in [LLAMA70B]
     ]
 
+
+    ####################
+    # let's just skip llama 7B/8B
+    # [
+        # (llama, None, None, embedding_layer)
+        # for llama in ['meta-llama/Llama-2-7b-hf', 'meta-llama/Meta-Llama-3-8B']
+        # for embedding_layer in [6, 12, 18, 24, 30]
+    # ]
 
 }
 # Args list is a list of dictionaries
