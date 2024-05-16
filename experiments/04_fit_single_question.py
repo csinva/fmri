@@ -148,9 +148,9 @@ if __name__ == "__main__":
         'qs_selected': qs_selected,
         'corrs_train_selected': corrs_train_selected,
         'corrs_test_selected': corrs_test_selected,
-        'corrs_train_selected_mean': corrs_train_selected.mean(),
-        'corrs_test_selected_mean': corrs_test_selected.mean(),
-        'corrs_test_mean_baseline': corrs_test.mean(),
+        'corrs_train_selected_mean': np.nanmean(corrs_train_selected),
+        'corrs_test_selected_mean': np.nanmean(corrs_test_selected),
+        'corrs_test_mean_baseline': np.nanmean(corrs_test),
     })
     print('corrs_test_selected_mean', r['corrs_test_selected_mean'])
 

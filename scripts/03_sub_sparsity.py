@@ -37,11 +37,12 @@ params_shared_dict = {
     # we can also use selected features with subsampling #######################################
     'ndelays': [8],
     # 'subject': ['UTS01', 'UTS02', 'UTS03'],
-    'subject': [f'UTS0{k}' for k in range(1, 9)],
+    'subject': [f'UTS0{k}' for k in range(4, 9)],
     'feature_selection_stability_seeds': [5],
     'feature_selection_alpha': [get_alphas('qa_embedder')[3]],
     # 'num_stories': [10],
-    'num_stories': [5, 20],
+    # 'num_stories': [5, 20],
+    'num_stories': [-1],
     # 'num_stories': [-1, 5, 10, 15, 20],
     # 'feature_selection_alpha': get_alphas('eng1000'),
 }
@@ -80,7 +81,7 @@ amlt_kwargs = {
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
-    amlt_kwargs=amlt_kwargs,
+    # amlt_kwargs=amlt_kwargs,
     # n_cpus=6,
     # n_cpus=2,
     # gpu_ids=[0, 1, 2, 3],
