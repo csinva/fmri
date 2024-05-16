@@ -22,9 +22,9 @@ sys.path.append('..')
 path_to_repo = dirname(dirname(os.path.abspath(__file__)))
 
 
-def _save_flatmap(vals, subject, fname_save, clab):
+def _save_flatmap(vals, subject, fname_save, clab=None, with_rois=False, cmap='RdBu', with_borders=False):
     vabs = max(np.abs(vals))
-    cmap = 'RdBu'
+
     # cmap = sns.diverging_palette(12, 210, as_cmap=True)
     # cmap = sns.diverging_palette(16, 240, as_cmap=True)
 
@@ -32,10 +32,12 @@ def _save_flatmap(vals, subject, fname_save, clab):
         vals, 'UT' + subject, xfmname=f'UT{subject}_auto', vmin=-vabs, vmax=vabs, cmap=cmap)
 
     cortex.quickshow(vol,
-                     with_rois=False,
+                     with_rois=with_rois,
                      with_labels=False,
-                     with_colorbar=False
+                     with_borders=with_borders,
+                     with_colorbar=clab == None,  # if not None, save separate cbar
                      )
+    os.makedirs(dirname(fname_save), exist_ok=True)
     plt.savefig(fname_save)
     plt.close()
 
@@ -46,9 +48,10 @@ def _save_flatmap(vals, subject, fname_save, clab):
     sm.set_array([])
     fig, ax = plt.subplots(figsize=(5, 0.35))
     cbar = plt.colorbar(sm, cax=ax, orientation='horizontal')
-    cbar.set_label(clab, fontsize='x-large')
-    plt.savefig(fname_save.replace('flatmap.pdf',
-                'cbar.pdf'), bbox_inches='tight')
+    if clab:
+        cbar.set_label(clab, fontsize='x-large')
+        plt.savefig(fname_save.replace('flatmap.pdf',
+                    'cbar.pdf'), bbox_inches='tight')
     plt.close()
 
 
