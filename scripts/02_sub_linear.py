@@ -28,8 +28,8 @@ params_shared_dict = {
     'pc_components': [100],
 
     # 'subject': [f'UTS0{k}' for k in range(1, 9)],
-    'subject': [f'UTS0{k}' for k in range(1, 4)],
-    # 'subject': [f'UTS0{k}' for k in range(4, 9)],
+    # 'subject': [f'UTS0{k}' for k in range(1, 4)],
+    'subject': [f'UTS0{k}' for k in range(4, 9)],
     # 'subject': ['UTS04'],
 
     # ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08']
@@ -101,16 +101,16 @@ amlt_kwargs_cpu = {
     # E4ads_v5 (30 GB), E8ads_v5 (56 GB), E16ads_v5 (120GB), E32ads_v5 (240GB), E64ads_v5 (480 GB)
     # 'sku': 'E64ads_v5',
     # 'sku': 'E32ads_v5',
-    # 'sku': 'E16ads_v5',
-    'sku': 'E8ads_v5',
+    'sku': 'E16ads_v5',
+    # 'sku': 'E8ads_v5',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    # amlt_kwargs=amlt_kwargs_cpu,
-    n_cpus=4,
+    amlt_kwargs=amlt_kwargs_cpu,
+    # n_cpus=4,
     # actually_run=False,
     repeat_failed_jobs=True,
     shuffle=True,
