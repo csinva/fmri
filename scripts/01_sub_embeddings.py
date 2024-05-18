@@ -26,7 +26,7 @@ params_shared_dict = {
     'subject': ['UTS05'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
 
-    'seed_stories': range(25),
+    'seed_stories': range(14),
 }
 
 params_coupled_dict = {

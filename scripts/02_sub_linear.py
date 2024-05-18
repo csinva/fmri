@@ -29,17 +29,17 @@ params_shared_dict = {
 
     # 'subject': [f'UTS0{k}' for k in range(1, 9)],
     # 'subject': [f'UTS0{k}' for k in range(1, 4)],
-    'subject': [f'UTS0{k}' for k in range(4, 9)],
-    # 'subject': ['UTS04'],
+    # 'subject': [f'UTS0{k}' for k in range(4, 9)],
+    'subject': ['UTS03'],
 
     # ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08']
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
-    'ndelays': [4, 8],
-    # 'ndelays': [8],
+    # 'ndelays': [4, 8],
+    'ndelays': [8],
 
     # default is -1, SO4-SO8 have 24 or 25 stories
     # 'num_stories': [-1, 5, 10, 15, 20],
-    'num_stories': [5, 10, 20],
+    # 'num_stories': [5, 10, 20],
 }
 
 params_coupled_dict = {
@@ -47,8 +47,8 @@ params_coupled_dict = {
 
     [
         # baselines
-        # ('eng1000', None, None, None),
-        # ('bert-base-uncased', None, None, None),
+        ('eng1000', None, None, None),
+        ('bert-base-uncased', None, None, None),
         # ('finetune_roberta-base-10', None, None, None),
         # ('finetune_roberta-base_binary-10', None, None, None),
     ]
@@ -100,8 +100,8 @@ amlt_kwargs_cpu = {
     'amlt_file': join(repo_dir, 'scripts', 'launch_cpu.yaml'),
     # E4ads_v5 (30 GB), E8ads_v5 (56 GB), E16ads_v5 (120GB), E32ads_v5 (240GB), E64ads_v5 (480 GB)
     # 'sku': 'E64ads_v5',
-    # 'sku': 'E32ads_v5',
-    'sku': 'E16ads_v5',
+    'sku': 'E32ads_v5',
+    # 'sku': 'E16ads_v5',
     # 'sku': 'E8ads_v5',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
@@ -110,7 +110,7 @@ submit_utils.run_args_list(
     script_name=script_name,
     unique_seeds='seed_stories',
     amlt_kwargs=amlt_kwargs_cpu,
-    # n_cpus=4,
+    # n_cpus=3,
     # actually_run=False,
     repeat_failed_jobs=True,
     shuffle=True,
