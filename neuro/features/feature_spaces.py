@@ -122,7 +122,7 @@ def get_embs_from_text_list(text_list: List[str], embedding_function) -> List[np
     return embs
 
 
-def get_ngrams_list_main(ds, num_trs_context, num_secs_context_per_word, num_ngrams_context):
+def get_ngrams_list_main(ds, num_trs_context=None, num_secs_context_per_word=None, num_ngrams_context=None) -> List[str]:
     def _get_ngrams_list_from_words_list(words_list: List[str], ngram_size: int = 5) -> List[str]:
         """Concatenate running list of words into grams with spaces in between
         """

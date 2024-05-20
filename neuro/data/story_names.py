@@ -1,4 +1,7 @@
 
+import warnings
+
+
 def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=False, all=False):
     TRAIN_01_PUBLIC = ['adollshouse', 'gpsformylostidentity', 'singlewomanseekingmanwich', 'adventuresinsayingyes', 'hangtime', 'sloth', 'afatherscover', 'haveyoumethimyet', 'souls', 'againstthewind', 'howtodraw', 'stagefright', 'alternateithicatom', 'ifthishaircouldtalk', 'stumblinginthedark', 'avatar', 'inamoment', 'superheroesjustforeachother', 'backsideofthestorm', 'itsabox', 'sweetaspie', 'becomingindian', 'jugglingandjesus', 'swimmingwithastronauts', 'beneaththemushroomcloud', 'kiksuya', 'thatthingonmyarm', 'birthofanation', 'leavingbaghdad', 'theadvancedbeginner', 'bluehope', 'legacy', 'theclosetthatateeverything', 'breakingupintheageofgoogle', 'lifeanddeathontheoregontrail', 'thecurse', 'buck', 'life', 'thefreedomridersandme', 'catfishingstrangerstofindmyself',
                        'lifereimagined', 'theinterview', 'cautioneating', 'listo', 'thepostmanalwayscalls', 'christmas1940', 'mayorofthefreaks', 'theshower', 'cocoonoflove', 'metsmagic', 'thetiniestbouquet', 'comingofageondeathrow', 'mybackseatviewofagreatromance', 'thetriangleshirtwaistconnection', 'exorcism', 'myfathershands', 'threemonths', 'eyespy', 'myfirstdaywiththeyankees', 'thumbsup', 'firetestforlove', 'naked', 'tildeath', 'food', 'notontheusualtour', 'treasureisland', 'forgettingfear', 'odetostepfather', 'undertheinfluence', 'onlyonewaytofindout', 'vixenandtheussr', 'gangstersandcookies', 'penpal', 'waitingtogo', 'goingthelibertyway', 'quietfire', 'whenmothersbullyback', 'goldiethegoldfish', 'reachingoutbetweenthebars', 'golfclubbing', 'shoppinginchina', 'wildwomenanddancingqueens']
@@ -66,6 +69,7 @@ def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=Fals
         story_names = DICT_PUBLIC[train_or_test][subject]
     # story_names = [s for s in story_names if not 'canplanetearth' in s]
     if all:
+        warnings.warn('Loading all stories, ignoring subject / train_or_test')
         # get set of all stories
         all_stories = []
         for k in ['train', 'test']:
