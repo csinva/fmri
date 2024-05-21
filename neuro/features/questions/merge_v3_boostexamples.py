@@ -61,6 +61,7 @@ DICT_MERGE_V3_BOOSTEXAMPLES = {
         "Does the story mention a form of art or exhibition?",
         "Does the input discuss a craft or DIY project?",
         "Does the story mention a craft or DIY project?",
+        'Is the sentence describing a craft or DIY project?',
         "Is an art or craft mentioned?",
         "Does the sentence describe an act of creativity or imagination?",
         "Does the sentence describe an artistic or creative activity?",
