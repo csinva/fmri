@@ -27,8 +27,8 @@ params_shared_dict = {
     'use_extract_only': [0],
     'pc_components': [100],
 
-    # 'subject': [f'UTS0{k}' for k in range(1, 9)],
-    'subject': [f'UTS0{k}' for k in range(1, 4)],
+    'subject': [f'UTS0{k}' for k in range(1, 9)],
+    # 'subject': [f'UTS0{k}' for k in range(1, 4)],
     # 'subject': [f'UTS0{k}' for k in range(4, 9)],
     # 'subject': ['UTS04'],
 
@@ -65,10 +65,10 @@ params_coupled_dict = {
     # qa versions
     [
         # ensemble1
-        # questions: v4, v5, v6, v4_boostexamples, v1, v2, v3_boostexamples, v3
-        ('qa_embedder', 'v3_boostexamples', model, None)
-        for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
-        # for model in ['ensemble1']
+        # questions: v4, v5, v6, v4_boostexamples, v1, v2, v3_boostexamples, v3, 'v3_boostexamples_merged'
+        ('qa_embedder', 'v3_boostexamples_merged', model, None)
+        # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
+        for model in ['ensemble1']
     ]
     +
     # qa 70B
@@ -109,8 +109,8 @@ submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    amlt_kwargs=amlt_kwargs_cpu,
-    # n_cpus=3,
+    # amlt_kwargs=amlt_kwargs_cpu,
+    n_cpus=4,
     # actually_run=False,
     repeat_failed_jobs=True,
     shuffle=True,

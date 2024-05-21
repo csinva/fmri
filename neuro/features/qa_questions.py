@@ -3,6 +3,7 @@ import json
 from neuro.features.questions.qa_questions_base import *
 from neuro.features.questions.qa_questions_data_boost import *
 from neuro.features.questions.qa_questions_llama_boost import *
+from neuro.features.questions.merge_v3_boostexamples import DICT_MERGE_V3_BOOSTEXAMPLES
 from os.path import join, dirname
 path_to_file = dirname(__file__)
 
@@ -38,8 +39,12 @@ def get_kwargs_list_for_version_str(version_str: str):
     # version str contains version and suffix
     # v3 -> v1, v2, v3
     # v3-ending -> v1-ending, v2-ending, v3-ending
-    # v3_boost_basic -> v1, v2, v3_boost_basic
-    # v3_boost_examples -> v1, v2, v3_boost_examples
+    # v3_boostbasic -> v1, v2, v3_boostbasic
+    # v3_boostexamples -> v1, v2, v3_boostexamples
+    # v3_boostexamples_merged -> v1, v2, v3_boostexamples
+
+    # remove _merged
+    version_str = version_str.replace('_merged', '')
 
     # check that there is no more than one hyphen or one underscore
     assert len(version_str.split('-')) <= 2
@@ -143,6 +148,22 @@ def get_questions(version='v1', suffix=None, full=False):
     return qs_added
 
 
+def get_merged_questions_v3_boostexamples():
+    questions = get_questions(
+        version='v3_boostexamples', full=True)
+    for k, v in DICT_MERGE_V3_BOOSTEXAMPLES.items():
+        # check that all questions are precise and have no spacing
+        for q in v:
+            assert q.strip() == q, q
+            assert q.strip() in questions, q
+        # check that questions are unique
+        assert len(v) == len(set(v)), v
+
+    questions_to_drop = [k for k in sum(DICT_MERGE_V3_BOOSTEXAMPLES.values(), [
+    ]) if not k in DICT_MERGE_V3_BOOSTEXAMPLES]
+    return [q for q in questions if not q in questions_to_drop]
+
+
 def get_question_num(question_version):
     if '-' in question_version:
         return int(question_version.split('-')[0][1:])
@@ -172,3 +193,5 @@ if __name__ == "__main__":
 
     # for q in get_questions('v4_boostexamples'):
         # print(q)
+
+    print(get_kwargs_list_for_version_str('v3_boostexamples_merged'))

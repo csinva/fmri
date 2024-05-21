@@ -2,9 +2,10 @@ from copy import deepcopy
 import torch
 import numpy as np
 import neuro.features.feature_spaces as feature_spaces
-import os
+from neuro.features.questions.merge_v3_boostexamples import DICT_MERGE_V3_BOOSTEXAMPLES
 import neuro.features.qa_questions as qa_questions
 from neuro.data.npp import zscore
+import pandas as pd
 
 
 def get_features_full(args, qa_embedding_model, story_names, extract_only=False):
@@ -61,8 +62,21 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False)
     if extract_only:
         return
 
-    features_downsampled_list = np.hstack(features_downsampled_list)
-    features_delayed = make_delayed(features_downsampled_list,
+    features_downsampled = np.hstack(features_downsampled_list)
+
+    # apply averaging over answers if relevant (and drop somem questions)
+    if '_merged' in args.qa_questions_version:
+        assert args.qa_questions_version == 'v3_boostexamples_merged', f'Only v3_boostexamples_merged is supported but got {args.qa_questions_version}'
+        # apply averaging over stim
+        questions = np.array(qa_questions.get_questions(
+            args.qa_questions_version.replace('_merged', ''), full=True))
+        for k, v in DICT_MERGE_V3_BOOSTEXAMPLES.items():
+            idx_k = np.where(questions == k)[0][0]
+            idxs_v = np.where(pd.Series(questions).isin(v))[0]
+            features_downsampled[:, idx_k] = features_downsampled[:, idxs_v].mean(
+                axis=1)
+
+    features_delayed = make_delayed(features_downsampled,
                                     delays=range(1, args.ndelays+1))
     return features_delayed
 
