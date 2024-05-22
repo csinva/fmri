@@ -79,6 +79,9 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False)
             idxs_v = np.where(pd.Series(questions).isin(v))[0]
             features_downsampled[:, idx_k] = features_downsampled[:, idxs_v].mean(
                 axis=1)
+        # keep only cols corresponding for non-drop features
+        idxs_to_keep = qa_questions._get_merged_keep_indices_v3_boostexamples()
+        features_downsampled = features_downsampled[:, idxs_to_keep]
 
     features_delayed = make_delayed(features_downsampled,
                                     delays=range(1, args.ndelays+1))

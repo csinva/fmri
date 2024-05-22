@@ -20,13 +20,13 @@ params_shared_dict = {
     'pc_components': [100],
 
     # first run to perform and save feature selection #######################################
-    # 'subject': ['shared'],  # first run with shared
-    # 'seed': range(5),
-    # 'feature_selection_alpha': get_alphas('qa_embedder'),
+    'subject': ['shared'],  # first run with shared
+    'seed': range(5),
+    'feature_selection_alpha': get_alphas('qa_embedder'),
     # 'feature_selection_alpha': get_alphas('eng1000'),
 
 
-    # next, we can use selected featuers to fit ridge #######################################
+    # next, we can use selected features to fit ridge #######################################
     # 'ndelays': [4, 8],
     # 'ndelays': [8],
     # 'subject': ['UTS01', 'UTS02', 'UTS03'],
@@ -35,21 +35,21 @@ params_shared_dict = {
     # 'feature_selection_alpha': get_alphas('eng1000'),
 
     # we can also use selected features with subsampling #######################################
-    'ndelays': [8],
+    # 'ndelays': [8],
     # 'subject': ['UTS01', 'UTS02', 'UTS03'],
-    'subject': [f'UTS0{k}' for k in range(4, 9)],
-    'feature_selection_stability_seeds': [5],
-    'feature_selection_alpha': [get_alphas('qa_embedder')[3]],
+    # 'subject': [f'UTS0{k}' for k in range(4, 9)],
+    # 'feature_selection_stability_seeds': [5],
+    # 'feature_selection_alpha': [get_alphas('qa_embedder')[3]],
     # 'num_stories': [10],
     # 'num_stories': [5, 20],
-    'num_stories': [-1],
+    # 'num_stories': [-1],
     # 'num_stories': [-1, 5, 10, 15, 20],
     # 'feature_selection_alpha': get_alphas('eng1000'),
 }
 
 params_coupled_dict = {
     ('feature_space', 'qa_questions_version', 'qa_embedding_model'): [
-        ('qa_embedder', 'v3_boostexamples', 'ensemble1')
+        ('qa_embedder', 'v3_boostexamples_merged', 'ensemble2')
         # ('eng1000', None, None),
         # ('bert-base-uncased', None, None), # maybe never have to run this
     ],
@@ -72,17 +72,17 @@ script_name = join(repo_dir, 'experiments', '02_fit_encoding.py')
 amlt_kwargs = {
     'amlt_file': join(repo_dir, 'scripts', 'launch_cpu.yaml'),
     # E4ads_v5 (30 GB), E8ads_v5 (56 GB), E16ads_v5 (120GB), E32ads_v5 (240GB), E64ads_v5 (480 GB)
-    # 'sku': 'E64ads_v5',
+    'sku': 'E64ads_v5',
     # 'sku': 'E32ads_v5',
     # 'sku': 'E16ads_v5',
-    'sku': 'E8ads_v5',
+    # 'sku': 'E8ads_v5',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
-    # amlt_kwargs=amlt_kwargs,
-    # n_cpus=6,
+    amlt_kwargs=amlt_kwargs,
+    n_cpus=6,
     # n_cpus=2,
     # gpu_ids=[0, 1, 2, 3],
     # actually_run=False,

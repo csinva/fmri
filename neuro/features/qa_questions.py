@@ -1,5 +1,6 @@
 import re
 import json
+import numpy as np
 from neuro.features.questions.qa_questions_base import *
 from neuro.features.questions.qa_questions_data_boost import *
 from neuro.features.questions.qa_questions_llama_boost import *
@@ -148,6 +149,14 @@ def get_questions(version='v1', suffix=None, full=False):
     return qs_added
 
 
+def _get_merged_keep_indices_v3_boostexamples():
+    questions = get_questions(
+        version='v3_boostexamples', full=True)
+    questions_to_drop = [k for k in sum(DICT_MERGE_V3_BOOSTEXAMPLES.values(), [
+    ]) if not k in DICT_MERGE_V3_BOOSTEXAMPLES]
+    return np.array([i for i, q in enumerate(questions) if q not in questions_to_drop])
+
+
 def get_merged_questions_v3_boostexamples():
     questions = get_questions(
         version='v3_boostexamples', full=True)
@@ -159,9 +168,8 @@ def get_merged_questions_v3_boostexamples():
         # check that questions are unique
         assert len(v) == len(set(v)), v
 
-    questions_to_drop = [k for k in sum(DICT_MERGE_V3_BOOSTEXAMPLES.values(), [
-    ]) if not k in DICT_MERGE_V3_BOOSTEXAMPLES]
-    return [q for q in questions if not q in questions_to_drop]
+    idxs_to_keep = _get_merged_keep_indices_v3_boostexamples()
+    return [q for i, q in enumerate(questions) if i in idxs_to_keep]
 
 
 def get_question_num(question_version):

@@ -38,7 +38,7 @@ params_shared_dict = {
     # 'ndelays': [8],
 
     # default is -1, SO4-SO8 have 24 or 25 stories
-    # 'num_stories': [-1, 5, 10, 15, 20],
+    'num_stories': [-1, 5, 10, 20],
     # 'num_stories': [5, 10, 20],
 }
 
@@ -69,7 +69,7 @@ params_coupled_dict = {
         ('qa_embedder', 'v3_boostexamples_merged', model, None)
         # ('qa_embedder', 'v2', model, None)
         # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
-        for model in ['ensemble2'] #, LLAMA8B, LLAMA70B]
+        for model in ['ensemble2']  # , LLAMA8B, LLAMA70B]
     ]
     +
     # qa 70B
@@ -111,7 +111,7 @@ submit_utils.run_args_list(
     script_name=script_name,
     unique_seeds='seed_stories',
     # amlt_kwargs=amlt_kwargs_cpu,
-    n_cpus=4,
+    n_cpus=8,
     # actually_run=False,
     repeat_failed_jobs=True,
     shuffle=True,
