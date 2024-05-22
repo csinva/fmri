@@ -21,9 +21,13 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False)
         n_time_points x(n_delays x n_features)
     '''
     # for ensemble, recursively call this function and average the features
-    if qa_embedding_model == 'ensemble1':
+    ensemble_dict = {
+        'ensemble1': ['mistralai/Mistral-7B-Instruct-v0.2', 'meta-llama/Meta-Llama-3-8B-Instruct', 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot'],
+        'ensemble2': ['mistralai/Mistral-7B-Instruct-v0.2', 'meta-llama/Meta-Llama-3-8B-Instruct', 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot', 'meta-llama/Meta-Llama-3-70B-Instruct'],
+    }
+    if qa_embedding_model in ensemble_dict.keys():
         features_delayed_list = []
-        for qa_embedding_model in ['mistralai/Mistral-7B-Instruct-v0.2', 'meta-llama/Meta-Llama-3-8B-Instruct', 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot']:
+        for qa_embedding_model in ensemble_dict[qa_embedding_model]:
             features_delayed = get_features_full(
                 args,
                 qa_embedding_model,

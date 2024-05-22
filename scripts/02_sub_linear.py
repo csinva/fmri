@@ -67,8 +67,9 @@ params_coupled_dict = {
         # ensemble1
         # questions: v4, v5, v6, v4_boostexamples, v1, v2, v3_boostexamples, v3, 'v3_boostexamples_merged'
         ('qa_embedder', 'v3_boostexamples_merged', model, None)
+        # ('qa_embedder', 'v2', model, None)
         # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
-        for model in ['ensemble1']
+        for model in ['ensemble2'] #, LLAMA8B, LLAMA70B]
     ]
     +
     # qa 70B

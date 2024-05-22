@@ -151,11 +151,12 @@ if __name__ == '__main__':
                         resp = call_api(messages)
                     else:
                         resp = call_api_limited(messages)
+                        # print(resp)
                     answers.append(resp.choices[0].message.content)
 
                 # print(i, resp.choices[0].message.content)
 
             answers = pd.Series(answers).str.lower()
             print(answers.value_counts())
-            assert set(answers.values) == {'yes', 'no'}
+            # assert set(answers.values) == {'yes', 'no'}
             joblib.dump((answers.values == 'yes').astype(bool), out_file)

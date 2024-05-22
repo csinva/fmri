@@ -87,7 +87,7 @@ def add_main_args(parser):
                         help='Model to use for QA embedding, if feature_space is qa_embedder',
                         )
     parser.add_argument("--qa_questions_version", type=str,
-                        default='v3_boostexamples_merged',
+                        default='v1',
                         choices=['v1', 'v2', 'v3', 'v3_boostexamples',
                                  'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged'],
                         help='Which set of QA questions to use, if feature_space is qa_embedder')
