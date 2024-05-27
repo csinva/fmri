@@ -38,6 +38,22 @@ def load_story_wordseqs_huge(stories) -> Dict[str, DataSequence]:
     return wordseqs
 
 
+def load_story_wordseqs_brain_drive(stories) -> Dict[str, DataSequence]:
+    df = joblib.load(join(config.brain_drive_resps_dir, 'metadata.pkl'))
+    wordseqs = df.loc[stories]['wordseq'].to_dict()
+    return wordseqs
+
+
+def load_story_wordseqs_wrapper(stories, use_huge, use_brain_drive):
+    if use_brain_drive:
+        return load_story_wordseqs_brain_drive(stories)
+    if use_huge:
+        # this is usually faster...
+        return load_story_wordseqs_huge(stories)
+    else:
+        return load_story_wordseqs(stories)
+
+
 class TRFile(object):
     def __init__(self, trfilename, expectedtr=2.0045):
         """Loads data from [trfilename], should be output from stimulus presentation code.

@@ -20,7 +20,7 @@ import logging
 import imodelsx.llm
 from neuro.features.qa_embedder import QuestionEmbedder, FinetunedQAEmbedder
 import neuro.config as config
-from neuro.features.stim_utils import load_story_wordseqs, load_story_wordseqs_huge
+from neuro.features.stim_utils import load_story_wordseqs, load_story_wordseqs_huge, load_story_wordseqs_wrapper
 
 
 def downsample_word_vectors(stories, word_vectors, wordseqs, strategy='lanczos'):
@@ -312,11 +312,8 @@ def _get_kwargs_extra(args):
 def get_features(args, feature_space, **kwargs):
     kwargs_extra = _get_kwargs_extra(args)
     logging.info(f'getting wordseqs..')
-    if kwargs['use_huge']:
-        # this is usually faster...
-        wordseqs = load_story_wordseqs_huge(kwargs['story_names'])
-    else:
-        wordseqs = load_story_wordseqs(kwargs['story_names'])
+    wordseqs = load_story_wordseqs_wrapper(
+        kwargs['story_names'], kwargs['use_huge'], kwargs['use_brain_drive'])
 
     if feature_space == 'eng1000':
         return get_eng1000_vectors(wordseqs, **kwargs)

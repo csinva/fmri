@@ -1,7 +1,7 @@
 import cortex
 from tqdm import tqdm
 import joblib
-import huth.features.qa_questions as qa_questions
+import neuro.features.qa_questions as qa_questions
 import numpy as np
 from os.path import join
 from matplotlib import pyplot as plt
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         # for version in ['v1', 'v2', 'v3', 'v4']:
         for version in ['v3_boostexamples']:
             print('Version', version)
-            args = r[(r.feature_space == 'qa_embedder-10') *
+            args = r[(r.feature_space == 'qa_embedder') *
                      #  (r.pc_components == -1) *
                      (r.pc_components == 100) *
                      #  (r.qa_embedding_model == 'mist-7B') *

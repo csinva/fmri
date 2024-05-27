@@ -30,7 +30,7 @@ def evaluate_pc_model_on_each_voxel(
 
 
 def add_summary_stats(r, verbose=True):
-    for key in ['corrs_test', 'corrs_tune', 'corrs_tune_pc', 'corrs_test_pc']:
+    for key in ['corrs_test', 'corrs_tune', 'corrs_tune_pc', 'corrs_test_pc', 'corrs_brain_drive']:
         if key in r:
             r[key + '_mean'] = np.nanmean(r[key])
             r[key + '_median'] = np.nanmedian(r[key])
@@ -46,7 +46,7 @@ def add_summary_stats(r, verbose=True):
             r[key.replace('corrs', 'r2') +
               '_median'] = np.nanmedian(r[key] * np.abs(r[key]))
 
-            if key == 'corrs_test' and verbose:
+            if key in ['corrs_test', 'corrs_brain_drive'] and verbose:
                 logging.info(f"mean {key}: {r[key + '_mean']:.4f}")
                 logging.info(f"median {key}: {r[key + '_median']:.4f}")
                 logging.info(f"frac>0 {key}: {r[key + '_frac>0']:.4f}")

@@ -33,7 +33,8 @@ params_shared_dict = {
     # 'subject': ['UTS04'],
 
     # ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08']
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
+    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may27'],
+    'use_eval_brain_drive': [1],
     'ndelays': [4, 8],
     # 'ndelays': [8],
 
@@ -47,8 +48,8 @@ params_coupled_dict = {
 
     [
         # baselines
-        # ('eng1000', None, None, None),
-        # ('bert-base-uncased', None, None, None),
+        ('eng1000', None, None, None),
+        ('bert-base-uncased', None, None, None),
         # ('finetune_roberta-base-10', None, None, None),
         # ('finetune_roberta-base_binary-10', None, None, None),
     ]
@@ -66,10 +67,10 @@ params_coupled_dict = {
     [
         # ensemble1
         # questions: v4, v5, v6, v4_boostexamples, v1, v2, v3_boostexamples, v3, 'v3_boostexamples_merged'
-        ('qa_embedder', 'v3_boostexamples_merged', model, None)
+        # ('qa_embedder', 'v3_boostexamples_merged', model, None)
         # ('qa_embedder', 'v2', model, None)
         # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
-        for model in ['ensemble2']  # , LLAMA8B, LLAMA70B]
+        # for model in ['ensemble2']  # , LLAMA8B, LLAMA70B]
     ]
     +
     # qa 70B

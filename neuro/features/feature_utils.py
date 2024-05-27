@@ -9,7 +9,7 @@ from neuro.data.npp import zscore
 import pandas as pd
 
 
-def get_features_full(args, qa_embedding_model, story_names, extract_only=False):
+def get_features_full(args, qa_embedding_model, story_names, extract_only=False, use_brain_drive=False):
     '''
     Params
     - -----
@@ -56,6 +56,7 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False)
             qa_embedding_model=qa_embedding_model,
             # use_huge=args.use_huge,
             use_huge=True,  # always use_huge, since it's just faster
+            use_brain_drive=use_brain_drive,
             # use_cache=False,
             **kwargs)
         # n_time_points x n_features

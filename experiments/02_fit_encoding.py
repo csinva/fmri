@@ -47,6 +47,8 @@ def add_main_args(parser):
                         default=None,
                         # default='/home/chansingh/mntv1/deep-fMRI/encoding/results_apr7/68936a10a548e2b4ce895d14047ac49e7a56c3217e50365134f78f990036c5f7',
                         help='Path to saved pickles for distillation. Instead of fitting responses, fit the predictions of this model.')
+    parser.add_argument("--use_eval_brain_drive", type=int, default=0,
+                        help='Whether to evaluate fitted model on brain drive stories')
 
     # encoding
     parser.add_argument("--feature_space", type=str,
@@ -165,6 +167,7 @@ def get_story_names(args):
         story_names_test = ['fromboyhoodtofatherhood']
         # story_names_test = ['onapproachtopluto']
         args.pc_components = 100
+        args.use_eval_brain_drive = 1
         # args.feature_selection_frac = 0.2
     else:
         story_names_train = story_names.get_story_names(
@@ -300,10 +303,17 @@ if __name__ == "__main__":
     # get data
     story_names_train, story_names_test = get_story_names(args)
     if args.use_extract_only:
+        # extract braindrive
+        story_names_brain_drive = story_names.get_story_names(
+            subject=args.subject, use_brain_drive=True, all=True)
+        stim_brain_drive_delayed = feature_utils.get_features_full(
+            args, args.qa_embedding_model, story_names_brain_drive, use_brain_drive=True)
+
         all_stories = story_names.get_story_names(all=True)
         random.shuffle(all_stories)
         feature_utils.get_features_full(args, args.qa_embedding_model,
                                         all_stories, extract_only=True)
+
     print('loading features...')
     stim_test_delayed = feature_utils.get_features_full(
         args, args.qa_embedding_model, story_names_test)
@@ -351,6 +361,17 @@ if __name__ == "__main__":
             explained_var_weight.sum() * len(explained_var_weight)
         r['corrs_tune_pc_weighted_mean'] = np.mean(
             explained_var_weight * r['corrs_tune_pc'])
+
+    if args.use_eval_brain_drive and args.subject in story_names.TEST_BRAINDRIVE.keys():
+        story_names_brain_drive = story_names.get_story_names(
+            subject=args.subject, use_brain_drive=True)
+        stim_brain_drive_delayed = feature_utils.get_features_full(
+            args, args.qa_embedding_model, story_names_brain_drive, use_brain_drive=True)
+        resp_brain_drive = response_utils.load_response_wrapper(
+            args, story_names_brain_drive, args.subject, use_brain_drive=True)
+        r['corrs_brain_drive'] = evaluate_pc_model_on_each_voxel(
+            args, stim_brain_drive_delayed, resp_brain_drive,
+            model_params_to_save, pca, scaler_test)
 
     # add extra stats
     r = add_summary_stats(r, verbose=True)

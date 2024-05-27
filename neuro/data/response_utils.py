@@ -40,7 +40,23 @@ def load_response_huge(stories, subject):
     return np.vstack([resps[story] for story in stories])
 
 
-def load_response_wrapper(args, stories, subject):
+def load_response_brain_drive(stories):
+    df = joblib.load(join(config.brain_drive_resps_dir, 'metadata.pkl'))
+    df_filt = df.loc[stories]
+    resps = []
+    file_paths = (config.brain_drive_resps_dir + '/' +
+                  df_filt['session'] + '/' + df_filt['resp_file']).to_list()
+    for file_path in file_paths:
+        resp = np.load(file_path)
+        resps.append(resp)
+    return np.vstack(resps)
+
+
+def load_response_wrapper(args, stories, subject, use_brain_drive=False):
+    if len(stories) == 0:
+        return []
+    if use_brain_drive:
+        return load_response_brain_drive(stories)
     if args.use_huge:
         return load_response_huge(stories, subject)
     else:
@@ -85,17 +101,18 @@ def get_resps_full(
 
         # pca.components_ is (n_components, n_voxels)
         pca = load_pca(subject, args.pc_components)
+        scaler_train = None
+        scaler_test = None
 
-        # fill nans with nanmean
         resp_train[np.isnan(resp_train)] = np.nanmean(resp_train)
-        resp_test[np.isnan(resp_test)] = np.nanmean(resp_test)
-
         resp_train = pca.transform(resp_train)
-        resp_test = pca.transform(resp_test)
-        logging.info(f'resp_train.shape (after pca) {resp_train.shape}')
         scaler_train = StandardScaler().fit(resp_train)
-        scaler_test = StandardScaler().fit(resp_test)
         resp_train = scaler_train.transform(resp_train)
+        logging.info(f'resp_train.shape (after pca) {resp_train.shape}')
+
+        resp_test[np.isnan(resp_test)] = np.nanmean(resp_test)
+        resp_test = pca.transform(resp_test)
+        scaler_test = StandardScaler().fit(resp_test)
         resp_test = scaler_test.transform(resp_test)
         return resp_train, resp_test, pca, scaler_train, scaler_test
 
