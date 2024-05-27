@@ -20,18 +20,18 @@ params_shared_dict = {
     'pc_components': [100],
 
     # first run to perform and save feature selection #######################################
-    'subject': ['shared'],  # first run with shared
-    'seed': range(5),
-    'feature_selection_alpha': get_alphas('qa_embedder'),
+    # 'subject': ['shared'],  # first run with shared
+    # 'seed': range(5),
+    # 'feature_selection_alpha': get_alphas('qa_embedder'),
     # 'feature_selection_alpha': get_alphas('eng1000'),
 
 
     # next, we can use selected features to fit ridge #######################################
     # 'ndelays': [4, 8],
-    # 'ndelays': [8],
-    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
-    # 'feature_selection_stability_seeds': [5],
-    # 'feature_selection_alpha': get_alphas('qa_embedder'),
+    'ndelays': [8],
+    'subject': ['UTS01', 'UTS02', 'UTS03'],
+    'feature_selection_stability_seeds': [5],
+    'feature_selection_alpha': get_alphas('qa_embedder'),
     # 'feature_selection_alpha': get_alphas('eng1000'),
 
     # we can also use selected features with subsampling #######################################
@@ -81,7 +81,7 @@ amlt_kwargs = {
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
-    amlt_kwargs=amlt_kwargs,
+    # amlt_kwargs=amlt_kwargs,
     n_cpus=6,
     # n_cpus=2,
     # gpu_ids=[0, 1, 2, 3],

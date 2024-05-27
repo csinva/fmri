@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import List
 import torch
 import numpy as np
 import neuro.features.feature_spaces as feature_spaces
@@ -107,7 +108,7 @@ def trim_and_normalize_features(downsampled_feat, trim=5, normalize=True):
     return feat
 
 
-def make_delayed(stim, delays, circpad=False):
+def make_delayed(stim, delays: List[int], circpad=False):
     """Creates non-interpolated concatenated delayed versions of [stim] with the given [delays] 
     (in samples).
 

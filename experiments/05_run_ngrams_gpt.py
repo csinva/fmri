@@ -39,87 +39,43 @@ if __name__ == '__main__':
     print(f'{len(ngrams_list_total)=} ngrams')
 
     questions = [
-        'Does the sentence describe a relationship between people?',
+        'Does the sentence describe a personal reflection or thought?',
         'Does the sentence contain a proper noun?',
-        'Does the sentence involve a description of an interpersonal misunderstanding or dispute?',
-        'Does the sentence involve the mention of a specific object or item?',
-        'Is time mentioned in the input?',
-        'Does the sentence involve a description of physical environment or setting?',
-        'Does the sentence include dialogue or thoughts directed towards another character?',
         'Does the sentence describe a physical action?',
-        'Does the sentence include dialogue?',
-        'Does the sentence involve a discussion about personal or social values?',
-        'Does the sentence describe a visual experience or scene?',
         'Does the sentence describe a personal or social interaction that leads to a change or revelation?',
-        'Does the sentence describe a specific sensation or feeling?',
-        'Is the input related to a specific industry or profession?',
-        'Does the input involve planning or organizing?',
-        'Does the sentence involve an expression of personal values or beliefs?',
-        "Is the sentence conveying the narrator's physical movement or action in detail?",
-        'Does the sentence include technical or specialized terminology?',
-        'Does the sentence contain a cultural reference?',
-        'Does the sentence contain a negation?',
+        #  'Does the sentence involve the mention of a specific object or item?', # completed
+        'Does the sentence involve a description of physical environment or setting?',
+        'Does the sentence describe a relationship between people?',
+        'Does the sentence mention a specific location?',
+        #  'Is time mentioned in the input?', # completed
+        'Is the sentence abstract rather than concrete?',
         "Does the sentence express the narrator's opinion or judgment about an event or character?",
-        'Does the input describe a specific texture or sensation?',
-        'Is the sentence in the passive voice?',
-        'Does the sentence express a sense of belonging or connection to a place or community?',
-        'Does the sentence reference a specific time or date?',
-        'Does the sentence use a unique or unusual word?',
-        'Does the sentence describe a routine activity?',
-        'Does the sentence include a personal anecdote or story?',
-        'Does the text describe a journey?',
-        'Does the input include a comparison or metaphor?',
-        'Does the sentence include a direct speech quotation?',
-        'Does the sentence involve moral reasoning?',
-        'Does the sentence express a philosophical or existential query or observation?',
-        'Does the sentence describe a sensory experience?',
-        'Is the sentence designed to persuade or convince?',
+        'Is the input related to a specific industry or profession?',
+        'Does the sentence include dialogue?',
+        'Does the sentence describe a visual experience or scene?',
+        'Does the input involve planning or organizing?',
         'Does the sentence involve spatial reasoning?',
-        'Does the input discuss a societal issue or social justice topic?',
-        'Does the sentence describe a physical sensation?',
-        'Does the sentence use irony or sarcasm?',
-        'Is the sentence a command?',
-        'Is there mention of a city, country, or geographic feature?',
+        'Does the sentence involve an expression of personal values or beliefs?',
+        'Does the sentence contain a negation?',
+        'Does the sentence describe a sensory experience?',
+        'Does the sentence include technical or specialized terminology?',
+        'Does the input contain a number?',
+        'Does the sentence contain a cultural reference?',
         'Does the text describe a mode of communication?',
-        'Does the sentence involve a recount of a social or community event?',
-        'Is the sentence providing an explanation or rationale?',
-        'Does the sentence describe a moment of relief or resolution of tension?',
-        'Does the sentence include a conditional clause?',
-        'Does the sentence describe a change in a physical or emotional state?',
-        'Does the sentence involve a safety or security concern?',
-        'Is the sentence structured as a list?',
-        'Is the sentence part of a mystery or puzzle?',
-        'Does the sentence include a threat or warning?',
-        'Does the sentence involve a personal anecdote about family or friends?',
+        'Does the input include a comparison or metaphor?',
+        'Does the sentence express a sense of belonging or connection to a place or community?',
+        'Does the sentence describe a specific sensation or feeling?',
         'Does the text include a planning or decision-making process?',
-        'Is there a mention of a scientific fact or concept?',
-        'Does the sentence involve a description of adapting to a new environment or situation?',
-        'Does the sentence include an account of a miscommunication or misunderstanding?',
-        'Does the sentence include a specific sound or auditory description?',
-        'Does the sentence describe a physical sensation (e.g., touch, taste)?',
-        'Does the sentence convey a sense of urgency or haste?',
-        'Does the sentence convey a decision or choice made by the narrator?',
-        'Does the sentence describe an indoor setting?',
-        'Does the sentence describe an experience of learning or gaining new knowledge?',
-        'Does the sentence use alliteration or rhyme?',
-        'Is a form of self-improvement or personal development mentioned?',
-        'Is the sentence describing a moment of realization or epiphany?',
-        'Does the input describe a specific emotion in detail?',
-        'Does the sentence describe a significant personal interaction?',
-        'Does the input include a description of clothing?']
-    # questions = qa_questions.get_questions('v3_boostexamples', full=True)
-    # questions = [
-    #     'Does the input include a philosophical or reflective thought?',
-    #     'Does the sentence contain a proper noun?',
-    #     'Does the sentence describe a physical action?',
-    #     'Does the sentence describe a relationship between people?',
-    #     'Does the sentence include dialogue or thoughts directed towards another character?',
-    #     'Does the sentence involve a description of an interpersonal misunderstanding or dispute?',
-    #     'Does the sentence involve a description of physical environment or setting?',
-    #     'Does the sentence involve the mention of a specific object or item?',
-    #     'Does the sentence reference a specific location or place?',
-    #     'Is time mentioned in the input?',
-    # ]
+        'Does the sentence include a personal anecdote or story?',
+        'Does the sentence involve a discussion about personal or social values?',
+        'Does the text describe a journey?',
+        'Does the input contain a measurement?',
+        'Does the sentence describe a physical sensation?',
+        'Does the sentence include a direct speech quotation?',
+        'Is the sentence reflective, involving self-analysis or introspection?',
+        'Does the input describe a specific texture or sensation?',
+    ]
+
     prompt_template = 'Read the input then answer a question about the input.\nInput: {example}\nQuestion: {question} Answer yes or no.'
     prompt = prompt_template.format(
         example=ngrams_list[100], question='Does the sentence include a metaphor?')
@@ -132,6 +88,7 @@ if __name__ == '__main__':
     for question in tqdm(questions):
         out_file = f'/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt/{question}.pkl'
         answers = []
+        print(out_file)
         if not os.path.exists(out_file):
             for i, ngrams in enumerate(tqdm(ngrams_list_total)):
                 if len(ngrams.strip()) <= 3:
@@ -160,3 +117,6 @@ if __name__ == '__main__':
             print(answers.value_counts())
             # assert set(answers.values) == {'yes', 'no'}
             joblib.dump((answers.values == 'yes').astype(bool), out_file)
+        else:
+            answers = joblib.load(out_file)
+            print('\tloaded', answers.shape, answers.value_counts())
