@@ -17,9 +17,12 @@ volumes = {
 }
 
 # create viewer
-cortex.webgl.show(data=volumes)
+# cortex.webgl.show(data=volumes)
+cortex.webgl.make_static(outpath='static_webviz', data=volume1, recache=True)
 
 user_input = input("Please enter something and press Enter to finish: ")
 
 # Print the user's input
 print(f"Ending because user input entered: {user_input}")
+
+# a webserver such as nginx can then be used to host the static viewer

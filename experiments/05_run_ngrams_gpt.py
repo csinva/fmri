@@ -9,6 +9,7 @@ from neuro.features import qa_questions, feature_spaces
 import imodelsx.process_results
 import pandas as pd
 import os
+import neuro.config
 import sys
 
 
@@ -43,11 +44,11 @@ if __name__ == '__main__':
         'Does the sentence contain a proper noun?',
         'Does the sentence describe a physical action?',
         'Does the sentence describe a personal or social interaction that leads to a change or revelation?',
-        #  'Does the sentence involve the mention of a specific object or item?', # completed
+        'Does the sentence involve the mention of a specific object or item?',  # completed
         'Does the sentence involve a description of physical environment or setting?',
         'Does the sentence describe a relationship between people?',
         'Does the sentence mention a specific location?',
-        #  'Is time mentioned in the input?', # completed
+        'Is time mentioned in the input?',  # completed
         'Is the sentence abstract rather than concrete?',
         "Does the sentence express the narrator's opinion or judgment about an event or character?",
         'Is the input related to a specific industry or profession?',
@@ -86,7 +87,7 @@ if __name__ == '__main__':
 
     answers = []
     for question in tqdm(questions):
-        out_file = f'/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt/{question}.pkl'
+        out_file = os.path.join(neuro.config.root_dir, f'qa/cache_gpt/{question}.pkl')
         answers = []
         print(out_file)
         if not os.path.exists(out_file):
@@ -116,7 +117,8 @@ if __name__ == '__main__':
             answers = pd.Series(answers).str.lower()
             print(answers.value_counts())
             # assert set(answers.values) == {'yes', 'no'}
+            os.makedirs(os.path.dirname(out_file), exist_ok=True)
             joblib.dump((answers.values == 'yes').astype(bool), out_file)
         else:
             answers = joblib.load(out_file)
-            print('\tloaded', answers.shape, answers.value_counts())
+            print('\tloaded', answers.shape, pd.Series(answers).value_counts())

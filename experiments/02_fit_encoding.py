@@ -87,6 +87,7 @@ def add_main_args(parser):
     # qa features
     parser.add_argument("--qa_embedding_model", type=str,
                         default='mistralai/Mistral-7B-Instruct-v0.2',
+                        # default='gpt4',
                         help='Model to use for QA embedding, if feature_space is qa_embedder',
                         )
     parser.add_argument("--qa_questions_version", type=str,
@@ -167,7 +168,7 @@ def get_story_names(args):
         story_names_test = ['fromboyhoodtofatherhood']
         # story_names_test = ['onapproachtopluto']
         args.pc_components = 100
-        args.use_eval_brain_drive = 1
+        args.use_eval_brain_drive = 0
         # args.feature_selection_frac = 0.2
     else:
         story_names_train = story_names.get_story_names(

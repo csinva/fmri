@@ -16,7 +16,7 @@ params_shared_dict = {
     'nboots': [5],
     'use_test_setup': [0],
     'use_extract_only': [0],
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may7'],
+    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may27'],
     'pc_components': [100],
 
     # first run to perform and save feature selection #######################################
@@ -28,23 +28,25 @@ params_shared_dict = {
 
     # next, we can use selected features to fit ridge #######################################
     # 'ndelays': [4, 8],
-    'ndelays': [8],
-    'subject': ['UTS01', 'UTS02', 'UTS03'],
-    'feature_selection_stability_seeds': [5],
-    'feature_selection_alpha': get_alphas('qa_embedder'),
-    # 'feature_selection_alpha': get_alphas('eng1000'),
-
-    # we can also use selected features with subsampling #######################################
     # 'ndelays': [8],
     # 'subject': ['UTS01', 'UTS02', 'UTS03'],
+    # 'feature_selection_alpha': get_alphas('eng1000'),
+    # 'feature_selection_alpha': get_alphas('qa_embedder'),
+    # 'feature_selection_stability_seeds': [5],
+
+    # we can also use selected features with subsampling #######################################
+    'ndelays': [8],
+    'subject': [f'UTS0{k}' for k in range(1, 9)],
+    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
     # 'subject': [f'UTS0{k}' for k in range(4, 9)],
+    'feature_selection_alpha': get_alphas('eng1000'),
     # 'feature_selection_stability_seeds': [5],
     # 'feature_selection_alpha': [get_alphas('qa_embedder')[3]],
     # 'num_stories': [10],
     # 'num_stories': [5, 20],
     # 'num_stories': [-1],
     # 'num_stories': [-1, 5, 10, 15, 20],
-    # 'feature_selection_alpha': get_alphas('eng1000'),
+
 }
 
 params_coupled_dict = {

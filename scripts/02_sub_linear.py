@@ -48,8 +48,8 @@ params_coupled_dict = {
 
     [
         # baselines
-        ('eng1000', None, None, None),
-        ('bert-base-uncased', None, None, None),
+        # ('eng1000', None, None, None),
+        # ('bert-base-uncased', None, None, None),
         # ('finetune_roberta-base-10', None, None, None),
         # ('finetune_roberta-base_binary-10', None, None, None),
     ]
@@ -57,7 +57,7 @@ params_coupled_dict = {
 
     # llama versions
     [
-        # (llama, None, None, embedding_layer)
+        (llama, None, None, embedding_layer)
         # for llama in ['meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-70B']
         # for embedding_layer in [12, 24, 36, 48, 60]
     ]

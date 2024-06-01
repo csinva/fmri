@@ -89,6 +89,7 @@ def get_story_names(subject: str = "UTS01", train_or_test="train", use_huge=Fals
             for k2 in DICT_HUGE[k]:
                 all_stories += DICT_HUGE[k][k2]
         story_names = list(set(all_stories))
+        return story_names
 
     if use_huge and subject in DICT_HUGE['train'].keys():
         story_names = DICT_HUGE[train_or_test][subject]

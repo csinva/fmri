@@ -5,6 +5,7 @@ import datasets
 import joblib
 import numpy as np
 import json
+import pandas as pd
 from os.path import join, dirname
 from functools import partial
 import neuro.features.qa_questions as qa_questions
@@ -20,6 +21,7 @@ import logging
 import imodelsx.llm
 from neuro.features.qa_embedder import QuestionEmbedder, FinetunedQAEmbedder
 import neuro.config as config
+import neuro.config
 from neuro.features.stim_utils import load_story_wordseqs, load_story_wordseqs_huge, load_story_wordseqs_wrapper
 
 
@@ -119,6 +121,36 @@ def get_embs_from_text_list(text_list: List[str], embedding_function) -> List[np
     for i in tqdm(range(num_ngrams)):
         # embs_list is (batch_size, 1, (seq_len + 2), 768) -- BERT adds initial / final tokens
         embs[i] = np.mean(embs_list[i], axis=1)  # avg over seq_len dim
+    return embs
+
+
+def get_gpt4_qa_embs_cached(qa_questions_version, story_name):
+    questions = qa_questions.get_questions(
+        version=qa_questions_version)
+    ngrams_metadata = joblib.load(os.path.join(
+        neuro.config.root_dir, 'qa/cache_gpt/ngrams_metadata.joblib'))
+    ngrams_list_total = ngrams_metadata['ngrams_list_total']
+    wordseq_idxs = ngrams_metadata['wordseq_idxs'][story_name]
+    story_len = wordseq_idxs[1] - wordseq_idxs[0]
+    answers_dict = {}
+    for question in os.listdir(os.path.join(neuro.config.root_dir, 'qa/cache_gpt')):
+        if '?' in question:
+            gpt4_cached_answers_file = os.path.join(neuro.config.root_dir,
+                                                    f'qa/cache_gpt/{question}')
+            answers_dict[question] = joblib.load(gpt4_cached_answers_file)
+    gpt4_cached_answers = pd.DataFrame(
+        answers_dict, index=ngrams_list_total)
+
+    embs = np.zeros((story_len, len(questions)))
+    gpt4_cached_answers_story = gpt4_cached_answers.iloc[wordseq_idxs
+                                                         [0]: wordseq_idxs[1]]
+    for q_pkl in gpt4_cached_answers.columns:
+        # assert q in questions
+        q = q_pkl.replace('.pkl', '')
+        if q in questions:
+            idx = questions.index(q)
+            embs[:, idx] = gpt4_cached_answers_story[q_pkl].values
+
     return embs
 
 
@@ -230,7 +262,7 @@ def get_llm_vectors(
         cache_file = join(
             config.cache_embs_dir, qa_questions_version, checkpoint.replace('/', '_'), f'{cache_hash}.jl')
         loaded_from_cache = False
-        if os.path.exists(cache_file) and use_cache:
+        if os.path.exists(cache_file) and use_cache and qa_embedding_model != 'gpt4':
             logging.info(
                 f'Loading cached {story_num}/{len(story_names)}: {story}')
             try:
@@ -250,12 +282,15 @@ def get_llm_vectors(
                 wordseqs[story], num_trs_context, num_secs_context_per_word, num_ngrams_context)
 
             # embed the ngrams
-            if embedding_model is None:
+            if embedding_model is None and not qa_embedding_model == 'gpt4':
                 embedding_model = _get_embedding_model(
                     checkpoint, qa_questions_version, qa_embedding_model)
             if checkpoint == 'qa_embedder':
                 print(f'Extracting {story_num}/{len(story_names)}: {story}')
-                embs = embedding_model(ngrams_list, verbose=False)
+                if qa_embedding_model == 'gpt4':
+                    embs = get_gpt4_qa_embs_cached(qa_questions_version, story)
+                else:
+                    embs = embedding_model(ngrams_list, verbose=False)
             elif checkpoint.startswith('finetune_'):
                 embs = embedding_model.get_embs_from_text_list(ngrams_list)
                 if '_binary' in checkpoint:
@@ -282,7 +317,8 @@ def get_llm_vectors(
             # print(story, 'vectors', vectors[story].shape,
             #   'unique', np.unique(vectors[story], return_counts=True))
             os.makedirs(dirname(cache_file), exist_ok=True)
-            joblib.dump(embs, cache_file)
+            if not qa_embedding_model == 'gpt4':
+                joblib.dump(embs, cache_file)
 
     if num_trs_context is not None:
         return vectors

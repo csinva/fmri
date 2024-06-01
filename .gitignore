@@ -55,3 +55,4 @@ qa_results/finetune*
 **.pkl
 **.txt
 **.npz
+huth
