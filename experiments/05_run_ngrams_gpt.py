@@ -87,7 +87,8 @@ if __name__ == '__main__':
 
     answers = []
     for question in tqdm(questions):
-        out_file = os.path.join(neuro.config.root_dir, f'qa/cache_gpt/{question}.pkl')
+        out_file = os.path.join(neuro.config.root_dir,
+                                f'qa/cache_gpt/{question}.pkl')
         answers = []
         print(out_file)
         if not os.path.exists(out_file):
