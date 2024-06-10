@@ -25,13 +25,15 @@ params_shared_dict = {
 
     # extract standard embeddings
     'use_extract_only': [1],
-    'subject': ['UTS05'],
+    # all subjects will be extracted regardless, this is just for prediction
+    'subject': ['UTS03'],
 
     # extract braindrive embs
     'use_eval_brain_drive': [1],
 
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may27'],
-    'seed_stories': range(10),
+    # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may27'],
+    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/jun8'],
+    'seed_stories': range(20),
 }
 
 params_coupled_dict = {
@@ -55,21 +57,21 @@ params_coupled_dict = {
 
     # qa versions
     [
-        # ('qa_embedder', version, model, None)
+        ('qa_embedder', version, model, None)
         #     # ensemble1, v4, v5, v6, v4_boostexamples
-        # for version in ['v3_boostexamples']
+        for version in ['v3_boostexamples']
         # for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
-        #     # for model in [LLAMA8B_fewshot]  # , LLAMA8B, LLAMA8B_fewshot]
-        # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
+        # for model in [LLAMA8B_fewshot]  # , LLAMA8B, LLAMA8B_fewshot]
+        for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
     ]
 
     +
 
     # qa 70B
     [
-        ('qa_embedder', version, model, None)
-        for version in ['v3_boostexamples']  # 'v1', 'v2', 'v3_boostexamples'
-        for model in [LLAMA70B]
+        # ('qa_embedder', version, model, None)
+        # for version in ['v3_boostexamples']  # 'v1', 'v2', 'v3_boostexamples'
+        # for model in [LLAMA70B]
     ]
 
     # let's just skip llama 7B/8B
@@ -90,9 +92,9 @@ amlt_kwargs = {
     # change this to run a cpu job
     'amlt_file': join(repo_dir, 'scripts', 'launch.yaml'),
     # [64G16-MI200-IB-xGMI, 64G16-MI200-xGMI
-    'sku': '64G8-MI200-xGMI',
+    # 'sku': '64G8-MI200-xGMI',
     # 'sku': '64G4-MI200-xGMI',
-    # 'sku': '64G2-MI200-xGMI',
+    'sku': '64G2-MI200-xGMI',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(

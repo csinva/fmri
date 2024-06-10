@@ -258,6 +258,8 @@ def get_llm_vectors(
                       'num_trs_context': num_trs_context, 'num_secs_context_per_word': num_secs_context_per_word}
         if layer_idx is not None:
             args_cache['layer_idx'] = layer_idx
+        if 'genstory' in story.lower():
+            args_cache['story_gen'] = True
         cache_hash = sha256(args_cache)
         cache_file = join(
             config.cache_embs_dir, qa_questions_version, checkpoint.replace('/', '_'), f'{cache_hash}.jl')

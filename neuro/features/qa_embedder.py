@@ -204,9 +204,9 @@ if __name__ == "__main__":
     # checkpoint = "mistralai/Mixtral-8x7B-v0.1"
     # checkpoint = 'mistralai/Mistral-7B-v0.1'
     # checkpoint = "meta-llama/Meta-Llama-3-8B"
-    # checkpoint = "meta-llama/Meta-Llama-3-8B-Instruct"
+    checkpoint = "meta-llama/Meta-Llama-3-8B-Instruct"
     # checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot'
-    checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-refined'
+    # checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-refined'
     # checkpoint = 'meta-llama/Meta-Llama-3-70B-Instruct-refined'
 
     # test

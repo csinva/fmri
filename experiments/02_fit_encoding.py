@@ -306,7 +306,7 @@ if __name__ == "__main__":
     if args.use_extract_only:
         # extract braindrive
         story_names_brain_drive = story_names.get_story_names(
-            subject=args.subject, use_brain_drive=True, all=True)
+            use_brain_drive=True, all=True)
         stim_brain_drive_delayed = feature_utils.get_features_full(
             args, args.qa_embedding_model, story_names_brain_drive, use_brain_drive=True)
 
