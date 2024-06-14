@@ -75,6 +75,29 @@ if __name__ == '__main__':
         'Does the sentence include a direct speech quotation?',
         'Is the sentence reflective, involving self-analysis or introspection?',
         'Does the input describe a specific texture or sensation?',
+
+        # newer
+        'Is the input about a discovery or realization?',
+        'Does the sentence include an account of a miscommunication or misunderstanding?',
+        'Does the sentence include a specific sound or auditory description?',
+        'Does the sentence use a unique or unusual word?',
+        'Does the sentence describe a change in a physical or emotional state?',
+        'Does the sentence describe a moment of relief or resolution of tension?',
+        'Does the sentence include a conditional clause?',
+        'Does the sentence reference a specific time or date?',
+        "Is the sentence conveying the narrator's physical movement or action in detail?",
+        'Is there mention of a city, country, or geographic feature?',
+        'Does the sentence involve an unexpected incident or accident?',
+        'Does the sentence involve a recount of a social or community event?',
+        'Does the sentence express a philosophical or existential query or observation?',
+        'Does the story involve a personal project or creation?',
+        'Is the sentence emotionally positive?',
+        'Does the sentence describe an activity related to daily life or routine?',
+        'Does the text include a reference to a past era or time period?',
+        'Does the input discuss a societal issue or social justice topic?',
+        'Does the sentence convey a decision or choice made by the narrator?',
+        'Does the sentence convey a sense of urgency or haste?',
+        'Is the sentence providing an explanation or rationale?',
     ]
 
     prompt_template = 'Read the input then answer a question about the input.\nInput: {example}\nQuestion: {question} Answer yes or no.'
