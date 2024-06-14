@@ -124,9 +124,11 @@ def get_embs_from_text_list(text_list: List[str], embedding_function) -> List[np
     return embs
 
 
-def get_gpt4_qa_embs_cached(qa_questions_version, story_name):
-    questions = qa_questions.get_questions(
-        version=qa_questions_version)
+def get_gpt4_qa_embs_cached(story_name, qa_questions_version=None, questions=None):
+    if questions is None:
+        questions = qa_questions.get_questions(
+            version=qa_questions_version)
+
     ngrams_metadata = joblib.load(os.path.join(
         neuro.config.root_dir, 'qa/cache_gpt/ngrams_metadata.joblib'))
     ngrams_list_total = ngrams_metadata['ngrams_list_total']
@@ -290,7 +292,7 @@ def get_llm_vectors(
             if checkpoint == 'qa_embedder':
                 print(f'Extracting {story_num}/{len(story_names)}: {story}')
                 if qa_embedding_model == 'gpt4':
-                    embs = get_gpt4_qa_embs_cached(qa_questions_version, story)
+                    embs = get_gpt4_qa_embs_cached(story, qa_questions_version)
                 else:
                     embs = embedding_model(ngrams_list, verbose=False)
             elif checkpoint.startswith('finetune_'):
