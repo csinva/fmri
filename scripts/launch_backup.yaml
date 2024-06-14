@@ -25,8 +25,8 @@ code:
 target:
   service: sing
   name: huashanvc1
-  resource_group: chansingh
-  workspace_name: chansingh_ws
+  resource_group: gcr-singularity
+  workspace_name: msrresrchws
 
 storage:
   output:

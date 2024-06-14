@@ -33,7 +33,7 @@ params_shared_dict = {
 
     # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may27'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/jun8'],
-    'seed_stories': range(20),
+    # 'seed_stories': range(20),
 }
 
 params_coupled_dict = {
@@ -61,7 +61,7 @@ params_coupled_dict = {
         #     # ensemble1, v4, v5, v6, v4_boostexamples
         for version in ['v3_boostexamples']
         # for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
-        # for model in [LLAMA8B_fewshot]  # , LLAMA8B, LLAMA8B_fewshot]
+        # for model in [MIST7B]  # , LLAMA8B, LLAMA8B_fewshot]
         for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
     ]
 
@@ -101,9 +101,9 @@ submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    amlt_kwargs=amlt_kwargs,
+    # amlt_kwargs=amlt_kwargs,
     # gpu_ids=[0, 1],
-    # gpu_ids=[0, 1, 2, 3],
+    gpu_ids=[0, 1, 2, 3],
     # gpu_ids=[[0, 1], [2, 3]],
     # gpu_ids=[[0, 1, 2, 3]],
     # actually_run=False,
