@@ -1,5 +1,5 @@
 import imodelsx.process_results
-import viz
+# import viz
 import dvu
 from tqdm import tqdm
 import seaborn as sns
