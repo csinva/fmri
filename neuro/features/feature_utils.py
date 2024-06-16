@@ -61,7 +61,7 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False,
             **kwargs)
         # n_time_points x n_features
         features_downsampled = trim_and_normalize_features(
-            features_downsampled_dict, normalize=True
+            features_downsampled_dict, trim=5, normalize=True
         )
         features_downsampled_list.append(deepcopy(features_downsampled))
     torch.cuda.empty_cache()
@@ -70,7 +70,7 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False,
 
     features_downsampled = np.hstack(features_downsampled_list)
 
-    # apply averaging over answers if relevant (and drop somem questions)
+    # apply averaging over answers if relevant (and drop some questions)
     if '_merged' in args.qa_questions_version:
         assert args.qa_questions_version == 'v3_boostexamples_merged', f'Only v3_boostexamples_merged is supported but got {args.qa_questions_version}'
         # apply averaging over stim

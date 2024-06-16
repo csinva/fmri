@@ -71,3 +71,9 @@ def load_clean_results(results_dir, experiment_filename='../experiments/02_fit_e
     )
     mets.append('corrs_test_mean_sem')
     return r, cols_varied, mets
+
+
+def abbrev_question(q):
+    for prefix in ['Does the sentence ', 'Is the sentence ', 'Does the input ', 'Is the input ', 'Does the text ']:
+        q = q.replace(prefix, '...')
+    return q
