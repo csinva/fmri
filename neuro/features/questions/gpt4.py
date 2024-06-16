@@ -1,13 +1,15 @@
-QUESTIONS_GPT4 = [
+
+
+QS_35_STABLE = [
     'Does the sentence describe a personal reflection or thought?',
     'Does the sentence contain a proper noun?',
     'Does the sentence describe a physical action?',
     'Does the sentence describe a personal or social interaction that leads to a change or revelation?',
-    'Does the sentence involve the mention of a specific object or item?',  # completed
+    'Does the sentence involve the mention of a specific object or item?',
     'Does the sentence involve a description of physical environment or setting?',
     'Does the sentence describe a relationship between people?',
     'Does the sentence mention a specific location?',
-    'Is time mentioned in the input?',  # completed
+    'Is time mentioned in the input?',
     'Is the sentence abstract rather than concrete?',
     "Does the sentence express the narrator's opinion or judgment about an event or character?",
     'Is the input related to a specific industry or profession?',
@@ -34,8 +36,10 @@ QUESTIONS_GPT4 = [
     'Does the sentence include a direct speech quotation?',
     'Is the sentence reflective, involving self-analysis or introspection?',
     'Does the input describe a specific texture or sensation?',
+]
 
-    # newer
+# note: only 54 stable in this setting as 2 qs get dropped from the previous 36
+QS_36_56_STABLE = [
     'Is the input about a discovery or realization?',
     'Does the sentence include an account of a miscommunication or misunderstanding?',
     'Does the sentence include a specific sound or auditory description?',
@@ -58,3 +62,13 @@ QUESTIONS_GPT4 = [
     'Does the sentence convey a sense of urgency or haste?',
     'Is the sentence providing an explanation or rationale?',
 ]
+
+QS_HYPOTHESES = [
+    'Does the input mention anything related to food?',
+]
+
+QUESTIONS_GPT4 = QS_35_STABLE + QS_36_56_STABLE
+
+if __name__ == '__main__':
+    assert len(QS_35_STABLE) == 35
+    assert len(QS_36_56_STABLE) == 56-35, len(QS_36_56_STABLE)
