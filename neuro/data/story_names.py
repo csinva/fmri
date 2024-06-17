@@ -63,7 +63,8 @@ DICT_HUGE = {
 
 TEST_BRAINDRIVE = {
     'UTS02': ['GenStory1', 'GenStory2', 'GenStory3', 'GenStory4', 'GenStory5',
-              'GenStory6', 'GenStory7', 'GenStory8', 'GenStory9', 'GenStory10'],
+              'GenStory6', 'GenStory7', 'GenStory8', 'GenStory9', 'GenStory10',
+              'GenStory27', 'GenStory28', 'GenStory29'],
     'UTS03': ['GenStory12', 'GenStory13', 'GenStory14', 'GenStory15',
               'GenStory16', 'GenStory17'],
 }

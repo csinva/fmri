@@ -165,7 +165,7 @@ def add_computational_args(parser):
 
 
 def get_story_names(args):
-    if args.use_test_setup:
+    if args.use_test_setup == 1:
         args.nboots = 2
         args.use_extract_only = 0
         args.use_huge = 0
@@ -175,6 +175,22 @@ def get_story_names(args):
         args.pc_components = 100
         args.use_eval_brain_drive = 0
         # args.feature_selection_frac = 0.2
+    elif args.use_test_setup == 2:
+        args.nboots = 3
+        args.feature_space = 'eng1000'
+        args.use_extract_only = 0
+        args.use_huge = 1
+        args.subject = 'UTS02'
+        story_names_train = story_names.get_story_names(
+            args.subject, 'train', use_huge=args.use_huge)
+        story_names_test = ['adollshouse', 'hangtime', 'sloth']
+        story_names_train = [
+            s for s in story_names_train if not s in story_names_test]
+        # story_names_test = ['sloth', 'adollshouse', 'fromboyhoodtofatherhood']
+        story_names_test = ['GenStory27', 'GenStory28', 'GenStory29']
+        args.pc_components = 100
+        args.use_eval_brain_drive = 0
+
     else:
         story_names_train = story_names.get_story_names(
             args.subject, 'train', use_huge=args.use_huge)

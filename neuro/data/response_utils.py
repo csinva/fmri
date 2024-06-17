@@ -55,7 +55,7 @@ def load_response_brain_drive(stories):
 def load_response_wrapper(args, stories, subject, use_brain_drive=False):
     if len(stories) == 0:
         return []
-    if use_brain_drive:
+    if use_brain_drive or all([s.startswith('GenStory') for s in stories]):
         return load_response_brain_drive(stories)
     if args.use_huge:
         return load_response_huge(stories, subject)

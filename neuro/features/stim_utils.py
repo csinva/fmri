@@ -45,13 +45,17 @@ def load_story_wordseqs_brain_drive(stories) -> Dict[str, DataSequence]:
 
 
 def load_story_wordseqs_wrapper(stories, use_huge, use_brain_drive):
-    if use_brain_drive:
-        return load_story_wordseqs_brain_drive(stories)
-    if use_huge:
-        # this is usually faster...
-        return load_story_wordseqs_huge(stories)
-    else:
-        return load_story_wordseqs(stories)
+    wordseqs = load_story_wordseqs_huge(stories)
+    # print('stories', stories, 'ks')
+    if use_brain_drive or any([s.startswith('GenStory') for s in stories]):
+        wordseqs.update(load_story_wordseqs_brain_drive(stories))
+    return wordseqs
+
+    # if use_huge:
+    # this is usually faster...
+    # return load_story_wordseqs_huge(stories)
+    # else:
+    # return load_story_wordseqs(stories)
 
 
 class TRFile(object):
