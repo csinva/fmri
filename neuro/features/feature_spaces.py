@@ -124,37 +124,34 @@ def get_embs_from_text_list(text_list: List[str], embedding_function) -> List[np
     return embs
 
 
-def get_gpt4_qa_embs_cached(story_name, qa_questions_version=None, questions=None):
+def get_gpt4_qa_embs_cached(story_name, questions: List[str] = None, qa_questions_version: str = None):
+    '''Returns (binary) embeedings for a story using GPT4 questions
+    Params
+    -----
+    story_name: str
+        Name of the story to get embeddings for
+    questions: List[str]
+        List of questions to get embeddings for
+    qa_questions_version: str, Optional
+        If questions is not passed, get questions from this version
+    '''
+    # set up question names
+    CACHE_DIR_GPT = join(neuro.config.root_dir, 'qa/cache_gpt')
     if questions is None:
         if '?' in qa_questions_version:
             questions = [qa_questions_version]
         else:
             questions = qa_questions.get_questions(
                 version=qa_questions_version)
-
-    ngrams_metadata = joblib.load(os.path.join(
-        neuro.config.root_dir, 'qa/cache_gpt/ngrams_metadata.joblib'))
-    ngrams_list_total = ngrams_metadata['ngrams_list_total']
+    ngrams_metadata = joblib.load(
+        join(CACHE_DIR_GPT, 'ngrams_metadata.joblib'))
     wordseq_idxs = ngrams_metadata['wordseq_idxs'][story_name]
     story_len = wordseq_idxs[1] - wordseq_idxs[0]
-    answers_dict = {}
-    for question in os.listdir(os.path.join(neuro.config.root_dir, 'qa/cache_gpt')):
-        if '?' in question:
-            gpt4_cached_answers_file = os.path.join(neuro.config.root_dir,
-                                                    f'qa/cache_gpt/{question}')
-            answers_dict[question] = joblib.load(gpt4_cached_answers_file)
-    gpt4_cached_answers = pd.DataFrame(
-        answers_dict, index=ngrams_list_total)
     embs = np.zeros((story_len, len(questions)))
-    gpt4_cached_answers_story = gpt4_cached_answers.iloc[wordseq_idxs
-                                                         [0]: wordseq_idxs[1]]
-    for q_pkl in gpt4_cached_answers.columns:
-        # assert q in questions
-        q = q_pkl.replace('.pkl', '')
-        if q in questions:
-            idx = questions.index(q)
-            embs[:, idx] = gpt4_cached_answers_story[q_pkl].values
-
+    for i, q in enumerate(questions):
+        gpt4_cached_answers_file = join(CACHE_DIR_GPT, f'{q}.pkl')
+        embs[:, i] = joblib.load(gpt4_cached_answers_file)[
+            wordseq_idxs[0]: wordseq_idxs[1]]
     return embs
 
 
@@ -294,7 +291,8 @@ def get_llm_vectors(
             if checkpoint == 'qa_embedder':
                 print(f'Extracting {story_num}/{len(story_names)}: {story}')
                 if qa_embedding_model == 'gpt4':
-                    embs = get_gpt4_qa_embs_cached(story, qa_questions_version)
+                    embs = get_gpt4_qa_embs_cached(
+                        story, qa_questions_version=qa_questions_version)
                 else:
                     embs = embedding_model(ngrams_list, verbose=False)
             elif checkpoint.startswith('finetune_'):

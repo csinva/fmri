@@ -19,6 +19,8 @@ params_shared_dict = {
     # things to change
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/jun16_gpt4'],
     'subject': ['UTS01', 'UTS02', 'UTS03'],
+    # 'subject': ['UTS02', 'UTS03', 'UTS01'],
+    # 'subject': ['UTS02'],  # , 'UTS03', 'UTS01'],
     'use_added_wordrate_feature': [0, 1],
 }
 
@@ -35,7 +37,8 @@ params_coupled_dict = {
     +
     [
         ('qa_embedder', repr(QUESTIONS_GPT4[i]), 'gpt4', None)
-        for i in range(len(QUESTIONS_GPT4))
+        # for i in range(len(QUESTIONS_GPT4))
+        for i in range(40)
     ],
 }
 # Args list is a list of dictionaries
@@ -59,7 +62,7 @@ submit_utils.run_args_list(
     script_name=script_name,
     unique_seeds='seed_stories',
     # amlt_kwargs=amlt_kwargs_cpu,
-    n_cpus=8,
+    # n_cpus=8,
     # actually_run=False,
     # repeat_failed_jobs=True,
     shuffle=True,

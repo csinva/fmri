@@ -11,7 +11,7 @@ import os
 from os.path import dirname
 import seaborn as sns
 import dvu
-import analyze_helper
+from neuro import analyze_helper
 import sys
 import json
 sys.path.append('..')
