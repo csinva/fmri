@@ -126,8 +126,11 @@ def get_embs_from_text_list(text_list: List[str], embedding_function) -> List[np
 
 def get_gpt4_qa_embs_cached(story_name, qa_questions_version=None, questions=None):
     if questions is None:
-        questions = qa_questions.get_questions(
-            version=qa_questions_version)
+        if '?' in qa_questions_version:
+            questions = [qa_questions_version]
+        else:
+            questions = qa_questions.get_questions(
+                version=qa_questions_version)
 
     ngrams_metadata = joblib.load(os.path.join(
         neuro.config.root_dir, 'qa/cache_gpt/ngrams_metadata.joblib'))
@@ -142,7 +145,6 @@ def get_gpt4_qa_embs_cached(story_name, qa_questions_version=None, questions=Non
             answers_dict[question] = joblib.load(gpt4_cached_answers_file)
     gpt4_cached_answers = pd.DataFrame(
         answers_dict, index=ngrams_list_total)
-
     embs = np.zeros((story_len, len(questions)))
     gpt4_cached_answers_story = gpt4_cached_answers.iloc[wordseq_idxs
                                                          [0]: wordseq_idxs[1]]

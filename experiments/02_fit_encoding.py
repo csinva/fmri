@@ -15,6 +15,7 @@ from neuro.features import feature_utils, feat_select
 from neuro.encoding.ridge import bootstrap_ridge, gen_temporal_chunk_splits
 import imodelsx.cache_save_utils
 import neuro.data.story_names as story_names
+from neuro.features.questions.gpt4 import QUESTIONS_GPT4
 import random
 import warnings
 import time
@@ -53,7 +54,7 @@ def add_main_args(parser):
     # encoding
     parser.add_argument("--feature_space", type=str,
                         default='qa_embedder',
-                        choices=['qa_embedder', 'eng1000', 'finetune_roberta-base', 'finetune_roberta-base_binary',
+                        choices=['qa_embedder', 'eng1000', 'wordrate', 'finetune_roberta-base', 'finetune_roberta-base_binary',
                                  'bert-base-uncased', 'distilbert-base-uncased',  'roberta-base',
                                  'meta-llama/Llama-2-7b-hf', 'meta-llama/Llama-2-70b-hf', 'meta-llama/Meta-Llama-3-8B', 'meta-llama/Meta-Llama-3-70B'],
                         help='''Passing a standard HF model name will compute embeddings from that model.
@@ -93,8 +94,10 @@ def add_main_args(parser):
     parser.add_argument("--qa_questions_version", type=str,
                         default='v1',
                         choices=['v1', 'v2', 'v3', 'v3_boostexamples',
-                                 'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged'],
-                        help='Which set of QA questions to use, if feature_space is qa_embedder')
+                                 'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged'] + QUESTIONS_GPT4,
+                        help='''Which set of QA questions to use, if feature_space is qa_embedder.
+                        If passed a single question name, uses only that question with gpt4-extracted feats.
+                        ''')
 
     # linear modeling
     parser.add_argument("--encoding_model", type=str,
@@ -320,7 +323,6 @@ if __name__ == "__main__":
         args, args.qa_embedding_model, story_names_test)
     stim_train_delayed = feature_utils.get_features_full(
         args, args.qa_embedding_model, story_names_train)
-
     if args.feature_selection_alpha >= 0:
         print('selecting features...')
         r, stim_train_delayed, stim_test_delayed = feat_select.select_features(

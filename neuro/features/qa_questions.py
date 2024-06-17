@@ -37,6 +37,8 @@ def _rewrite_to_focus_on_end(question, suffix='last'):
 
 
 def get_kwargs_list_for_version_str(version_str: str):
+    if '?' in version_str:
+        return [{'qa_questions_version': version_str}]
     # version str contains version and suffix
     # v3 -> v1, v2, v3
     # v3-ending -> v1-ending, v2-ending, v3-ending

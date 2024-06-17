@@ -67,7 +67,7 @@ QS_HYPOTHESES = [
     'Does the input mention anything related to food?',
 ]
 
-QUESTIONS_GPT4 = QS_35_STABLE + QS_36_56_STABLE
+QUESTIONS_GPT4 = QS_35_STABLE + QS_36_56_STABLE + QS_HYPOTHESES
 
 if __name__ == '__main__':
     assert len(QS_35_STABLE) == 35
