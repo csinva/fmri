@@ -9,7 +9,9 @@ from neuro.data.npp import zscore
 import pandas as pd
 
 
-def get_features_full(args, qa_embedding_model, story_names, extract_only=False, use_brain_drive=False):
+def get_features_full(
+        args, feature_space, qa_embedding_model, story_names,
+        extract_only=False, use_brain_drive=False, use_added_wordrate_feature=False):
     '''
     Params
     - -----
@@ -30,7 +32,7 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False,
         features_delayed_list = []
         for qa_embedding_model in ensemble_dict[qa_embedding_model]:
             features_delayed = get_features_full(
-                args,
+                args, feature_space,
                 qa_embedding_model,
                 story_names)
             features_delayed_list.append(features_delayed)
@@ -41,7 +43,7 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False,
 
     # for qa versions, we extract features multiple times and concatenate them
     # this helps with caching
-    if 'qa_embedder' in args.feature_space:
+    if 'qa_embedder' in feature_space:
         kwargs_list = qa_questions.get_kwargs_list_for_version_str(
             args.qa_questions_version)
     else:
@@ -51,7 +53,7 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False,
     for kwargs in kwargs_list:
         features_downsampled_dict = feature_spaces.get_features(
             args=args,
-            feature_space=args.feature_space,
+            feature_space=feature_space,
             story_names=story_names,
             qa_embedding_model=qa_embedding_model,
             # use_huge=args.use_huge,
@@ -87,6 +89,15 @@ def get_features_full(args, qa_embedding_model, story_names, extract_only=False,
 
     features_delayed = make_delayed(features_downsampled,
                                     delays=range(1, args.ndelays+1))
+
+    if use_added_wordrate_feature:
+        features_delayed_wordrate = get_features_full(
+            args, feature_space, qa_embedding_model, story_names,
+            extract_only=extract_only, use_brain_drive=use_brain_drive, use_added_wordrate_feature=False
+        )
+        features_delayed = np.hstack(
+            [features_delayed, features_delayed_wordrate])
+
     return features_delayed
 
 
@@ -110,7 +121,7 @@ def trim_and_normalize_features(downsampled_feat, trim=5, normalize=True):
 
 
 def make_delayed(stim, delays: List[int], circpad=False):
-    """Creates non-interpolated concatenated delayed versions of [stim] with the given [delays] 
+    """Creates non-interpolated concatenated delayed versions of [stim] with the given [delays]
     (in samples).
 
     If [circpad], instead of being padded with zeros, [stim] will be circularly shifted.

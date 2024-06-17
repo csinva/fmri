@@ -84,6 +84,8 @@ def add_main_args(parser):
                         Applies if feature_selection_alpha >= 0.
                         Note: needs to run feature-selection with this many different seeds (slow, good to run in parallel before calling this)
                         ''')
+    parser.add_argument("--use_added_wordrate_feature", type=int, default=0,
+                        choices=[0, 1], help='Whether to add the wordrate feature')
 
     # qa features
     parser.add_argument("--qa_embedding_model", type=str,
@@ -311,18 +313,18 @@ if __name__ == "__main__":
         story_names_brain_drive = story_names.get_story_names(
             use_brain_drive=True, all=True)
         stim_brain_drive_delayed = feature_utils.get_features_full(
-            args, args.qa_embedding_model, story_names_brain_drive, use_brain_drive=True)
+            args, args.feature_space,  args.qa_embedding_model, story_names_brain_drive, use_brain_drive=True, use_added_wordrate_feature=args.use_added_wordrate_feature)
 
         all_stories = story_names.get_story_names(all=True)
         random.shuffle(all_stories)
-        feature_utils.get_features_full(args, args.qa_embedding_model,
-                                        all_stories, extract_only=True)
+        feature_utils.get_features_full(args, args.feature_space, args.qa_embedding_model,
+                                        all_stories, extract_only=True, use_added_wordrate_feature=args.use_added_wordrate_feature)
 
     print('loading features...')
     stim_test_delayed = feature_utils.get_features_full(
-        args, args.qa_embedding_model, story_names_test)
+        args, args.feature_space, args.qa_embedding_model, story_names_test, use_added_wordrate_feature=args.use_added_wordrate_feature)
     stim_train_delayed = feature_utils.get_features_full(
-        args, args.qa_embedding_model, story_names_train)
+        args, args.feature_space, args.qa_embedding_model, story_names_train, use_added_wordrate_feature=args.use_added_wordrate_feature)
     if args.feature_selection_alpha >= 0:
         print('selecting features...')
         r, stim_train_delayed, stim_test_delayed = feat_select.select_features(
@@ -369,7 +371,7 @@ if __name__ == "__main__":
         story_names_brain_drive = story_names.get_story_names(
             subject=args.subject, use_brain_drive=True)
         stim_brain_drive_delayed = feature_utils.get_features_full(
-            args, args.qa_embedding_model, story_names_brain_drive, use_brain_drive=True)
+            args, args.feature_space, args.qa_embedding_model, story_names_brain_drive, use_brain_drive=True, use_added_wordrate_feature=args.use_added_wordrate_feature)
         resp_brain_drive = response_utils.load_response_wrapper(
             args, story_names_brain_drive, args.subject, use_brain_drive=True)
         r['corrs_brain_drive'] = evaluate_pc_model_on_each_voxel(
