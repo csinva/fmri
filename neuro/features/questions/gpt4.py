@@ -65,9 +65,19 @@ QS_36_56_STABLE = [
 
 QS_HYPOTHESES = [
     'Does the input mention anything related to food?',
+    'Does the input mention or describe a sound?',
+    'Does the input mention or describe a visual experience?',
+    'Does the input mention or describe a smell?',
+    'Does the input mention or describe a texture?',
+    'Does the input mention or describe a taste?',
+    'Does the input mention a number less than 5?',
+    'Does the input mention a number greater than 100?',
+    'Does the input mention or describe highly positive emotional valence?',
+    'Does the input mention or describe highly negative emotional valence?',
+    'Does the input mention or describe high emotional intensity?',
 ]
 
-QUESTIONS_GPT4 = QS_35_STABLE + QS_36_56_STABLE + QS_HYPOTHESES
+QUESTIONS_GPT4 = QS_35_STABLE + QS_HYPOTHESES + QS_36_56_STABLE
 
 if __name__ == '__main__':
     assert len(QS_35_STABLE) == 35
