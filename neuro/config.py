@@ -1,5 +1,7 @@
-from os.path import join, expanduser
-# join(dirname(dirname(os.path.abspath(__file__))))
+from os.path import join, expanduser, dirname
+import os.path
+path_to_file = os.path.dirname(os.path.abspath(__file__))
+repo_dir = dirname(path_to_file)
 
 if 'chansingh' in expanduser('~'):
     mnt_dir = '/home/chansingh/mntv1'

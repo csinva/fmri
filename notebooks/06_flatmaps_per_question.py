@@ -26,7 +26,7 @@ def get_weights_top(args):
 
     model_params = joblib.load(
         join(args.save_dir_unique, 'model_params.pkl'))
-    print(f'{args.feature_space=}, {args.pc_components=}, {args.ndelays=} {args.qa_embedding_model}')
+    # print(f'{args.feature_space=}, {args.pc_components=}, {args.ndelays=} {args.qa_embedding_model}')
 
     # get weights
     ndelays = args.ndelays
