@@ -1,0 +1,26 @@
+description: test
+
+target:
+  service: sing
+  name: msrresrchvc
+  workspace_name: gcrllama2ws
+
+environment:
+  image: amlt-sing/acpt-2.2.1-py3.10-cuda12.1
+
+code:  
+  local_dir: $CONFIG_DIR/..
+
+storage:
+  data:
+    storage_account_name: internblobdl
+    container_name: t-chansingh
+    mount_dir: /blob_data
+
+jobs:
+- name: run_fmri
+  process_count_per_node: 1
+  sku: G1-V100
+  command:
+  - echo "test"
+  - echo "Succesfully tested on cluster" > /blob_data/test_cluster.txt
