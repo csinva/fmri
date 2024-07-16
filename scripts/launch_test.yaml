@@ -22,5 +22,6 @@ jobs:
   process_count_per_node: 1
   sku: G1-V100
   command:
-  - echo "test"
+  - echo "test" # this is where you would run your python script
   - echo "Succesfully tested on cluster" > /blob_data/test_cluster.txt
+  - sleep 10000

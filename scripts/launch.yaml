@@ -14,8 +14,8 @@ environment:
     - pip install imodelsX/
     - pip install .
 
-code:
-  local_dir: $CONFIG_DIR/..
+code:  
+  local_dir: $CONFIG_DIR/.. # CONFIG_DIR is the directory where this launch.yaml file is located
 
 # target:
 #   service: amlk8s
@@ -25,11 +25,12 @@ code:
 target:
   service: sing
   name: huashanvc1
-  resource_group: chansingh
-  workspace_name: chansingh_ws
+  # resource_group: gcr-singularity-lab
+  workspace_name: gcrllama2ws
+
 
 storage:
-  output:
+  data:
     storage_account_name: chansingh
     container_name: cs1
     mount_dir: /mntv1 # dir on the local machine

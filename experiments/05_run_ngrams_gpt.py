@@ -30,7 +30,7 @@ def call_api(messages):
 
 if __name__ == '__main__':
     out_dir = os.path.join(neuro.config.root_dir, 'qa/cache_gpt')
-    questions = QUESTIONS_GPT4
+    questions = QUESTIONS_GPT4[::-1]
     story_names_list = sorted(story_names.get_story_names(
         all=True))
     print('loaded', len(story_names_list), 'stories')
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     print('example prompt', repr(prompt_template.format(
         example=ngrams_list_total[100], question=questions[0])))
-    lm = imodelsx.llm.get_llm('gpt-4-turbo-0125-spot')
+    lm = imodelsx.llm.get_llm('gpt-4-turbo-0125-spot', repeat_delay=1)
 
     answers = []
     for question in tqdm(questions):

@@ -57,21 +57,21 @@ params_coupled_dict = {
 
     # qa versions
     [
-        ('qa_embedder', version, model, None)
+        # ('qa_embedder', version, model, None)
         #     # ensemble1, v4, v5, v6, v4_boostexamples
-        for version in ['v3_boostexamples']
-        # for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
-        # for model in [MIST7B]  # , LLAMA8B, LLAMA8B_fewshot]
-        for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
+        # # for version in ['v3_boostexamples']
+        # # for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
+        # # for model in [MIST7B]  # , LLAMA8B, LLAMA8B_fewshot]
+        # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
     ]
 
     +
 
     # qa 70B
     [
-        # ('qa_embedder', version, model, None)
-        # for version in ['v3_boostexamples']  # 'v1', 'v2', 'v3_boostexamples'
-        # for model in [LLAMA70B]
+        ('qa_embedder', version, model, None)
+        for version in ['v3_boostexamples']  # 'v1', 'v2', 'v3_boostexamples'
+        for model in [LLAMA70B]
     ]
 
     # let's just skip llama 7B/8B
@@ -87,23 +87,26 @@ args_list = submit_utils.get_args_list(
     params_shared_dict=params_shared_dict,
     params_coupled_dict=params_coupled_dict,
 )
+
+args_list = args_list[:1]
+
 script_name = join(repo_dir, 'experiments', '02_fit_encoding.py')
 amlt_kwargs = {
     # change this to run a cpu job
     'amlt_file': join(repo_dir, 'scripts', 'launch.yaml'),
     # [64G16-MI200-IB-xGMI, 64G16-MI200-xGMI
-    # 'sku': '64G8-MI200-xGMI',
+    'sku': '64G8-MI200-xGMI',
     # 'sku': '64G4-MI200-xGMI',
-    'sku': '64G2-MI200-xGMI',
+    # 'sku': '64G2-MI200-xGMI',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    # amlt_kwargs=amlt_kwargs,
+    amlt_kwargs=amlt_kwargs,
     # gpu_ids=[0, 1],
-    gpu_ids=[0, 1, 2, 3],
+    # gpu_ids=[0, 1, 2, 3],
     # gpu_ids=[[0, 1], [2, 3]],
     # gpu_ids=[[0, 1, 2, 3]],
     # actually_run=False,
