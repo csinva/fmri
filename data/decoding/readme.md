@@ -1,4 +1,4 @@
-Each folder contains data for a single human subject (UTS03 is the most easily decodable, so start there). The `labels` folder contains annotated labels for each part of the story.
+Each folder contains data for a single human subject (UTS03 is the most easily decodable, so start there). The `labels` folder contains binary labels for different questions for each ngram of the story.
 
 - The embeddings are different for each subject, so always train/test on each subject individually
 
