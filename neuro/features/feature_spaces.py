@@ -124,20 +124,25 @@ def get_embs_from_text_list(text_list: List[str], embedding_function) -> List[np
     return embs
 
 
-def get_gpt4_qa_embs_cached(story_name, questions: List[str] = None, qa_questions_version: str = None):
+def get_gpt4_qa_embs_cached(
+        story_name,
+        questions: List[str] = None,
+        qa_questions_version: str = None,
+        return_ngrams=False,
+):
     '''Returns (binary) embeedings for a story using GPT4 questions
     Params
     -----
     story_name: str
         Name of the story to get embeddings for
     questions: List[str]
-        List of questions to get embeddings for
+        List of questions to get embeddings for. These end in '?'
     qa_questions_version: str, Optional
         If questions is not passed, get questions from this version
     '''
     # set up question names
     CACHE_DIR_GPT = join(neuro.config.root_dir, 'qa/cache_gpt')
-    if questions is None:
+    if questions is None or questions == []:
         if '?' in qa_questions_version:
             questions = [qa_questions_version]
         else:
@@ -152,7 +157,10 @@ def get_gpt4_qa_embs_cached(story_name, questions: List[str] = None, qa_question
         gpt4_cached_answers_file = join(CACHE_DIR_GPT, f'{q}.pkl')
         embs[:, i] = joblib.load(gpt4_cached_answers_file)[
             wordseq_idxs[0]: wordseq_idxs[1]]
-    return embs
+    if return_ngrams:
+        return embs, ngrams_metadata['ngrams_list_total'][wordseq_idxs[0]: wordseq_idxs[1]]
+    else:
+        return embs
 
 
 def get_ngrams_list_main(ds, num_trs_context=None, num_secs_context_per_word=None, num_ngrams_context=None) -> List[str]:
