@@ -83,7 +83,18 @@ for train_or_test in ['test', 'train']:
             df = pd.DataFrame(
                 resp_selected, columns=column_names, index=ngrams_list)
 
-            # add answer to questions
+            # print('saving shape', df.shape)
+            os.makedirs(dirname(out_file), exist_ok=True)
+            df.to_pickle(out_file)
+            # joblib.dump(resp_selected, f'{subject.lower()}/{story_name}_resp.pkl')
+            # joblib.dump(
+            # ngrams_list, f'{subject.lower()}/{story_name}_row_names_ngrams.pkl')
+            # joblib.dump(
+            # column_names, f'{subject.lower()}/{story_name}_column_names_fmri.pkl')
+
+            # add answer labels
+            out_file_labels = f'labels/{train_or_test}/{story_name}_labels.pkl'
+            print('\tsaving', out_file_labels)
             questions = [
                 'Does the input contain a number?',
                 'Is time mentioned in the input?',
@@ -99,14 +110,5 @@ for train_or_test in ['test', 'train']:
             question_answers = neuro.features.feature_spaces.downsample_word_vectors(
                 [story_name], {story_name: question_answers}, wordseqs)[story_name][10:-5]
             df_answers = pd.DataFrame(question_answers, columns=questions)
-            for c in df_answers.columns:
-                df['ANS___' + c] = df_answers[c].values
-
-            print('saving shape', df.shape)
-            os.makedirs(dirname(out_file), exist_ok=True)
-            df.to_pickle(out_file)
-            # joblib.dump(resp_selected, f'{subject.lower()}/{story_name}_resp.pkl')
-            # joblib.dump(
-            # ngrams_list, f'{subject.lower()}/{story_name}_row_names_ngrams.pkl')
-            # joblib.dump(
-            # column_names, f'{subject.lower()}/{story_name}_column_names_fmri.pkl')
+            os.makedirs(dirname(out_file_labels), exist_ok=True)
+            df_answers = df_answers.astype(bool).to_pickle(out_file_labels)
