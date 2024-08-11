@@ -5,6 +5,7 @@ from neuro.features.questions.qa_questions_base import *
 from neuro.features.questions.qa_questions_data_boost import *
 from neuro.features.questions.qa_questions_llama_boost import *
 from neuro.features.questions.merge_v3_boostexamples import DICT_MERGE_V3_BOOSTEXAMPLES
+from neuro.features.questions.gpt4 import QS_HYPOTHESES
 from os.path import join, dirname
 path_to_file = dirname(__file__)
 
@@ -37,7 +38,7 @@ def _rewrite_to_focus_on_end(question, suffix='last'):
 
 
 def get_kwargs_list_for_version_str(version_str: str):
-    if '?' in version_str:
+    if '?' in version_str or 'neurosynth' in version_str:
         return [{'qa_questions_version': version_str}]
     # version str contains version and suffix
     # v3 -> v1, v2, v3
@@ -129,15 +130,21 @@ def get_questions(version='v1', suffix=None, full=False):
         ans_list = [ANS_BOOST_6, ANS_BOOST_6_2]
         remove_list = ['v1', 'v2', 'v3', 'v4', 'v5']
 
-    # special cases
+    # neurosynth
+    elif version == 'v1neurosynth':
+        qs = QS_HYPOTHESES
+        remove_list = []
+
+        # special cases
     elif version == 'base':
         return get_questions(version='v2', suffix=suffix, full=True)
 
     elif version == 'all':
         return get_questions(version='v6', suffix=suffix, full=True)
 
-    qs = sum([_split_bulleted_str(ans, remove_parentheticals)
-             for ans in ans_list], [])
+    if not 'neurosynth' in version:
+        qs = sum([_split_bulleted_str(ans, remove_parentheticals)
+                  for ans in ans_list], [])
 
     if suffix is not None:
         qs = [_rewrite_to_focus_on_end(q, suffix) for q in qs]
@@ -185,8 +192,8 @@ if __name__ == "__main__":
     # for k in ['v1', 'v3', 'v6', 'v3_boostbasic', 'v3_boostexamples', 'v4-ending', 'v3_boostbasic-ending', 'v4_boostexamples']:
     # print(k, get_kwargs_list_for_version_str(k))
 
-    for v in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']:
-        print(v, len(get_questions(v)))
+    for v in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v1_neurosynth']:
+        print(v, len(get_questions(v)))  # , get_questions(v)[:10])
     print('total questions', len(get_questions('all')))
 
     # boosting

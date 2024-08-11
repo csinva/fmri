@@ -96,7 +96,7 @@ def add_main_args(parser):
     parser.add_argument("--qa_questions_version", type=str,
                         default='v1',
                         choices=['v1', 'v2', 'v3', 'v3_boostexamples',
-                                 'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged'] + QUESTIONS_GPT4,
+                                 'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged', 'v1neurosynth'] + QUESTIONS_GPT4,
                         help='''Which set of QA questions to use, if feature_space is qa_embedder.
                         If passed a single question name, uses only that question with gpt4-extracted feats.
                         ''')
@@ -326,10 +326,12 @@ if __name__ == "__main__":
     story_names_train, story_names_test = get_story_names(args)
     if args.use_extract_only:
         # extract braindrive
-        story_names_brain_drive = story_names.get_story_names(
-            use_brain_drive=True, all=True)
-        stim_brain_drive_delayed = feature_utils.get_features_full(
-            args, args.feature_space,  args.qa_embedding_model, story_names_brain_drive, use_brain_drive=True, use_added_wordrate_feature=args.use_added_wordrate_feature)
+        if args.use_eval_brain_drive:
+            story_names_brain_drive = story_names.get_story_names(
+                use_brain_drive=True, all=True)
+            stim_brain_drive_delayed = feature_utils.get_features_full(
+                args, args.feature_space,  args.qa_embedding_model, story_names_brain_drive,
+                use_brain_drive=True, use_added_wordrate_feature=args.use_added_wordrate_feature)
 
         all_stories = story_names.get_story_names(all=True)
         random.shuffle(all_stories)
