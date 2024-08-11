@@ -43,6 +43,29 @@ def get_fmri_and_labs(story_name='onapproachtopluto', train_or_test='test', subj
     labs = labs[~idxs_na]
     texts = pd.Series(df.index)
     return df, labs, texts
+
+
+def concatenate_running_texts(texts, frac=1/2):
+    '''When decoding, you might want to concatenate 
+    the text of the current and surrounding texts
+    to deal with the temporal imprecision of the fMRI signal.
+    '''
+    texts_before = (
+        texts.shift(1)
+        .str.split().apply(  # only keep second half of words
+            lambda l: ' '.join(l[int(-len(l) * frac):]) if l else '')
+    )
+
+    texts_after = (
+        texts.shift(-1)
+        .str.split().apply(  # only keep first half of words
+            lambda l: ' '.join(l[:int(len(l) * frac)]) if l else '')
+    )
+
+    return texts_before + ' ' + texts + ' ' + texts_after
+
+df_orig, labs, texts = get_fmri_and_labs()
+texts = concatenate_running_texts(texts)
 ```
 
 
