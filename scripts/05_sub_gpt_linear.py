@@ -19,9 +19,9 @@ params_shared_dict = {
 
     # things to change
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/jun16_gpt4'],
-    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
+    'subject': ['UTS01', 'UTS02', 'UTS03'],
     # 'subject': ['UTS02', 'UTS03', 'UTS01'],
-    'subject': ['UTS02'],  # , 'UTS03', 'UTS01'],
+    # 'subject': ['UTS02'],  # , 'UTS03', 'UTS01'],
     'use_added_wordrate_feature': [0, 1],
 }
 
@@ -39,7 +39,7 @@ params_coupled_dict = {
     [
         ('qa_embedder', repr(QUESTIONS_GPT4[i]), 'gpt4', None)
         # for i in range(len(QUESTIONS_GPT4))
-        for i in range(44)
+        for i in range(86)
     ],
 }
 # Args list is a list of dictionaries

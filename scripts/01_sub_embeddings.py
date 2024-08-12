@@ -58,21 +58,12 @@ params_coupled_dict = {
     # qa versions
     [
         ('qa_embedder', version, model, None)
+        # for version in ['v1neurosynth']
+        for version in ['v3_boostexamples']
         #     # ensemble1, v4, v5, v6, v4_boostexamples
-        # for version in ['v3_boostexamples']
-        for version in ['v1neurosynth']
         # # for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
-        # # for model in [MIST7B]  # , LLAMA8B, LLAMA8B_fewshot]
-        for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
-    ]
-
-    +
-
-    # qa 70B
-    [
-        # ('qa_embedder', version, model, None)
-        # for version in ['v3_boostexamples']  # 'v1', 'v2', 'v3_boostexamples'
-        # for model in [LLAMA70B]
+        # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
+        for model in [LLAMA70B]
     ]
 
     # let's just skip llama 7B/8B
@@ -105,10 +96,10 @@ submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    # amlt_kwargs=amlt_kwargs,
+    amlt_kwargs=amlt_kwargs,
     # gpu_ids=[0, 1],
     # gpu_ids=[0, 1, 2, 3],
-    gpu_ids=[[0, 1], [2, 3]],
+    # gpu_ids=[[0, 1], [2, 3]],
     # gpu_ids=[[0, 1, 2, 3]],
     # actually_run=False,
     # shuffle=True,
