@@ -32,3 +32,6 @@ term_dict = {
     'emotions': 'Does the input mention or describe highly positive emotional valence?',
     'negative-emotions': 'Does the input mention or describe highly negative emotional valence?'
 }
+
+
+term_dict_rev = {v: k for k, v in term_dict.items()}

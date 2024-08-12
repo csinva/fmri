@@ -26,14 +26,14 @@ params_shared_dict = {
     # extract standard embeddings
     'use_extract_only': [1],
     # all subjects will be extracted regardless, this is just for prediction
-    'subject': ['UTS03'],
+    # 'subject': ['UTS03'],
 
     # extract braindrive embs
     # 'use_eval_brain_drive': [1],
 
     # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/may27'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/jun8'],
-    # 'seed_stories': range(20),
+    'seed_stories': range(55, 60),
 }
 
 params_coupled_dict = {
@@ -58,8 +58,8 @@ params_coupled_dict = {
     # qa versions
     [
         ('qa_embedder', version, model, None)
-        # for version in ['v1neurosynth']
-        for version in ['v3_boostexamples']
+        for version in ['v1neurosynth']
+        # for version in ['v3_boostexamples']
         #     # ensemble1, v4, v5, v6, v4_boostexamples
         # # for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
         # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
