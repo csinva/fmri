@@ -22,7 +22,13 @@ sys.path.append('../notebooks')
 flatmaps_per_question = __import__('06_flatmaps_per_question')
 
 
-def _calc_corrs(flatmaps_qa, flatmaps_gt, titles_qa, titles_gt,):
+def _calc_corrs(flatmaps_qa, flatmaps_gt, titles_qa, titles_gt, preproc=None):
+
+    if preproc is not None:
+        if preproc == 'quantize':
+            # bin into n bins with equal number of samples
+            n_bins = 10
+
     corrs = pd.DataFrame(
         np.zeros((len(flatmaps_qa), len(flatmaps_gt))),
         index=titles_qa,

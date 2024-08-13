@@ -96,10 +96,13 @@ def add_main_args(parser):
     parser.add_argument("--qa_questions_version", type=str,
                         default='v1',
                         choices=['v1', 'v2', 'v3', 'v3_boostexamples',
-                                 'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged', 'v1neurosynth'] + QUESTIONS_GPT4,
+                                 'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged'] +
+                        ['v1neurosynth'] + QUESTIONS_GPT4,
                         help='''Which set of QA questions to use, if feature_space is qa_embedder.
                         If passed a single question name, uses only that question with gpt4-extracted feats.
                         ''')
+    parser.add_argument("--use_random_subset_features", type=int, default=0,
+                        help='Whether to use a random subset of features')
 
     # linear modeling
     parser.add_argument("--encoding_model", type=str,
@@ -348,6 +351,12 @@ if __name__ == "__main__":
         r, stim_train_delayed, stim_test_delayed = feat_select.select_features(
             args, r, stim_train_delayed, stim_test_delayed,
             story_names_train, story_names_test)
+    if args.use_random_subset_features:
+        rng = np.random.default_rng(args.seed_stories)
+        r['weight_random_mask'] = rng.choice(
+            [0, 1], stim_train_delayed.shape[1], p=[0.5, 0.5]).astype(bool)
+        stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
+        stim_test_delayed = stim_test_delayed[:, r['weight_random_mask']]
 
     print('loading resps...')
     if args.pc_components <= 0:
