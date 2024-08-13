@@ -352,9 +352,11 @@ if __name__ == "__main__":
             args, r, stim_train_delayed, stim_test_delayed,
             story_names_train, story_names_test)
     if args.use_random_subset_features:
-        rng = np.random.default_rng(args.seed_stories)
-        r['weight_random_mask'] = rng.choice(
-            [0, 1], stim_train_delayed.shape[1], p=[0.5, 0.5]).astype(bool)
+        rng = np.random.default_rng(args.seed)
+        r['weight_random_mask'] = np.tile(
+            rng.choice([0, 1], stim_train_delayed.shape[1] // args.ndelays),
+            args.ndelays
+        ).astype(bool)
         stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
         stim_test_delayed = stim_test_delayed[:, r['weight_random_mask']]
 

@@ -11,23 +11,21 @@ sys.path.append(repo_dir)
 params_shared_dict = {
     # things to average over
     'use_extract_only': [0],
-    'use_test_setup': [0],
     'pc_components': [100],
     'use_eval_brain_drive': [0],
-    # 'ndelays': [8],
-
     'ndelays': [4],
     'nboots': [50],
-    'use_random_subset_features': [1],
     'feature_selection_stability_seeds': [5],
 
+
     # things to change
-    # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/jun16_gpt4'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug12_neurosynth_gemv'],
     'subject': ['UTS01', 'UTS02', 'UTS03'],
     # 'subject': ['UTS02'],  # , 'UTS03', 'UTS01'],
     # 'use_added_wordrate_feature': [0, 1],
-    'seed_stories': range(50),
+    'use_test_setup': [0],
+    'use_random_subset_features': [1],
+    'seed': range(50),
 }
 
 params_coupled_dict = {
@@ -45,9 +43,9 @@ params_coupled_dict = {
     ]
     +
     [
-        ('qa_embedder', 'v3_boostexamples_merged',
-         'ensemble2', get_alphas('qa_embedder')[3])
-        # ('qa_embedder', 'v1neurosynth', 'meta-llama/Meta-Llama-3-8B-Instruct', None)
+        # ('qa_embedder', 'v3_boostexamples_merged',
+        #  'ensemble2', get_alphas('qa_embedder')[3])
+        ('qa_embedder', 'v1neurosynth', 'ensemble2', None)
     ]
 
 
@@ -71,7 +69,7 @@ amlt_kwargs_cpu = {
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
-    unique_seeds='seed_stories',
+    # unique_seeds='seed',
     amlt_kwargs=amlt_kwargs_cpu,
     # n_cpus=8,
     # actually_run=False,

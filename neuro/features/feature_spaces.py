@@ -130,7 +130,7 @@ def get_gpt4_qa_embs_cached(
         qa_questions_version: str = None,
         return_ngrams=False,
 ):
-    '''Returns (binary) embeedings for a story using GPT4 questions
+    '''Returns (binary) embeddings for a story using GPT4 questions
     Params
     -----
     story_name: str
@@ -139,6 +139,12 @@ def get_gpt4_qa_embs_cached(
         List of questions to get embeddings for. These end in '?'
     qa_questions_version: str, Optional
         If questions is not passed, get questions from this version
+
+
+    Returns
+    -------
+    embs: np.ndarray (n_ngrams, n_questions)
+        if a question is not found in the list, returns nan for that column in embs
     '''
     # set up question names
     CACHE_DIR_GPT = join(neuro.config.root_dir, 'qa/cache_gpt')
@@ -155,8 +161,11 @@ def get_gpt4_qa_embs_cached(
     embs = np.zeros((story_len, len(questions)))
     for i, q in enumerate(questions):
         gpt4_cached_answers_file = join(CACHE_DIR_GPT, f'{q}.pkl')
-        embs[:, i] = joblib.load(gpt4_cached_answers_file)[
-            wordseq_idxs[0]: wordseq_idxs[1]]
+        if os.path.exists(gpt4_cached_answers_file):
+            embs[:, i] = joblib.load(gpt4_cached_answers_file)[
+                wordseq_idxs[0]: wordseq_idxs[1]]
+        else:
+            embs[:, i] = np.nan
     if return_ngrams:
         return embs, ngrams_metadata['ngrams_list_total'][wordseq_idxs[0]: wordseq_idxs[1]]
     else:

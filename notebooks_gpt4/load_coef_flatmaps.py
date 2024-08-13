@@ -94,7 +94,7 @@ def _load_coefs_individual_wordrate(subject='S02'):
 
 def _load_coefs_wordrate(subject='S02'):
     r = rr
-    r = r[r.subject == 'S02']
+    r = r[r.subject == subject]
     r = r[r.use_added_wordrate_feature == 0]
     r = r[r.feature_space == 'wordrate']
 

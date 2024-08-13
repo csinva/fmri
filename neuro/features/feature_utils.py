@@ -125,11 +125,17 @@ def make_delayed(stim, delays: List[int], circpad=False):
     (in samples).
 
     If [circpad], instead of being padded with zeros, [stim] will be circularly shifted.
+
+    Returns
+    -------
+    np.ndarray
+        n_time_points x (n_delays x n_features)
+
     """
-    nt, ndim = stim.shape
+    num_trs, dim_emb = stim.shape
     dstims = []
     for di, d in enumerate(delays):
-        dstim = np.zeros((nt, ndim))
+        dstim = np.zeros((num_trs, dim_emb))
         if d < 0:  # negative delay
             dstim[:d, :] = stim[-d:, :]
             if circpad:
