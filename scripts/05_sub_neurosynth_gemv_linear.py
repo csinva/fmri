@@ -22,18 +22,19 @@ params_shared_dict = {
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug12_neurosynth_gemv'],
     'subject': ['UTS01', 'UTS02', 'UTS03'],
     # 'subject': ['UTS02'],  # , 'UTS03', 'UTS01'],
-    'use_added_wordrate_feature': [0, 1],
+    # 'use_added_wordrate_feature': [0, 1],
+    'use_added_wordrate_feature': [1],
     'use_test_setup': [1],
 
 
     # 3 settings
     # shapley feats
-    # 'use_random_subset_features': [1],
-    # 'seed': range(50),
+    'use_random_subset_features': [1],
+    'seed': range(50),
 
     # single question
     # 'single_question_idx': range(35),
-    'single_question_idx': range(len(QS_HYPOTHESES)),
+    # 'single_question_idx': range(len(QS_HYPOTHESES)),
 
     # comment the above to get all questions
 }
@@ -41,8 +42,8 @@ params_shared_dict = {
 params_coupled_dict = {
     ('feature_space', 'qa_questions_version', 'qa_embedding_model', 'feature_selection_alpha'):
     [
-        # ('qa_embedder', 'v3_boostexamples_merged',
-        #  'ensemble2', get_alphas('qa_embedder')[3]),
+        ('qa_embedder', 'v3_boostexamples_merged',
+         'ensemble2', get_alphas('qa_embedder')[3]),
         ('qa_embedder', 'v1neurosynth', 'ensemble2', None),
     ]
     +

@@ -108,3 +108,5 @@ def corr_bars(corrs, out_dir_save, xlab: str = ''):
              f'{np.diag(corrs).mean():.3f}', ha='left', color='C0')
     plt.xlabel(xlab + ' flatmap correlation')
     plt.savefig(join(out_dir_save, 'corrs_barplot.pdf'), bbox_inches='tight')
+    plt.savefig(join(out_dir_save, 'corrs_barplot.png'),
+                bbox_inches='tight', dpi=300)

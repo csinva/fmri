@@ -340,8 +340,9 @@ if __name__ == "__main__":
 
         all_stories = story_names.get_story_names(all=True)
         random.shuffle(all_stories)
-        feature_utils.get_features_full(args, args.feature_space, args.qa_embedding_model,
-                                        all_stories, extract_only=True, use_added_wordrate_feature=args.use_added_wordrate_feature)
+        feature_utils.get_features_full(
+            args, args.feature_space, args.qa_embedding_model,
+            all_stories, extract_only=True, use_added_wordrate_feature=args.use_added_wordrate_feature)
 
     print('loading features...')
     stim_test_delayed = feature_utils.get_features_full(

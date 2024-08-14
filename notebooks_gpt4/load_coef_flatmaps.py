@@ -21,8 +21,34 @@ sys.path.append('../notebooks')
 flatmaps_per_question = __import__('06_flatmaps_per_question')
 
 
-results_dir = '/home/chansingh/mntv1/deep-fMRI/encoding/jun16_gpt4'
-rr, cols_varied, mets = analyze_helper.load_clean_results(results_dir)
+def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexamples_merged'):
+    r = r[r['qa_questions_version'] == qa_questions_version]
+    r = r[r['subject'] == subject]
+    r = r[r['use_random_subset_features'] == 1]
+    # print(r.shape, rr_shapley.shape)
+    row = r.iloc[0]
+
+    if qa_questions_version == 'v3_boostexamples_merged':
+        questions = get_merged_questions_v3_boostexamples()
+        questions = np.array(questions)[row.weight_enet_mask]
+    else:
+        questions = get_questions(qa_questions_version)
+
+    flatmaps_shapley = defaultdict(list)
+    for i in range(len(r)):
+        row = r.iloc[i]
+        weights, weights_pc = flatmaps_per_question.get_weights_top(row)
+
+        # note: wordrate feature gets skipped because it's last
+        question_indexes = np.arange(len(questions))[
+            row['weight_random_mask'][:len(questions)]]
+
+        for w_idx, q_idx in enumerate(question_indexes):
+            flatmaps_shapley[questions[q_idx]].append(weights[w_idx])
+
+    for q, w in flatmaps_shapley.items():
+        flatmaps_shapley[q] = np.vstack(w).mean(axis=0)
+    return flatmaps_shapley
 
 
 def _load_coefs_35questions(subject='S02'):
@@ -52,11 +78,12 @@ def _load_coefs_35questions(subject='S02'):
     return df_w_selected35
 
 
-def _load_coefs_individual(subject='S02'):
+def _load_coefs_individual(rr, subject='S02'):
     r = rr
     r = r[r.subject == subject]
     r = r[r.use_added_wordrate_feature == 0]
     r = r[r.feature_space == 'qa_embedder']
+    r = r[r.single_question_idx >= 0]
 
     weights = np.array([
         flatmaps_per_question.get_weights_top(r.iloc[i])[0]
@@ -72,7 +99,7 @@ def _load_coefs_individual(subject='S02'):
     return df_w_individual
 
 
-def _load_coefs_individual_wordrate(subject='S02'):
+def _load_coefs_individual_wordrate(rr, subject='S02'):
     r = rr
     r = r[r.subject == subject]
     r = r[r.use_added_wordrate_feature == 1]
@@ -92,7 +119,7 @@ def _load_coefs_individual_wordrate(subject='S02'):
     return df_w_individual_wordrate
 
 
-def _load_coefs_wordrate(subject='S02'):
+def _load_coefs_wordrate(rr, subject='S02'):
     r = rr
     r = r[r.subject == subject]
     r = r[r.use_added_wordrate_feature == 0]
