@@ -19,13 +19,10 @@ params_shared_dict = {
 
 
     # things to change
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug12_neurosynth_gemv'],
+    'use_test_setup': [0],
+    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug14_neurosynth_gemv'],
     'subject': ['UTS01', 'UTS02', 'UTS03'],
-    # 'subject': ['UTS02'],  # , 'UTS03', 'UTS01'],
-    # 'use_added_wordrate_feature': [0, 1],
-    'use_added_wordrate_feature': [1],
-    'use_test_setup': [1],
-
+    'use_added_wordrate_feature': [0, 1],
 
     # 3 settings
     # shapley feats
@@ -48,11 +45,11 @@ params_coupled_dict = {
     ]
     +
     [
+
         # baseline wordrate alone
         # ('wordrate', None, None, None), None,
-    ]
-    +
-    [
+
+        # gpt4 questions
         # ('qa_embedder', 'v3_boostexamples_merged', 'gpt4', None, None),
         # ('qa_embedder', repr(QS_HYPOTHESES[i]), 'gpt4', None, None)
         # for i in range(len(QS_HYPOTHESES))

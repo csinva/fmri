@@ -22,6 +22,7 @@ flatmaps_per_question = __import__('06_flatmaps_per_question')
 
 
 def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexamples_merged'):
+    r = rr
     r = r[r['qa_questions_version'] == qa_questions_version]
     r = r[r['subject'] == subject]
     r = r[r['use_random_subset_features'] == 1]
@@ -35,7 +36,7 @@ def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexample
         questions = get_questions(qa_questions_version)
 
     flatmaps_shapley = defaultdict(list)
-    for i in range(len(r)):
+    for i in tqdm(range(len(r))):
         row = r.iloc[i]
         weights, weights_pc = flatmaps_per_question.get_weights_top(row)
 
