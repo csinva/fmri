@@ -3,7 +3,7 @@ import os
 from os.path import dirname, join, expanduser
 import sys
 from imodelsx import submit_utils
-from neuro.features.questions.gpt4 import QUESTIONS_GPT4
+from neuro.features.questions.gpt4 import QS_HYPOTHESES
 path_to_file = os.path.dirname(os.path.abspath(__file__))
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 sys.path.append(repo_dir)
@@ -22,30 +22,39 @@ params_shared_dict = {
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug12_neurosynth_gemv'],
     'subject': ['UTS01', 'UTS02', 'UTS03'],
     # 'subject': ['UTS02'],  # , 'UTS03', 'UTS01'],
-    # 'use_added_wordrate_feature': [0, 1],
-    'use_test_setup': [0],
-    'use_random_subset_features': [1],
-    'seed': range(50),
+    'use_added_wordrate_feature': [0, 1],
+    'use_test_setup': [1],
+
+
+    # 3 settings
+    # shapley feats
+    # 'use_random_subset_features': [1],
+    # 'seed': range(50),
+
+    # single question
+    # 'single_question_idx': range(35),
+    'single_question_idx': range(len(QS_HYPOTHESES)),
+
+    # comment the above to get all questions
 }
 
 params_coupled_dict = {
     ('feature_space', 'qa_questions_version', 'qa_embedding_model', 'feature_selection_alpha'):
-
-    [
-        # baselines
-        # ('wordrate', None, None, None),
-        # ('qa_embedder', 'v3_boostexamples_merged', 'gpt4', None),
-    ]
-    +
-    [
-        # ('qa_embedder', repr(QUESTIONS_GPT4[i]), 'gpt4', None)
-        # for i in range(len(QUESTIONS_GPT4))
-    ]
-    +
     [
         # ('qa_embedder', 'v3_boostexamples_merged',
-        #  'ensemble2', get_alphas('qa_embedder')[3])
-        ('qa_embedder', 'v1neurosynth', 'ensemble2', None)
+        #  'ensemble2', get_alphas('qa_embedder')[3]),
+        ('qa_embedder', 'v1neurosynth', 'ensemble2', None),
+    ]
+    +
+    [
+        # baseline wordrate alone
+        # ('wordrate', None, None, None), None,
+    ]
+    +
+    [
+        # ('qa_embedder', 'v3_boostexamples_merged', 'gpt4', None, None),
+        # ('qa_embedder', repr(QS_HYPOTHESES[i]), 'gpt4', None, None)
+        # for i in range(len(QS_HYPOTHESES))
     ]
 
 

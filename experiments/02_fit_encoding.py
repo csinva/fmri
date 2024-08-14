@@ -103,6 +103,8 @@ def add_main_args(parser):
                         ''')
     parser.add_argument("--use_random_subset_features", type=int, default=0,
                         help='Whether to use a random subset of features')
+    parser.add_argument("--single_question_idx", type=int, default=-1,
+                        help='If passed, only use this question index for QA features')
 
     # linear modeling
     parser.add_argument("--encoding_model", type=str,
@@ -355,6 +357,15 @@ if __name__ == "__main__":
         rng = np.random.default_rng(args.seed)
         r['weight_random_mask'] = np.tile(
             rng.choice([0, 1], stim_train_delayed.shape[1] // args.ndelays),
+            args.ndelays
+        ).astype(bool)
+        stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
+        stim_test_delayed = stim_test_delayed[:, r['weight_random_mask']]
+    elif args.single_question_idx >= 0:
+        idx_select = np.zeros(stim_train_delayed.shape[1] // args.ndelays)
+        idx_select[args.single_question_idx] = 1
+        r['weight_random_mask'] = np.tile(
+            idx_select,
             args.ndelays
         ).astype(bool)
         stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
