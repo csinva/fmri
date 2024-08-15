@@ -19,15 +19,16 @@ params_shared_dict = {
 
 
     # things to change
-    'use_test_setup': [0],
+    'use_test_setup': [1],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug14_neurosynth_gemv'],
     'subject': ['UTS01', 'UTS02', 'UTS03'],
-    'use_added_wordrate_feature': [0, 1],
+    # 'use_added_wordrate_feature': [0, 1],
+    'use_added_wordrate_feature': [0],
 
     # 3 settings
     # shapley feats
-    'use_random_subset_features': [1],
-    'seed': range(50, 100),
+    # 'use_random_subset_features': [1],
+    # 'seed': range(50, 100),
 
     # single question
     # 'single_question_idx': range(35),
@@ -41,7 +42,7 @@ params_coupled_dict = {
     [
         ('qa_embedder', 'v3_boostexamples_merged',
          'ensemble2', get_alphas('qa_embedder')[3]),
-        ('qa_embedder', 'v1neurosynth', 'ensemble2', None),
+        # ('qa_embedder', 'v1neurosynth', 'ensemble2', None),
     ]
     +
     [
@@ -77,7 +78,7 @@ submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     # unique_seeds='seed',
-    amlt_kwargs=amlt_kwargs_cpu,
+    # amlt_kwargs=amlt_kwargs_cpu,
     # n_cpus=8,
     # actually_run=False,
     # repeat_failed_jobs=True,

@@ -27,6 +27,7 @@ def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexample
     r = r[r['qa_questions_version'] == qa_questions_version]
     r = r[r['subject'] == subject]
     r = r[r['use_random_subset_features'] == 1]
+    # r = r[r['use_added_wordrate_feature'] == 1]
     # print(r.shape, rr_shapley.shape)
     row = r.iloc[0]
 
@@ -53,12 +54,12 @@ def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexample
     return flatmaps_shapley
 
 
-def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_merged'):
+def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_merged', use_added_wordrate_feature=0):
     r = r[r.qa_questions_version == qa_questions_version]
     r = r[r.feature_space == 'qa_embedder']
     r = r[r.subject == subject]
     r = r[r.use_random_subset_features == 0]
-    r = r[r.use_added_wordrate_feature == 0]
+    r = r[r.use_added_wordrate_feature == use_added_wordrate_feature]
     r = r[r.single_question_idx == -1]
     assert len(r) == 1
     args0 = r[r.subject == subject].iloc[0]
@@ -69,6 +70,7 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
         questions = np.array(questions)[args0.weight_enet_mask]
     else:
         questions = get_questions(qa_questions_version)
+    print(len(questions), 'questions', len(weights), 'weights')
 
     corrs_test = r['corrs_test']
     if qa_questions_version == 'v3_boostexamples_merged':

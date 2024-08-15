@@ -1,3 +1,4 @@
+import os
 term_dict = {
     'actions': 'Does the input mention anything related to an action?',
     'arithmetic': 'Does the input mention anything related to arithmetic?',
@@ -30,8 +31,39 @@ term_dict = {
     'sounds': 'Does the input mention anything related to sounds?',
     'taste': 'Does the input mention anything related to taste?',
     'emotions': 'Does the input mention or describe highly positive emotional valence?',
-    'negative-emotions': 'Does the input mention or describe highly negative emotional valence?'
+    'negative-emotions': 'Does the input mention or describe highly negative emotional valence?',
+
+    # hand-matched
+    'sensation': 'Does the sentence describe a physical sensation?',
+    'planning': 'Does the input involve planning or organizing?',
+    'food': 'Does the input mention anything related to food?',
+    'olfactory': 'Does the input mention or describe a smell?',
+    'sound': 'Does the input mention or describe a sound?',
+    'emotional-valence': 'Does the input mention or describe high emotional intensity?',
+    'negative': 'Does the sentence contain a negation?',
+    'thought': 'Does the sentence describe a personal reflection or thought?',
+    'sensory': 'Does the sentence describe a sensory experience?',
+    'location': 'Does the sentence mention a specific location?',
+    'communication': 'Does the text describe a mode of communication?',
+    'abstract': 'Is the sentence abstract rather than concrete?',
+
+
 }
 
 
 term_dict_rev = {v: k for k, v in term_dict.items()}
+
+if __name__ == '__main__':
+    computed_gpt4_qs = [
+        x.replace('.pkl', '') for x in os.listdir('/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')
+        if '?' in x
+    ]
+    print('num qs', len(computed_gpt4_qs))
+    computed_matched_gpt4_qs = [
+        k for k in computed_gpt4_qs if k in term_dict.values()]
+    print('num matched qs', len(computed_matched_gpt4_qs))
+
+    print('UNMATCHED QS')
+    for q in computed_gpt4_qs:
+        if q not in term_dict.values():
+            print(q)

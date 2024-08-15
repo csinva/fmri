@@ -179,6 +179,7 @@ def get_story_names(args):
         # story_names_test = ['onapproachtopluto']
         args.pc_components = 100
         args.use_eval_brain_drive = 0
+        # args.qa_embedding_model = 'mistralai/Mistral-7B-Instruct-v0.2'
         # args.feature_selection_frac = 0.2
     elif args.use_test_setup == 2:
         args.nboots = 3
@@ -370,6 +371,8 @@ if __name__ == "__main__":
         ).astype(bool)
         stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
         stim_test_delayed = stim_test_delayed[:, r['weight_random_mask']]
+    print('shapes', stim_test_delayed.shape, args.use_added_wordrate_feature)
+    breakpoint()
 
     print('loading resps...')
     if args.pc_components <= 0:
