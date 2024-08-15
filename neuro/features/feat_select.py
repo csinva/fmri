@@ -100,9 +100,12 @@ def select_features(args, r, stim_train_delayed, stim_test_delayed, story_names_
     r['weight_enet_mask'] = coef_nonzero
     r['weight_enet_mask_num_nonzero'] = coef_nonzero.sum()
 
+    # add a 1 to the end of coef_nonzero to account for the wordrate feature
+    if args.use_added_wordrate_feature:
+        coef_nonzero = np.concatenate([coef_nonzero, [1]])
+
     # mask stim_delayed based on nonzero coefs (need to repeat by args.ndelays)
-    coef_nonzero_rep = np.tile(
-        coef_nonzero.flatten(), args.ndelays).flatten()
+    coef_nonzero_rep = np.tile(coef_nonzero.flatten(), args.ndelays).flatten()
     stim_train_delayed = stim_train_delayed[:, coef_nonzero_rep]
     stim_test_delayed = stim_test_delayed[:, coef_nonzero_rep]
 

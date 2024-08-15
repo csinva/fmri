@@ -195,7 +195,6 @@ def get_story_names(args):
         story_names_test = ['GenStory27', 'GenStory28', 'GenStory29']
         args.pc_components = 100
         args.use_eval_brain_drive = 0
-
     else:
         story_names_train = story_names.get_story_names(
             args.subject, 'train', use_huge=args.use_huge)

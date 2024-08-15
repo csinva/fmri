@@ -12,6 +12,7 @@ import cortex
 import seaborn as sns
 from os.path import join
 from collections import defaultdict
+from neuro.config import repo_dir, PROCESSED_DIR
 import numpy as np
 import sasc.viz
 import joblib
@@ -52,52 +53,93 @@ def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexample
     return flatmaps_shapley
 
 
-def _load_coefs_35questions(subject='S02'):
-    # # load questions model weights
-    # results_dir = analyze_helper.best_results_dir
-    # rr, cols_varied, mets = analyze_helper.load_clean_results(results_dir)
-    # metric_sort = 'corrs_tune_pc_weighted_mean'
-
-    # # pick model to interpret
-    # r = rr
-    # r = r[r.qa_questions_version == 'v3_boostexamples_merged']
-    # r = r[r.num_stories == -1]
-    # r = r[r.weight_enet_mask_num_nonzero == 35]
-    # r = r[r.feature_space == 'qa_embedder']
-    # cols_varied = [c for c in cols_varied if not c in ['num_stories',
-    #                                                    'feature_selection_alpha', 'feature_selection_stability_seeds']]
-    # args0 = r[r.subject == subject].iloc[0]
-    # weights, weights_pc = flatmaps_per_question.get_weights_top(args0)
-    # qs_selected = questions[args0['weight_enet_mask']]
-    # df_w_selected35 = pd.DataFrame({'question': qs_selected, 'weights': [
-    #                     w for w in weights]}).set_index('question')
-    # joblib.dump((args0, qs_selected, df_w_selected35),
-    # '../qa_results/processed/selected_weights.pkl')
-
-    args0, qs_selected, df_w_selected35 = joblib.load(
-        '../qa_results/processed/selected_weights.pkl')
-    return df_w_selected35
-
-
-def _load_coefs_individual(rr, subject='S02'):
-    r = rr
-    r = r[r.subject == subject]
-    r = r[r.use_added_wordrate_feature == 0]
+def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_merged'):
+    r = r[r.qa_questions_version == qa_questions_version]
     r = r[r.feature_space == 'qa_embedder']
-    r = r[r.single_question_idx >= 0]
+    r = r[r.subject == subject]
+    r = r[r.use_random_subset_features == 0]
+    r = r[r.use_added_wordrate_feature == 0]
+    r = r[r.single_question_idx == -1]
+    assert len(r) == 1
+    args0 = r[r.subject == subject].iloc[0]
+    weights, weights_pc = flatmaps_per_question.get_weights_top(args0)
 
+    if qa_questions_version == 'v3_boostexamples_merged':
+        questions = get_merged_questions_v3_boostexamples()
+        questions = np.array(questions)[args0.weight_enet_mask]
+    else:
+        questions = get_questions(qa_questions_version)
+
+    # qs_selected = questions[args0['weight_enet_mask']]
+    df_w_full = pd.DataFrame({'question': questions, 'weights': [
+        w for w in weights]}).set_index('question')
+    r[['subject', 'feature_selection_alpha', 'use_added_wordrate_feature',
+        'qa_questions_version', 'single_question_idx', 'corrs_test_mean']]  # .value_counts()
+
+    corrs_test = r['corrs_test']
+    if qa_questions_version == 'v3_boostexamples_merged':
+        joblib.dump(corrs_test, join(PROCESSED_DIR,
+                                     subject, 'corrs_test_35.pkl'))
+    else:
+        joblib.dump(corrs_test, join(PROCESSED_DIR,
+                                     subject, 'corrs_test_neurosynth.pkl'))
+
+    return df_w_full
+
+
+def _load_coefs_individual(r, subject='S02', qa_questions_version='v3_boostexamples_merged'):
+    r = r[r.qa_questions_version == qa_questions_version]
+    r = r[r.feature_space == 'qa_embedder']
+    r = r[r.subject == subject]
+    r = r[r.use_random_subset_features == 0]
+    r = r[r.use_added_wordrate_feature == 0]
+    r = r[r.single_question_idx > -1]
+    args0 = r[r.subject == subject].iloc[0]
+
+    if qa_questions_version == 'v3_boostexamples_merged':
+        questions = get_merged_questions_v3_boostexamples()
+        questions = np.array(questions)[args0.weight_enet_mask]
+    else:
+        questions = get_questions(qa_questions_version)
+
+    assert r.single_question_idx.nunique() == len(
+        questions), f'{r.single_question_idx.nunique()} != {len(questions)}'
+    assert len(r) == len(questions), f'{len(r)} != {len(questions)}'
+    args0 = r[r.subject == subject].iloc[0]
+    # weights, weights_pc = flatmaps_per_question.get_weights_top(args0)
     weights = np.array([
         flatmaps_per_question.get_weights_top(r.iloc[i])[0]
         for i in tqdm(range(len(r)))
     ]).squeeze()
-    qs_selected = r['qa_questions_version']
-    df_w_individual = pd.DataFrame({'question': qs_selected, 'weights': [
+
+    # qs_selected = questions[args0['weight_enet_mask']]
+    df_w_full = pd.DataFrame({'question': questions, 'weights': [
         w for w in weights]}).set_index('question')
-    # joblib.dump((r, qs_selected, df_w_individual),
-    # '../qa_results/processed/individual_weights.pkl')
-    # r, qs_selected, df_w_individual = joblib.load(
-    # '../qa_results/processed/individual_weights.pkl')
-    return df_w_individual
+    r[['subject', 'feature_selection_alpha', 'use_added_wordrate_feature',
+        'qa_questions_version', 'single_question_idx', 'corrs_test_mean']]  # .value_counts()
+
+    return df_w_full
+
+
+# def _load_coefs_individual(rr, subject='S02'):
+#     r = rr
+#     r = r[r.subject == subject]
+#     r = r[r.use_added_wordrate_feature == 0]
+#     r = r[r.feature_space == 'qa_embedder']
+#     r = r[r.single_question_idx >= 0]
+
+#     weights = np.array([
+#         flatmaps_per_question.get_weights_top(r.iloc[i])[0]
+#         for i in tqdm(range(len(r)))
+#     ]).squeeze()
+#     qs_selected = r['qa_questions_version']
+#     df_w_individual = pd.DataFrame({'question': qs_selected, 'weights': [
+#         w for w in weights]}).set_index('question')
+#     # joblib.dump((r, qs_selected, df_w_individual),
+#     # '../qa_results/processed/individual_weights.pkl')
+#     # r, qs_selected, df_w_individual = joblib.load(
+#     # '../qa_results/processed/individual_weights.pkl')
+#     return df_w_individual
 
 
 def _load_coefs_individual_wordrate(rr, subject='S02'):
