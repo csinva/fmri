@@ -70,12 +70,6 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
     else:
         questions = get_questions(qa_questions_version)
 
-    # qs_selected = questions[args0['weight_enet_mask']]
-    # df_w_full = pd.DataFrame({'question': questions, 'weights': [
-        # w for w in weights]}).set_index('question')
-    # r[['subject', 'feature_selection_alpha', 'use_added_wordrate_feature',
-    # 'qa_questions_version', 'single_question_idx', 'corrs_test_mean']]  # .value_counts()
-
     corrs_test = r['corrs_test']
     if qa_questions_version == 'v3_boostexamples_merged':
         joblib.dump(corrs_test, join(PROCESSED_DIR,
@@ -107,17 +101,10 @@ def _load_coefs_individual(r, subject='S02', qa_questions_version='v3_boostexamp
         questions), f'{r.single_question_idx.nunique()} != {len(questions)}'
     assert len(r) == len(questions), f'{len(r)} != {len(questions)}'
     args0 = r[r.subject == subject].iloc[0]
-    # weights, weights_pc = flatmaps_per_question.get_weights_top(args0)
     weights = np.array([
         flatmaps_per_question.get_weights_top(r.iloc[i])[0]
         for i in tqdm(range(len(r)))
     ]).squeeze()
-
-    # qs_selected = questions[args0['weight_enet_mask']]
-    # df_w_full = pd.DataFrame({'question': questions, 'weights': [
-    # w for w in weights]}).set_index('question')
-    # r[['subject', 'feature_selection_alpha', 'use_added_wordrate_feature',
-    # 'qa_questions_version', 'single_question_idx', 'corrs_test_mean']]  # .value_counts()
 
     return {q: w for q, w in zip(questions, weights)}
 
@@ -134,26 +121,6 @@ def _load_coefs_individual_gpt4(rr, subject='S02'):
     ]).squeeze()
     questions = r['qa_questions_version']
     return {q: w for q, w in zip(questions, weights)}
-
-# def _load_coefs_individual(rr, subject='S02'):
-#     r = rr
-#     r = r[r.subject == subject]
-#     r = r[r.use_added_wordrate_feature == 0]
-#     r = r[r.feature_space == 'qa_embedder']
-#     r = r[r.single_question_idx >= 0]
-
-#     weights = np.array([
-#         flatmaps_per_question.get_weights_top(r.iloc[i])[0]
-#         for i in tqdm(range(len(r)))
-#     ]).squeeze()
-#     qs_selected = r['qa_questions_version']
-#     df_w_individual = pd.DataFrame({'question': qs_selected, 'weights': [
-#         w for w in weights]}).set_index('question')
-#     # joblib.dump((r, qs_selected, df_w_individual),
-#     # '../qa_results/processed/individual_weights.pkl')
-#     # r, qs_selected, df_w_individual = joblib.load(
-#     # '../qa_results/processed/individual_weights.pkl')
-#     return df_w_individual
 
 
 def _load_coefs_individual_wordrate(rr, subject='S02'):

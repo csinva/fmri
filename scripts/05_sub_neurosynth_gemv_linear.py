@@ -27,7 +27,7 @@ params_shared_dict = {
     # 3 settings
     # shapley feats
     'use_random_subset_features': [1],
-    'seed': range(50),
+    'seed': range(50, 100),
 
     # single question
     # 'single_question_idx': range(35),

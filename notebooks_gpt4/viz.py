@@ -63,7 +63,7 @@ def _heatmap(corrs, out_dir_save):
                 bbox_inches='tight')
 
 
-def corr_bars(corrs, out_dir_save, xlab: str = ''):
+def corr_bars(corrs, out_dir_save, xlab: str = '', color='C0', label=None):
     os.makedirs(out_dir_save, exist_ok=True)
     print(out_dir_save)
     # mask = args0['corrs_test'] >= 0
@@ -96,16 +96,16 @@ def corr_bars(corrs, out_dir_save, xlab: str = ''):
         x=corrs_diag[idx_sort],
         y=np.arange(len(corrs.columns)),
         # xerr=corrs_err,
-        fmt='o', color='C0')
+        fmt='o',
+        color=color,
+        label=label + f' (mean {corrs_diag.mean():.2f})',
+    )
 
     plt.yticks(np.arange(len(corrs.columns)), corrs.columns[idx_sort])
     plt.axvline(0, color='gray')
-    plt.axvline(np.diag(corrs).mean())
+    plt.axvline(np.diag(corrs).mean(), color=color, linestyle='--')
     # plt.title(f'{setting} mean {np.diag(corrs).mean():.3f}')
     # annotate line with mean value
-    plt.text(np.diag(corrs).mean(), 0.1,
-             f'{np.diag(corrs).mean():.3f}', ha='left', color='C0')
+    # plt.text(np.diag(corrs).mean(), 0.1,
+    #  f'{np.diag(corrs).mean():.3f}', ha='left', color=color)
     plt.xlabel(xlab + ' flatmap correlation')
-    plt.savefig(join(out_dir_save, 'corrs_barplot.pdf'), bbox_inches='tight')
-    plt.savefig(join(out_dir_save, 'corrs_barplot.png'),
-                bbox_inches='tight', dpi=300)
