@@ -22,12 +22,12 @@ params_shared_dict = {
     'use_test_setup': [0],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug14_neurosynth_gemv'],
     'subject': ['UTS01', 'UTS02', 'UTS03'],
-    'use_added_wordrate_feature': [1],  # [0, 1],
+    'use_added_wordrate_feature': [0, 1],
 
     # 3 settings
     # shapley feats
-    # 'use_random_subset_features': [1],
-    # 'seed': range(50),
+    'use_random_subset_features': [1],
+    'seed': range(50),
 
     # single question
     # 'single_question_idx': range(35),

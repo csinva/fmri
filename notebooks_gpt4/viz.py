@@ -1,4 +1,3 @@
-from load_coef_flatmaps import _load_coefs_35questions, _load_coefs_individual, _load_coefs_individual_wordrate, _load_coefs_wordrate
 from neuro.features.qa_questions import get_questions, get_merged_questions_v3_boostexamples
 from neuro import analyze_helper, viz
 from neuro.config import repo_dir

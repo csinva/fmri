@@ -71,10 +71,10 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
         questions = get_questions(qa_questions_version)
 
     # qs_selected = questions[args0['weight_enet_mask']]
-    df_w_full = pd.DataFrame({'question': questions, 'weights': [
-        w for w in weights]}).set_index('question')
-    r[['subject', 'feature_selection_alpha', 'use_added_wordrate_feature',
-        'qa_questions_version', 'single_question_idx', 'corrs_test_mean']]  # .value_counts()
+    # df_w_full = pd.DataFrame({'question': questions, 'weights': [
+        # w for w in weights]}).set_index('question')
+    # r[['subject', 'feature_selection_alpha', 'use_added_wordrate_feature',
+    # 'qa_questions_version', 'single_question_idx', 'corrs_test_mean']]  # .value_counts()
 
     corrs_test = r['corrs_test']
     if qa_questions_version == 'v3_boostexamples_merged':
@@ -84,7 +84,7 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
         joblib.dump(corrs_test, join(PROCESSED_DIR,
                                      subject, 'corrs_test_neurosynth.pkl'))
 
-    return df_w_full
+    return {q: w for q, w in zip(questions, weights)}
 
 
 def _load_coefs_individual(r, subject='S02', qa_questions_version='v3_boostexamples_merged'):
@@ -102,6 +102,7 @@ def _load_coefs_individual(r, subject='S02', qa_questions_version='v3_boostexamp
     else:
         questions = get_questions(qa_questions_version)
 
+    # print(sorted(r.single_question_idx.unique()))
     assert r.single_question_idx.nunique() == len(
         questions), f'{r.single_question_idx.nunique()} != {len(questions)}'
     assert len(r) == len(questions), f'{len(r)} != {len(questions)}'
@@ -113,12 +114,12 @@ def _load_coefs_individual(r, subject='S02', qa_questions_version='v3_boostexamp
     ]).squeeze()
 
     # qs_selected = questions[args0['weight_enet_mask']]
-    df_w_full = pd.DataFrame({'question': questions, 'weights': [
-        w for w in weights]}).set_index('question')
-    r[['subject', 'feature_selection_alpha', 'use_added_wordrate_feature',
-        'qa_questions_version', 'single_question_idx', 'corrs_test_mean']]  # .value_counts()
+    # df_w_full = pd.DataFrame({'question': questions, 'weights': [
+    # w for w in weights]}).set_index('question')
+    # r[['subject', 'feature_selection_alpha', 'use_added_wordrate_feature',
+    # 'qa_questions_version', 'single_question_idx', 'corrs_test_mean']]  # .value_counts()
 
-    return df_w_full
+    return {q: w for q, w in zip(questions, weights)}
 
 
 # def _load_coefs_individual(rr, subject='S02'):
@@ -159,7 +160,8 @@ def _load_coefs_individual_wordrate(rr, subject='S02'):
     # '../qa_results/processed/individual_weights_wordrate.pkl')
     # r, qs_selected, df_w_individual_wordrate = joblib.load(
     # '../qa_results/processed/individual_weights_wordrate.pkl')
-    return df_w_individual_wordrate
+    # return df_w_individual_wordrate
+    return {q: w for q, w in zip(qs_selected, weights)}
 
 
 def _load_coefs_wordrate(rr, subject='S02'):
