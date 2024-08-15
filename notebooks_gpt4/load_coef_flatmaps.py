@@ -122,6 +122,19 @@ def _load_coefs_individual(r, subject='S02', qa_questions_version='v3_boostexamp
     return {q: w for q, w in zip(questions, weights)}
 
 
+def _load_coefs_individual_gpt4(rr, subject='S02'):
+    r = rr
+    r = r[r.subject == subject]
+    r = r[r.use_added_wordrate_feature == 0]
+    r = r[r.feature_space == 'qa_embedder']
+
+    weights = np.array([
+        flatmaps_per_question.get_weights_top(r.iloc[i])[0]
+        for i in tqdm(range(len(r)))
+    ]).squeeze()
+    questions = r['qa_questions_version']
+    return {q: w for q, w in zip(questions, weights)}
+
 # def _load_coefs_individual(rr, subject='S02'):
 #     r = rr
 #     r = r[r.subject == subject]
