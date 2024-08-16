@@ -46,8 +46,6 @@ term_dict = {
     'location': 'Does the sentence mention a specific location?',
     'communication': 'Does the text describe a mode of communication?',
     'abstract': 'Is the sentence abstract rather than concrete?',
-
-
 }
 
 

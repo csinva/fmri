@@ -1,4 +1,4 @@
-
+import os
 
 QS_35_STABLE = [
     'Does the sentence describe a personal reflection or thought?',
@@ -106,8 +106,104 @@ QS_HYPOTHESES = [
     'Does the input mention anything related to motor movements?',
 ]
 
+QS_HYPOTHESES_COMPUTED = [
+    'Does the input contain a measurement?',
+    'Does the input contain a number?',
+    'Does the input contain a sense of ambiguity?',
+    'Does the input describe a specific texture or sensation?',
+    'Does the input discuss a societal issue or social justice topic?',
+    'Does the input include a comparison or metaphor?',
+    'Does the input involve planning or organizing?',
+    'Does the input mention a number greater than 100?',
+    'Does the input mention a number less than 5?',
+    'Does the input mention anything related to age?',
+    'Does the input mention anything related to an action?',
+    'Does the input mention anything related to anger?',
+    'Does the input mention anything related to arguing?',
+    'Does the input mention anything related to arithmetic?',
+    'Does the input mention anything related to calculation?',
+    'Does the input mention anything related to children?',
+    'Does the input mention anything related to color?',
+    'Does the input mention anything related to conflict?',
+    'Does the input mention anything related to debate?',
+    'Does the input mention anything related to diseases?',
+    'Does the input mention anything related to disgust?',
+    'Does the input mention anything related to empathy?',
+    'Does the input mention anything related to eyes?',
+    'Does the input mention anything related to food?',
+    'Does the input mention anything related to gender?',
+    'Does the input mention anything related to knowledge?',
+    'Does the input mention anything related to motor movements?',
+    'Does the input mention anything related to navigation?',
+    'Does the input mention or describe a smell?',
+    'Does the input mention or describe a sound?',
+    'Does the input mention or describe a taste?',
+    'Does the input mention or describe a texture?',
+    'Does the input mention or describe a visual experience?',
+    'Does the input mention or describe high emotional intensity?',
+    'Does the input mention or describe highly negative emotional valence?',
+    'Does the input mention or describe highly positive emotional valence?',
+    'Does the sentence contain a cultural reference?',
+    'Does the sentence contain a negation?',
+    'Does the sentence contain a proper noun?',
+    'Does the sentence convey a decision or choice made by the narrator?',
+    'Does the sentence convey a sense of urgency or haste?',
+    'Does the sentence describe a change in a physical or emotional state?',
+    'Does the sentence describe a moment of relief or resolution of tension?',
+    'Does the sentence describe a personal or social interaction that leads to a change or revelation?',
+    'Does the sentence describe a personal reflection or thought?',
+    'Does the sentence describe a physical action?',
+    'Does the sentence describe a physical sensation?',
+    'Does the sentence describe a relationship between people?',
+    'Does the sentence describe a sensory experience?',
+    'Does the sentence describe a specific sensation or feeling?',
+    'Does the sentence describe a visual experience or scene?',
+    'Does the sentence describe an activity related to daily life or routine?',
+    'Does the sentence express a philosophical or existential query or observation?',
+    'Does the sentence express a sense of belonging or connection to a place or community?',
+    "Does the sentence express the narrator's opinion or judgment about an event or character?",
+    'Does the sentence include a conditional clause?',
+    'Does the sentence include a direct speech quotation?',
+    'Does the sentence include a personal anecdote or story?',
+    'Does the sentence include a specific sound or auditory description?',
+    'Does the sentence include an account of a miscommunication or misunderstanding?',
+    'Does the sentence include dialogue?',
+    'Does the sentence include technical or specialized terminology?',
+    'Does the sentence involve a description of physical environment or setting?',
+    'Does the sentence involve a discussion about personal or social values?',
+    'Does the sentence involve a recount of a social or community event?',
+    'Does the sentence involve an expression of personal values or beliefs?',
+    'Does the sentence involve an unexpected incident or accident?',
+    'Does the sentence involve spatial reasoning?',
+    'Does the sentence involve the mention of a specific object or item?',
+    'Does the sentence mention a specific location?',
+    'Does the sentence reference a specific time or date?',
+    'Does the sentence use a unique or unusual word?',
+    'Does the story involve a personal project or creation?',
+    'Does the text describe a journey?',
+    'Does the text describe a mode of communication?',
+    'Does the text include a planning or decision-making process?',
+    'Does the text include a reference to a past era or time period?',
+    'Is the input about a discovery or realization?',
+    'Is the input related to a specific industry or profession?',
+    'Is the sentence abstract rather than concrete?',
+    "Is the sentence conveying the narrator's physical movement or action in detail?",
+    'Is the sentence emotionally positive?',
+    'Is the sentence providing an explanation or rationale?',
+    'Is the sentence reflective, involving self-analysis or introspection?',
+    'Is there mention of a city, country, or geographic feature?',
+    'Is time mentioned in the input?',
+]
+
 QUESTIONS_GPT4 = QS_35_STABLE + QS_HYPOTHESES + QS_36_56_STABLE
 
 if __name__ == '__main__':
     assert len(QS_35_STABLE) == 35
     assert len(QS_36_56_STABLE) == 56-35, len(QS_36_56_STABLE)
+
+    computed_gpt4_qs = [
+        x.replace('.pkl', '') for x in os.listdir('/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')
+        if '?' in x
+    ]
+    for q in computed_gpt4_qs:
+        print(repr(q) + ',')

@@ -95,18 +95,42 @@ def select_features(args, r, stim_train_delayed, stim_test_delayed, story_names_
     # pick the coefs
     # coef_enet = coefs_enet[:, :, args.feature_selection_alpha_index]
 
+    # add a 1 to the end of coef_nonzero to account for the wordrate feature
+    if args.use_added_wordrate_feature:
+        coef_nonzero = np.concatenate([coef_nonzero, [1]]).astype(bool)
+
     # r['alpha'] = alphas_enet[args.feature_selection_alpha_index]
     # r['weights_enet'] = coef_enet
     r['weight_enet_mask'] = coef_nonzero
     r['weight_enet_mask_num_nonzero'] = coef_nonzero.sum()
 
-    # add a 1 to the end of coef_nonzero to account for the wordrate feature
-    if args.use_added_wordrate_feature:
-        coef_nonzero = np.concatenate([coef_nonzero, [1]])
-
     # mask stim_delayed based on nonzero coefs (need to repeat by args.ndelays)
-    coef_nonzero_rep = np.tile(coef_nonzero.flatten(), args.ndelays).flatten()
+    coef_nonzero_rep = np.tile(
+        coef_nonzero.flatten(), args.ndelays).astype(bool)
     stim_train_delayed = stim_train_delayed[:, coef_nonzero_rep]
     stim_test_delayed = stim_test_delayed[:, coef_nonzero_rep]
 
+    return r, stim_train_delayed, stim_test_delayed
+
+
+def select_random_feature_subset(args, r, stim_train_delayed, stim_test_delayed):
+    rng = np.random.default_rng(args.seed)
+    r['weight_random_mask'] = np.tile(
+        rng.choice([0, 1], stim_train_delayed.shape[1] // args.ndelays),
+        args.ndelays
+    ).astype(bool)
+    stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
+    stim_test_delayed = stim_test_delayed[:, r['weight_random_mask']]
+    return r, stim_train_delayed, stim_test_delayed
+
+
+def select_single_feature(args, r, stim_train_delayed, stim_test_delayed):
+    idx_select = np.zeros(stim_train_delayed.shape[1] // args.ndelays)
+    idx_select[args.single_question_idx] = 1
+    r['weight_random_mask'] = np.tile(
+        idx_select,
+        args.ndelays
+    ).astype(bool)
+    stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
+    stim_test_delayed = stim_test_delayed[:, r['weight_random_mask']]
     return r, stim_train_delayed, stim_test_delayed

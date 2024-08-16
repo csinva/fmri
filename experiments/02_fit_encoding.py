@@ -15,7 +15,7 @@ from neuro.features import feature_utils, feat_select
 from neuro.encoding.ridge import bootstrap_ridge, gen_temporal_chunk_splits
 import imodelsx.cache_save_utils
 import neuro.data.story_names as story_names
-from neuro.features.questions.gpt4 import QUESTIONS_GPT4
+from neuro.features.questions.gpt4 import QUESTIONS_GPT4, QS_HYPOTHESES_COMPUTED
 import random
 import warnings
 import time
@@ -97,9 +97,11 @@ def add_main_args(parser):
                         default='v1',
                         choices=['v1', 'v2', 'v3', 'v3_boostexamples',
                                  'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged'] +
-                        ['v1neurosynth'] + QUESTIONS_GPT4,
+                        ['v1neurosynth'] + QS_HYPOTHESES_COMPUTED +
+                        ['QS_HYPOTHESES_COMPUTED'],
                         help='''Which set of QA questions to use, if feature_space is qa_embedder.
                         If passed a single question name, uses only that question with gpt4-extracted feats.
+                        QS_HYPOTHESES_COMPUTED will use the set of all computed GPT4 questions.
                         ''')
     parser.add_argument("--use_random_subset_features", type=int, default=0,
                         help='Whether to use a random subset of features')
@@ -349,30 +351,23 @@ if __name__ == "__main__":
         args, args.feature_space, args.qa_embedding_model, story_names_test, use_added_wordrate_feature=args.use_added_wordrate_feature)
     stim_train_delayed = feature_utils.get_features_full(
         args, args.feature_space, args.qa_embedding_model, story_names_train, use_added_wordrate_feature=args.use_added_wordrate_feature)
+    # print('feature shape before', stim_test_delayed.shape)
+
+    # select features
     if args.feature_selection_alpha >= 0:
         print('selecting features...')
         r, stim_train_delayed, stim_test_delayed = feat_select.select_features(
             args, r, stim_train_delayed, stim_test_delayed,
             story_names_train, story_names_test)
     if args.use_random_subset_features:
-        rng = np.random.default_rng(args.seed)
-        r['weight_random_mask'] = np.tile(
-            rng.choice([0, 1], stim_train_delayed.shape[1] // args.ndelays),
-            args.ndelays
-        ).astype(bool)
-        stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
-        stim_test_delayed = stim_test_delayed[:, r['weight_random_mask']]
+        r, stim_train_delayed, stim_test_delayed = feat_select.select_random_feature_subset(
+            args, r, stim_train_delayed, stim_test_delayed)
+
     elif args.single_question_idx >= 0:
-        idx_select = np.zeros(stim_train_delayed.shape[1] // args.ndelays)
-        idx_select[args.single_question_idx] = 1
-        r['weight_random_mask'] = np.tile(
-            idx_select,
-            args.ndelays
-        ).astype(bool)
-        stim_train_delayed = stim_train_delayed[:, r['weight_random_mask']]
-        stim_test_delayed = stim_test_delayed[:, r['weight_random_mask']]
-    print('shapes', stim_test_delayed.shape, args.use_added_wordrate_feature)
-    breakpoint()
+        r, stim_train_delayed, stim_test_delayed = feat_select.select_single_feature(
+            args, r, stim_train_delayed, stim_test_delayed)
+    # print('shape after', stim_test_delayed.shape)
+    # breakpoint()
 
     print('loading resps...')
     if args.pc_components <= 0:

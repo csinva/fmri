@@ -15,7 +15,7 @@ from tqdm import tqdm
 from neuro.data.interp_data import lanczosinterp2D, expinterp2D
 from neuro.data.semantic_model import SemanticModel
 from neuro.data.utils_ds import apply_model_to_words
-
+from neuro.features.questions.gpt4 import QS_HYPOTHESES_COMPUTED
 from transformers import pipeline
 import logging
 import imodelsx.llm
@@ -151,6 +151,8 @@ def get_gpt4_qa_embs_cached(
     if questions is None or questions == []:
         if '?' in qa_questions_version:
             questions = [qa_questions_version]
+        elif qa_questions_version == 'QS_HYPOTHESES_COMPUTED':
+            questions = QS_HYPOTHESES_COMPUTED
         else:
             questions = qa_questions.get_questions(
                 version=qa_questions_version)

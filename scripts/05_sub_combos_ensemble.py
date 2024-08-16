@@ -19,43 +19,50 @@ params_shared_dict = {
 
 
     # things to change
-    'use_test_setup': [1],
+    'use_test_setup': [0],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug14_neurosynth_gemv'],
+    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
     'subject': ['UTS01', 'UTS02', 'UTS03'],
-    # 'use_added_wordrate_feature': [0, 1],
-    'use_added_wordrate_feature': [0],
-
-    # 3 settings
-    # shapley feats
-    # 'use_random_subset_features': [1],
-    # 'seed': range(50, 100),
-
-    # single question
-    # 'single_question_idx': range(35),
-    # 'single_question_idx': range(len(QS_HYPOTHESES)),
-
-    # comment the above to get all questions
+    'use_added_wordrate_feature': [0, 1],
 }
 
 params_coupled_dict = {
-    ('feature_space', 'qa_questions_version', 'qa_embedding_model', 'feature_selection_alpha'):
+    ('qa_questions_version', 'qa_embedding_model',
+     'feature_selection_alpha', 'use_random_subset_features', 'seed', 'single_question_idx'):
+
+    # run full models
     [
-        ('qa_embedder', 'v3_boostexamples_merged',
-         'ensemble2', get_alphas('qa_embedder')[3]),
-        # ('qa_embedder', 'v1neurosynth', 'ensemble2', None),
+        ('v3_boostexamples_merged', 'ensemble2',
+         get_alphas('qa_embedder')[3], None, None, None),
+        ('v1neurosynth', 'ensemble2',
+         None, None, None, None),
+    ]
+    +
+    # shapley features
+    # [
+    #     ('v3_boostexamples_merged', 'ensemble2',
+    #      get_alphas('qa_embedder')[3], 1, seed, None)
+    #     for seed in range(50)
+    # ]
+    # +
+    # [
+    #     ('v1neurosynth', 'ensemble2',
+    #      None, 1, seed, None)
+    #     for seed in range(50)
+    # ]
+    # +
+    # single question
+    [
+        ('v3_boostexamples_merged', 'ensemble2',
+         get_alphas('qa_embedder')[3], None, None, i)
+        for i in range(len(QS_HYPOTHESES))
     ]
     +
     [
-
-        # baseline wordrate alone
-        # ('wordrate', None, None, None), None,
-
-        # gpt4 questions
-        # ('qa_embedder', 'v3_boostexamples_merged', 'gpt4', None, None),
-        # ('qa_embedder', repr(QS_HYPOTHESES[i]), 'gpt4', None, None)
-        # for i in range(len(QS_HYPOTHESES))
+        ('v1neurosynth', 'ensemble2',
+         None, None, None, i)
+        for i in range(len(QS_HYPOTHESES))
     ]
-
 
 }
 # Args list is a list of dictionaries

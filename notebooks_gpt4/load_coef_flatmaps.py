@@ -67,9 +67,18 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
 
     if qa_questions_version == 'v3_boostexamples_merged':
         questions = get_merged_questions_v3_boostexamples()
-        questions = np.array(questions)[args0.weight_enet_mask]
+        if use_added_wordrate_feature:
+            questions = questions + ['wordrate']
+        questions = np.array(questions)[
+            args0.weight_enet_mask.astype(bool)]
+        print('weight_enet_mask', args0.weight_enet_mask.sum(),
+              args0.weight_enet_mask.shape)
+        print('questions', len(questions), questions[:10])
     else:
         questions = get_questions(qa_questions_version)
+        if use_added_wordrate_feature:
+            questions = questions + ['wordrate']
+
     print(len(questions), 'questions', len(weights), 'weights')
 
     corrs_test = r['corrs_test']
@@ -111,17 +120,26 @@ def _load_coefs_individual(r, subject='S02', qa_questions_version='v3_boostexamp
     return {q: w for q, w in zip(questions, weights)}
 
 
-def _load_coefs_individual_gpt4(rr, subject='S02'):
+def _load_coefs_individual_gpt4(rr, subject='S02', use_added_wordrate_feature=0):
     r = rr
     r = r[r.subject == subject]
-    r = r[r.use_added_wordrate_feature == 0]
+    r = r[r.use_added_wordrate_feature == use_added_wordrate_feature]
     r = r[r.feature_space == 'qa_embedder']
+    r = r[r.qa_embedding_model == 'gpt4']
+    r = r[r.qa_questions_version.str.endswith('?')]  # individual question
 
-    weights = np.array([
+    weights_list = [
         flatmaps_per_question.get_weights_top(r.iloc[i])[0]
         for i in tqdm(range(len(r)))
-    ]).squeeze()
+    ]
     questions = r['qa_questions_version']
+
+    if use_added_wordrate_feature:
+        weights_list = [w[0] for w in weights_list]
+
+    weights = np.array(weights_list).squeeze()
+    # print('weights', weights.shape)
+
     return {q: w for q, w in zip(questions, weights)}
 
 
