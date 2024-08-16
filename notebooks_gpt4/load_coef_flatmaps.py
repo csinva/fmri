@@ -134,7 +134,7 @@ def _load_coefs_individual_gpt4(rr, subject='S02', use_added_wordrate_feature=0)
     ]
     questions = r['qa_questions_version']
 
-    if use_added_wordrate_feature:
+    if use_added_wordrate_feature == 1:
         weights_list = [w[0] for w in weights_list]
 
     weights = np.array(weights_list).squeeze()
