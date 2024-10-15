@@ -1,6 +1,6 @@
 import imodelsx.process_results
 # import viz
-import dvu
+# import dvu
 from tqdm import tqdm
 import seaborn as sns
 import os
@@ -11,7 +11,7 @@ from os.path import join
 import numpy as np
 import sys
 sys.path.append('../experiments')
-dvu.set_style()
+# dvu.set_style()
 fit_encoding = __import__('02_fit_encoding')
 best_results_dir = '/home/chansingh/mntv1/deep-fMRI/encoding/may7'
 

@@ -10,6 +10,7 @@ sys.path.append(repo_dir)
 MIST7B = 'mistralai/Mistral-7B-Instruct-v0.2'
 LLAMA8B = 'meta-llama/Meta-Llama-3-8B-Instruct'
 LLAMA8B_fewshot = 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot'
+LLAMA11B = 'meta-llama/Llama-3.2-11B-Vision-Instruct'
 
 # other models (also -refined models)
 LLAMA70B = 'meta-llama/Meta-Llama-3-70B-Instruct'
@@ -64,7 +65,8 @@ params_coupled_dict = {
         # # for version in ['v1', 'v2', 'v3_boostexamples', 'v3']
         # for model in [MIST7B, LLAMA8B, LLAMA8B_fewshot]
         # for model in [LLAMA8B_fewshot]
-        for model in [LLAMA70B]
+        # for model in [LLAMA70B]
+        for model in [LLAMA11B]
     ]
 
     # let's just skip llama 7B/8B
@@ -97,7 +99,7 @@ submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed_stories',
-    amlt_kwargs=amlt_kwargs,
+    # amlt_kwargs=amlt_kwargs,
     # gpu_ids=[0, 1],
     # gpu_ids=[0, 1, 2, 3],
     # gpu_ids=[[0, 1], [2, 3]],

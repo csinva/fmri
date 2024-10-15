@@ -1,4 +1,7 @@
 import os
+import cortex
+from os.path import join
+
 term_dict = {
     'actions': 'Does the input mention anything related to an action?',
     'arithmetic': 'Does the input mention anything related to arithmetic?',
@@ -47,6 +50,36 @@ term_dict = {
     'communication': 'Does the text describe a mode of communication?',
     'abstract': 'Is the sentence abstract rather than concrete?',
 }
+
+
+def get_neurosynth_flatmaps(subject, neurosynth_dir='/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data'):
+    subject_s = subject.replace('UT', '')
+    # neurosynth_dir = '/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data/all_association-test_z'
+
+    term_names = [k.replace('.nii.gz', '').replace(
+        '_association-test_z', '') for k in os.listdir(join(neurosynth_dir, f'all_in_{subject_s}-BOLD'))]
+
+    # filter dict for files that were in neurosynth
+    term_dict_ = {k: v for k, v in term_dict.items() if k in term_names}
+    # for k in term_dict.keys():
+    #     if k not in term_names:
+    #         print(k)
+
+    # filter dict for files that had questions run
+    questions_run = [k.replace('.pkl', '') for k in os.listdir(
+        '/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')]
+    term_dict_ = {k: v for k, v in term_dict_.items() if v in questions_run}
+
+    def _load_flatmap(term, neurosynth_dir, subject):
+        # output_file = join(neurosynth_dir, f'{term}_association-test_z.nii.gz')
+        output_file = join(
+            neurosynth_dir, f'all_in_{subject_s}-BOLD/{term}.nii.gz')
+        vol = cortex.Volume(output_file, subject, subject + '_auto').data
+        mask = cortex.db.get_mask(subject, subject + '_auto')
+        return vol[mask]
+
+    return {q: _load_flatmap(
+        term, neurosynth_dir, subject) for (term, q) in term_dict_.items()}
 
 
 term_dict_rev = {v: k for k, v in term_dict.items()}

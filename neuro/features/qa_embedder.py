@@ -73,7 +73,7 @@ class FinetunedQAEmbedder:
                 outputs = self.model(**{k: v[i:i+batch_size]
                                         for k, v in inputs.items()})
                 answer_predictions.append(outputs.cpu().detach().numpy())
-            answer_predictions = answer_predictions[self.question_idxs[0]                                                    :self.question_idxs[1]]
+            answer_predictions = answer_predictions[self.question_idxs[0]:self.question_idxs[1]]
             answer_predictions = np.vstack(answer_predictions)
             answer_predictions = scipy.special.softmax(
                 answer_predictions, axis=-1)
@@ -204,10 +204,11 @@ if __name__ == "__main__":
     # checkpoint = "mistralai/Mixtral-8x7B-v0.1"
     # checkpoint = 'mistralai/Mistral-7B-v0.1'
     # checkpoint = "meta-llama/Meta-Llama-3-8B"
-    checkpoint = "meta-llama/Meta-Llama-3-8B-Instruct"
+    # checkpoint = "meta-llama/Meta-Llama-3-8B-Instruct"
     # checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot'
     # checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-refined'
     # checkpoint = 'meta-llama/Meta-Llama-3-70B-Instruct-refined'
+    checkpoint = 'meta-llama/Llama-3.2-11B-Vision-Instruct'
 
     # test
     # llm = imodelsx.llm.get_llm(checkpoint)
