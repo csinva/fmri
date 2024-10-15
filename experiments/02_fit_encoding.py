@@ -198,6 +198,17 @@ def get_story_names(args):
         story_names_test = ['GenStory27', 'GenStory28', 'GenStory29']
         args.pc_components = 100
         args.use_eval_brain_drive = 0
+    elif args.use_test_setup == 3:
+        # eng1000 full run
+        args.nboots = 5
+        args.feature_space = 'eng1000'
+        args.use_extract_only = 0
+        args.use_huge = 1
+        args.subject = 'UTS03'
+        story_names_train = story_names.get_story_names(
+            args.subject, 'train', use_huge=args.use_huge)[:10]
+        story_names_test = story_names.get_story_names(
+            args.subject, 'test', use_huge=args.use_huge)
     else:
         story_names_train = story_names.get_story_names(
             args.subject, 'train', use_huge=args.use_huge)

@@ -22,7 +22,7 @@ params_shared_dict = {
     'use_test_setup': [0],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug14_neurosynth_gemv'],
     # 'subject': ['UTS01', 'UTS02', 'UTS03'],
-    'subject': ['UTS01', 'UTS02', 'UTS03'],
+    'subject': ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08'],
     'use_added_wordrate_feature': [0, 1],
 }
 
@@ -53,15 +53,15 @@ params_coupled_dict = {
     # +
     # single question
     [
-        ('v3_boostexamples_merged', 'ensemble2',
-         get_alphas('qa_embedder')[3], None, None, i)
-        for i in range(len(QS_HYPOTHESES))
+        # ('v3_boostexamples_merged', 'ensemble2',
+        #  get_alphas('qa_embedder')[3], None, None, i)
+        # for i in range(len(QS_HYPOTHESES))
     ]
     +
     [
-        ('v1neurosynth', 'ensemble2',
-         None, None, None, i)
-        for i in range(len(QS_HYPOTHESES))
+        # ('v1neurosynth', 'ensemble2',
+        #  None, None, None, i)
+        # for i in range(len(QS_HYPOTHESES))
     ]
 
 }
@@ -86,7 +86,7 @@ submit_utils.run_args_list(
     script_name=script_name,
     # unique_seeds='seed',
     # amlt_kwargs=amlt_kwargs_cpu,
-    # n_cpus=8,
+    n_cpus=8,
     # actually_run=False,
     # repeat_failed_jobs=True,
     shuffle=True,
