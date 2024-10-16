@@ -11,12 +11,13 @@ def zs(v): return (v-v.mean(0))/v.std(0)  # z-score function
 ridge_logger = logging.getLogger("ridge_corr")
 
 
-def gen_temporal_chunk_splits(num_splits: int, num_examples: int, chunk_len: int, num_chunks: int):
+def gen_temporal_chunk_splits(num_splits: int, num_examples: int, chunk_len: int, num_chunks: int, seed=42):
+    rng = np.random.RandomState(seed)
     all_indexes = range(num_examples)
     index_chunks = list(zip(*[iter(all_indexes)] * chunk_len))
     splits_list = []
     for _ in range(num_splits):
-        random.shuffle(index_chunks)
+        rng.shuffle(index_chunks)
         tune_indexes_ = list(itools.chain(*index_chunks[:num_chunks]))
         train_indexes_ = list(set(all_indexes)-set(tune_indexes_))
         splits_list.append((train_indexes_, tune_indexes_))
@@ -179,7 +180,7 @@ def ridge_corr_pred(stim_train, stim_test, resp_train, resp_test, valphas, norma
     return corr
 
 
-def ridge_corr(
+def _ridge_corr(
     stim_train, stim_test, resp_train, resp_test, alphas, normalpha=False, corrmin=0.2,
         singcutoff=1e-10, use_corr=True, logger=ridge_logger):
     """Uses ridge regression to find a linear transformation of [Rstim] that approximates [Rresp],
@@ -417,7 +418,7 @@ def bootstrap_ridge(
         resp_test_ = resp_train[tune_indexes_, :]
 
         # Run ridge regression using this test set
-        correlation_matrix_ = ridge_corr(
+        correlation_matrix_ = _ridge_corr(
             stim_train_, stim_test_, resp_train_, resp_test_, alphas,
             corrmin=corrmin, singcutoff=singcutoff,
             normalpha=normalpha, use_corr=use_corr,
@@ -498,3 +499,8 @@ def bootstrap_ridge(
             normalpha=normalpha, use_corr=use_corr, logger=logger, singcutoff=singcutoff)
 
         return [], corrs, valphas, all_correlation_matrices, valinds
+
+
+if __name__ == '__main__':
+    # sample data for ridge regression
+    np.random.seed(0)
