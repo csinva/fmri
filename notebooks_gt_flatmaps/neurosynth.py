@@ -52,7 +52,7 @@ term_dict = {
 }
 
 
-def get_neurosynth_flatmaps(subject, neurosynth_dir='/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data'):
+def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data', mni=False):
     subject_s = subject.replace('UT', '')
     # neurosynth_dir = '/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data/all_association-test_z'
 
@@ -70,7 +70,17 @@ def get_neurosynth_flatmaps(subject, neurosynth_dir='/home/chansingh/mntv1/deep-
         '/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')]
     term_dict_ = {k: v for k, v in term_dict_.items() if v in questions_run}
 
+    def _load_flatmap_mni(term, neurosynth_dir):
+        import nibabel as nib
+        output_file = join(
+            neurosynth_dir, f'all_association-test_z/{term}_association-test_z.nii.gz')
+        mni_array = cortex.Volume(output_file, "fsaverage", "atlas_2mm").data
+        # nii_file = nib.load(output_file)
+        # mni_array = nii_file.get_fdata()
+        return mni_array
+
     def _load_flatmap(term, neurosynth_dir, subject):
+        import nibabel as nib
         # output_file = join(neurosynth_dir, f'{term}_association-test_z.nii.gz')
         output_file = join(
             neurosynth_dir, f'all_in_{subject_s}-BOLD/{term}.nii.gz')
@@ -78,8 +88,13 @@ def get_neurosynth_flatmaps(subject, neurosynth_dir='/home/chansingh/mntv1/deep-
         mask = cortex.db.get_mask(subject, subject + '_auto')
         return vol[mask]
 
-    return {q: _load_flatmap(
-        term, neurosynth_dir, subject) for (term, q) in term_dict_.items()}
+    if mni:
+        return {q: _load_flatmap_mni(
+            term, neurosynth_dir) for (term, q) in term_dict_.items()}
+
+    else:
+        return {q: _load_flatmap(
+            term, neurosynth_dir, subject) for (term, q) in term_dict_.items()}
 
 
 term_dict_rev = {v: k for k, v in term_dict.items()}

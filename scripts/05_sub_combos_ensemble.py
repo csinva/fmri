@@ -11,7 +11,7 @@ sys.path.append(repo_dir)
 params_shared_dict = {
     # things to average over
     'use_extract_only': [0],
-    'pc_components': [100],
+    'pc_components': [100, -1],
     'use_eval_brain_drive': [0],
     'ndelays': [4],
     'nboots': [50],
@@ -20,7 +20,8 @@ params_shared_dict = {
 
     # things to change
     'use_test_setup': [0],
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug14_neurosynth_gemv'],
+    # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug14_neurosynth_gemv'],
+    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/oct17_neurosynth_gemv'],
     # 'subject': ['UTS01', 'UTS02', 'UTS03'],
     'subject': ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08'],
     'use_added_wordrate_feature': [0, 1],
@@ -32,25 +33,25 @@ params_coupled_dict = {
 
     # run full models
     [
-        ('v3_boostexamples_merged', 'ensemble2',
-         get_alphas('qa_embedder')[3], None, None, None),
-        ('v1neurosynth', 'ensemble2',
-         None, None, None, None),
+        # ('v3_boostexamples_merged', 'ensemble2',
+        #  get_alphas('qa_embedder')[3], None, None, None),
+        # ('v1neurosynth', 'ensemble2',
+        #  None, None, None, None),
     ]
     +
     # shapley features
-    # [
-    #     ('v3_boostexamples_merged', 'ensemble2',
-    #      get_alphas('qa_embedder')[3], 1, seed, None)
-    #     for seed in range(50)
-    # ]
-    # +
-    # [
-    #     ('v1neurosynth', 'ensemble2',
-    #      None, 1, seed, None)
-    #     for seed in range(50)
-    # ]
-    # +
+    [
+        ('v3_boostexamples_merged', 'ensemble2',
+         get_alphas('qa_embedder')[3], 1, seed, None)
+        for seed in range(50)
+    ]
+    +
+    [
+        # ('v1neurosynth', 'ensemble2',
+        #  None, 1, seed, None)
+        # for seed in range(50)
+    ]
+    +
     # single question
     [
         # ('v3_boostexamples_merged', 'ensemble2',
@@ -78,13 +79,14 @@ amlt_kwargs_cpu = {
     # 'sku': 'E64ads_v5',
     # 'sku': 'E32ads_v5',
     # 'sku': 'E16ads_v5',
-    'sku': 'E8ads_v5',
+    # 'sku': 'E8ads_v5',
+    'sku': '8C15',
     'mnt_rename': ('/home/chansingh/mntv1', '/mntv1'),
 }
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
-    # unique_seeds='seed',
+    unique_seeds='seed',
     # amlt_kwargs=amlt_kwargs_cpu,
     n_cpus=8,
     # actually_run=False,

@@ -243,19 +243,20 @@ def fit_regression(args, r, features_train_delayed, resp_train, features_test_de
         corrs_key_tune = 'corrs_tune'
 
     if args.encoding_model == 'ridge':
-        # example_params = {
-        #     'features_train_delayed': features_train_delayed,
-        #     'resp_train': resp_train,
-        #     'features_test_delayed': features_test_delayed,
-        #     'resp_test': resp_test,
-        #     'alphas': alphas,
-        #     'nboots': args.nboots,
-        #     'chunklen': args.chunklen,
-        #     'nchunks': args.nchunks,
-        #     'singcutoff': args.singcutoff,
-        #     'single_alpha': args.single_alpha,
-        # }
-        # joblib.dump(example_params, 'example_params_full.joblib')
+        if args.use_test_setup == 3:
+            example_params = {
+                'features_train_delayed': features_train_delayed,
+                'resp_train': resp_train,
+                'features_test_delayed': features_test_delayed,
+                'resp_test': resp_test,
+                'alphas': alphas,
+                'nboots': args.nboots,
+                'chunklen': args.chunklen,
+                'nchunks': args.nchunks,
+                'singcutoff': args.singcutoff,
+                'single_alpha': args.single_alpha,
+            }
+            joblib.dump(example_params, 'example_params_full.joblib')
         wt, corrs_test, alphas_best, corrs_tune, valinds = bootstrap_ridge(
             features_train_delayed, resp_train, features_test_delayed, resp_test,
             alphas, args.nboots, args.chunklen,

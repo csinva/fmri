@@ -56,3 +56,5 @@ qa_results/finetune*
 **.txt
 **.npz
 huth
+***.tar.gz
+*.joblib

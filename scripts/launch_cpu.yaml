@@ -29,11 +29,12 @@ storage:
 
 # sku options
 # equivalences: mem x C x numcpus
-# 10C3   E4ads_v5 # 30 GBs
-# 8C7    E8ads_v5 # 56 GBs
-# 8C15   E16ads_v5 # 120 GBs
-# 8C30   E32ads_v5 # 240 GBs
-# 8C60   E64ads_v5 # 480 GBs
+# cpu jobs
+# 10C3  # 4 cores, 30 GBs mem
+# 8C7   # 8 cores, 56 GBs mem
+# 8C15  # 15 cores, 120 GBs mem
+# 8C30  # 30 cores, 240 GBs mem
+# 8C60  # 60 cores, 480 GBs mem
 # jobs:
 # - name: run_fmri
 #   process_count_per_node: 1
