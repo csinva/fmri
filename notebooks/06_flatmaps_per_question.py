@@ -36,11 +36,15 @@ def get_weights_top(args):
     weights = weights.reshape(ndelays, int(emb_size), -1)
     weights = weights.mean(axis=0)
 
-    weights_pc = model_params['weights_pc']
-    assert weights_pc.shape[0] % ndelays == 0
-    qs_size = weights_pc.shape[0] / ndelays
-    weights_pc = weights_pc.reshape(ndelays, int(qs_size), -1)
-    weights_pc = weights_pc.mean(axis=0)
+    if hasattr(model_params, 'weights_pc'):
+        weights_pc = model_params['weights_pc']
+        assert weights_pc.shape[0] % ndelays == 0
+        qs_size = weights_pc.shape[0] / ndelays
+        weights_pc = weights_pc.reshape(ndelays, int(qs_size), -1)
+        weights_pc = weights_pc.mean(axis=0)
+
+    else:
+        weights_pc = None
 
     return weights, weights_pc
 

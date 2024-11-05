@@ -1,6 +1,14 @@
+from collections import defaultdict
+from copy import deepcopy
 import os
 import cortex
 from os.path import join
+
+import joblib
+import numpy as np
+from tqdm import tqdm
+
+from neuro.config import PROCESSED_DIR
 
 term_dict = {
     'actions': 'Does the input mention anything related to an action?',
@@ -52,23 +60,47 @@ term_dict = {
 }
 
 
+def load_flatmaps_qa_dicts_by_subject(subjects, settings):
+    flatmaps_qa_dicts_by_subject = {}
+    for subject in tqdm(subjects):
+        # for subject in tqdm([f'UTS0{i}' for i in range(1, 9)]):
+
+        flatmaps_qa_dict_over_settings = defaultdict(list)
+        for setting in settings:
+            flatmaps_qa_dict = joblib.load(
+                join(PROCESSED_DIR, subject.replace('UT', ''), setting + '.pkl'))
+            for q in flatmaps_qa_dict.keys():
+                flatmaps_qa_dict_over_settings[q].append(flatmaps_qa_dict[q])
+        flatmaps_qa_dict = {
+            q: np.mean(flatmaps_qa_dict_over_settings[q], axis=0)
+            for q in flatmaps_qa_dict_over_settings.keys()
+        }
+        flatmaps_qa_dicts_by_subject[subject] = deepcopy(flatmaps_qa_dict)
+    return flatmaps_qa_dicts_by_subject
+
+
 def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data', mni=False):
-    subject_s = subject.replace('UT', '')
-    # neurosynth_dir = '/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data/all_association-test_z'
 
-    term_names = [k.replace('.nii.gz', '').replace(
-        '_association-test_z', '') for k in os.listdir(join(neurosynth_dir, f'all_in_{subject_s}-BOLD'))]
+    def _get_term_dict():
+        subject_s = 'S01'  # subject.replace('UT', '')
+        # neurosynth_dir = '/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data/all_association-test_z'
 
-    # filter dict for files that were in neurosynth
-    term_dict_ = {k: v for k, v in term_dict.items() if k in term_names}
-    # for k in term_dict.keys():
-    #     if k not in term_names:
-    #         print(k)
+        # get term names
+        term_names = [k.replace('.nii.gz', '').replace(
+            '_association-test_z', '') for k in os.listdir(join(neurosynth_dir, f'all_in_{subject_s}-BOLD'))]
 
-    # filter dict for files that had questions run
-    questions_run = [k.replace('.pkl', '') for k in os.listdir(
-        '/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')]
-    term_dict_ = {k: v for k, v in term_dict_.items() if v in questions_run}
+        # filter dict for files that were in neurosynth
+        term_dict_ = {k: v for k, v in term_dict.items() if k in term_names}
+        # for k in term_dict.keys():
+        #     if k not in term_names:
+        #         print(k)
+
+        # filter dict for files that had questions run
+        questions_run = [k.replace('.pkl', '') for k in os.listdir(
+            '/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')]
+        term_dict_ = {k: v for k, v in term_dict_.items()
+                      if v in questions_run}
+        return term_dict_
 
     def _load_flatmap_mni(term, neurosynth_dir):
         import nibabel as nib
@@ -81,12 +113,15 @@ def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mnt
 
     def _load_flatmap(term, neurosynth_dir, subject):
         import nibabel as nib
+        subject_s = subject.replace('UT', '')
         # output_file = join(neurosynth_dir, f'{term}_association-test_z.nii.gz')
         output_file = join(
             neurosynth_dir, f'all_in_{subject_s}-BOLD/{term}.nii.gz')
         vol = cortex.Volume(output_file, subject, subject + '_auto').data
         mask = cortex.db.get_mask(subject, subject + '_auto')
         return vol[mask]
+
+    term_dict_ = _get_term_dict()
 
     if mni:
         return {q: _load_flatmap_mni(

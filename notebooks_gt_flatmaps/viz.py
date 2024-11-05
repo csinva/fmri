@@ -35,6 +35,7 @@ def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_d
     eng100_dir: str
         path to flatmaps of eng1000 for a particular subject
     '''
+    print(eng1000_dir)
     flatmaps_eng1000 = joblib.load(eng1000_dir)
     pvals = []
     for i in range(len(flatmaps_qa_list)):
