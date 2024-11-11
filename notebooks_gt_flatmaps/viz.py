@@ -22,7 +22,7 @@ sys.path.append('../notebooks')
 flatmaps_per_question = __import__('06_flatmaps_per_question')
 
 
-def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_dir: str):
+def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_dir: str, mask_corrs=None):
     '''
     Params
     ------
@@ -34,19 +34,34 @@ def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_d
         array of ground truth correlations 
     eng100_dir: str
         path to flatmaps of eng1000 for a particular subject
+    mask_cors: np.ndarray
+        if passed, use this as mask rather than mask extreme
     '''
     print(eng1000_dir)
     flatmaps_eng1000 = joblib.load(eng1000_dir)
     pvals = []
     for i in range(len(flatmaps_qa_list)):
         if frac_voxels_to_keep < 1:
-            mask_extreme = np.abs(flatmaps_qa_list[i]) >= np.percentile(
-                np.abs(flatmaps_qa_list[i]), 100 * (1 - frac_voxels_to_keep))
-        else:
-            mask_extreme = np.ones(flatmaps_qa_list[i].shape).astype(bool)
 
-        flatmaps_eng1000_masked = flatmaps_eng1000[:, mask_extreme]
-        flatmaps_qa_masked = flatmaps_qa_list[i][mask_extreme]
+            # mask based on corrs
+            if mask_corrs is not None:
+                mask = (mask_corrs > np.percentile(
+                    mask_corrs, 100 * (1 - frac_voxels_to_keep))).astype(bool)
+            else:
+                # mask based on extreme values
+                mask = np.abs(flatmaps_qa_list[i]) >= np.percentile(
+                    np.abs(flatmaps_qa_list[i]), 100 * (1 - frac_voxels_to_keep))
+
+        else:
+            mask = np.ones_like(flatmaps_qa_list[i]).astype(bool)
+        # if frac_voxels_to_keep < 1:
+        #     mask_extreme = np.abs(flatmaps_qa_list[i]) >= np.percentile(
+        #         np.abs(flatmaps_qa_list[i]), 100 * (1 - frac_voxels_to_keep))
+        # else:
+        #     mask_extreme = np.ones(flatmaps_qa_list[i].shape).astype(bool)
+
+        flatmaps_eng1000_masked = flatmaps_eng1000[:, mask]
+        flatmaps_qa_masked = flatmaps_qa_list[i][mask]
 
         # calculate correlation between each row of flatmaps_qa_masked and flatmaps_eng1000_masked
         flatmaps_eng1000_masked_norm = StandardScaler(
@@ -103,7 +118,7 @@ def _heatmap(corrs, out_dir_save):
 
 def corr_bars(corrs, out_dir_save, xlab: str = '', color='C0', label=None):
     os.makedirs(out_dir_save, exist_ok=True)
-    print(out_dir_save)
+    # print(out_dir_save)
     # mask = args0['corrs_test'] >= 0
     # wt_qas = [wt_qa[mask] for wt_qa in wt_qas]
     # wt_bds = [wt_bd[mask] for wt_bd in wt_bds]
@@ -136,7 +151,7 @@ def corr_bars(corrs, out_dir_save, xlab: str = '', color='C0', label=None):
         # xerr=corrs_err,
         fmt='o',
         color=color,
-        label=label + f' (mean {corrs_diag.mean():.2f})',
+        label=label + f' (mean {corrs_diag.mean():.3f})',
     )
 
     plt.yticks(np.arange(len(corrs.columns)), corrs.columns[idx_sort])

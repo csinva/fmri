@@ -103,7 +103,7 @@ def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mnt
         return term_dict_
 
     def _load_flatmap_mni(term, neurosynth_dir):
-        import nibabel as nib
+        # import nibabel as nib
         output_file = join(
             neurosynth_dir, f'all_association-test_z/{term}_association-test_z.nii.gz')
         mni_array = cortex.Volume(output_file, "fsaverage", "atlas_2mm").data
