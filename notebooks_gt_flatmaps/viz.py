@@ -34,7 +34,7 @@ def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_d
         array of ground truth correlations 
     eng100_dir: str
         path to flatmaps of eng1000 for a particular subject
-    mask_cors: np.ndarray
+    mask_corrs: np.ndarray
         if passed, use this as mask rather than mask extreme
     '''
     print(eng1000_dir)
@@ -75,7 +75,6 @@ def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_d
 
 
 def _calc_corrs(flatmaps_qa, flatmaps_gt, titles_qa, titles_gt, preproc=None):
-
     if preproc is not None:
         if preproc == 'quantize':
             # bin into n bins with equal number of samples
@@ -116,7 +115,7 @@ def _heatmap(corrs, out_dir_save):
                 bbox_inches='tight')
 
 
-def corr_bars(corrs, out_dir_save, xlab: str = '', color='C0', label=None):
+def corr_bars(corrs: np.ndarray, questions, out_dir_save, xlab: str = '', color='C0', label=None):
     os.makedirs(out_dir_save, exist_ok=True)
     # print(out_dir_save)
     # mask = args0['corrs_test'] >= 0
@@ -142,21 +141,22 @@ def corr_bars(corrs, out_dir_save, xlab: str = '', color='C0', label=None):
     #     corrs_err.append((corr_interval_max - corr_interval_min)/2)
     # sns.barplot(y=corrs.columns, x=np.diag(corrs), color='gray')
     plt.grid(alpha=0.2)
-    corrs_diag = np.diag(corrs)
-    idx_sort = np.argsort(corrs_diag)[::-1]
+    # corrs_diag = np.diag(corrs)
+    # idx_sort = np.argsort(corrs_diag)[::-1]
+    # idx_sort = np.arange(len(questions))
     # print('idx_sort', idx_sort, corrs_diag[idx_sort])
     plt.errorbar(
-        x=corrs_diag[idx_sort],
-        y=np.arange(len(corrs.columns)),
+        x=corrs,
+        y=np.arange(len(questions)),
         # xerr=corrs_err,
         fmt='o',
         color=color,
-        label=label + f' (mean {corrs_diag.mean():.3f})',
+        label=label + f' (mean {corrs.mean():.3f})',
     )
 
-    plt.yticks(np.arange(len(corrs.columns)), corrs.columns[idx_sort])
+    plt.yticks(np.arange(len(questions)), questions)
     plt.axvline(0, color='gray')
-    plt.axvline(np.diag(corrs).mean(), color=color, linestyle='--')
+    plt.axvline(corrs.mean(), color=color, linestyle='--')
     # plt.title(f'{setting} mean {np.diag(corrs).mean():.3f}')
     # annotate line with mean value
     # plt.text(np.diag(corrs).mean(), 0.1,
