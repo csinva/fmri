@@ -29,6 +29,7 @@ def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexample
     r = r[r['use_random_subset_features'] == 1]
     # r = r[r['use_added_wordrate_feature'] == 1]
     # print(r.shape, rr_shapley.shape)
+    print('num shapley runs', len(r))
     row = r.iloc[0]
 
     if qa_questions_version == 'v3_boostexamples_merged':
@@ -61,6 +62,10 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
     r = r[r.use_random_subset_features == 0]
     r = r[r.use_added_wordrate_feature == use_added_wordrate_feature]
     r = r[r.single_question_idx == -1]
+    if len(r) == 0:
+        print('\tskipping', subject, qa_questions_version,
+              use_added_wordrate_feature)
+        return
     assert len(r) == 1
     args0 = r[r.subject == subject].iloc[0]
     weights, weights_pc = flatmaps_per_question.get_weights_top(args0)
@@ -71,15 +76,15 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
             questions = questions + ['wordrate']
         questions = np.array(questions)[
             args0.weight_enet_mask.astype(bool)]
-        print('weight_enet_mask', args0.weight_enet_mask.sum(),
+        print('\tweight_enet_mask', args0.weight_enet_mask.sum(),
               args0.weight_enet_mask.shape)
-        print('questions', len(questions), questions[:10])
+        print('\tquestions', len(questions))  # , questions[:10])
     else:
         questions = get_questions(qa_questions_version)
         if use_added_wordrate_feature:
             questions = questions + ['wordrate']
 
-    print(len(questions), 'questions', len(weights), 'weights')
+    print('\t', len(questions), 'questions', len(weights), 'weights')
 
     corrs_test = r['corrs_test']
     if qa_questions_version == 'v3_boostexamples_merged':

@@ -256,10 +256,14 @@ if __name__ == '__main__':
     # setting = 'full_neurosynth'
     # setting = 'individual_gpt4'
     for settings in [
-        ['full_neurosynth_pc'], ['full_neurosynth_wordrate_pc'], [
-            'full_35_pc'], ['full_35_wordrate_pc'],
-        ['full_neurosynth'], ['full_neurosynth_wordrate'], [
-            'full_35'], ['full_35_wordrate'],
+        ['full_neurosynth_pc'],
+        ['full_neurosynth_wordrate_pc'],
+        ['full_35_pc'],
+        ['full_35_wordrate_pc'],
+        ['full_neurosynth'],
+        ['full_neurosynth_wordrate'],
+        ['full_35'],
+        ['full_35_wordrate'],
     ]:
         print('settings', settings)
         # settings = ['']  # shapley_neurosynth, individual_gpt4
