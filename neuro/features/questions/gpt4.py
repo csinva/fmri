@@ -207,3 +207,12 @@ if __name__ == '__main__':
     ]
     for q in computed_gpt4_qs:
         print(repr(q) + ',')
+
+    for q in QS_35_STABLE:
+        assert q in computed_gpt4_qs
+    for q in QS_35_STABLE:
+        assert q in computed_gpt4_qs
+    for q in QS_HYPOTHESES_COMPUTED:
+        assert q in computed_gpt4_qs
+    # for q in QS_HYPOTHESES:
+        # assert q in computed_gpt4_qs, 'Missing these hypotheses still'

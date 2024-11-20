@@ -5,7 +5,7 @@ from neuro.features.questions.qa_questions_base import *
 from neuro.features.questions.qa_questions_data_boost import *
 from neuro.features.questions.qa_questions_llama_boost import *
 from neuro.features.questions.merge_v3_boostexamples import DICT_MERGE_V3_BOOSTEXAMPLES
-from neuro.features.questions.gpt4 import QS_HYPOTHESES
+from neuro.features.questions.gpt4 import QS_35_STABLE, QS_HYPOTHESES
 from os.path import join, dirname
 path_to_file = dirname(__file__)
 
@@ -38,7 +38,7 @@ def _rewrite_to_focus_on_end(question, suffix='last'):
 
 
 def get_kwargs_list_for_version_str(version_str: str):
-    if '?' in version_str or 'neurosynth' in version_str:
+    if '?' in version_str or 'neurosynth' in version_str or version_str == 'qs_35':
         return [{'qa_questions_version': version_str}]
     # version str contains version and suffix
     # v3 -> v1, v2, v3
@@ -134,8 +134,11 @@ def get_questions(version='v1', suffix=None, full=False):
     elif version == 'v1neurosynth':
         qs = QS_HYPOTHESES
         remove_list = []
+    elif version == 'qs_35':
+        qs = QS_35_STABLE
+        remove_list = []
 
-        # special cases
+    # special cases
     elif version == 'base':
         return get_questions(version='v2', suffix=suffix, full=True)
 

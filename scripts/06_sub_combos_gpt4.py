@@ -12,16 +12,17 @@ params_shared_dict = {
     # things to average over
     'use_extract_only': [0],
     'pc_components': [100],
-    'ndelays': [8],
+    'ndelays': [4],
     'nboots': [50],
 
     # things to change
     'use_test_setup': [0],
-    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug16_gpt4'],
+    # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug16_gpt4'],
+    'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/oct17_neurosynth_gemv'],
     # 'subject': ['UTS01', 'UTS02', 'UTS03'],
     # 'use_added_wordrate_feature': [0, 1],
     'subject': ['UTS02'],
-    'use_added_wordrate_feature': [0, 1],
+    'use_added_wordrate_feature': [0],
 }
 
 params_coupled_dict = {
@@ -30,13 +31,19 @@ params_coupled_dict = {
 
     # single question
     [
-        (repr(QS_HYPOTHESES_COMPUTED[i]), 'gpt4', None, None)
-        for i in range(len(QS_HYPOTHESES_COMPUTED))
+        # (repr(QS_HYPOTHESES_COMPUTED[i]), 'gpt4', None, None)
+        # for i in range(len(QS_HYPOTHESES_COMPUTED))
+    ]
+    +
+    # shapley features
+    [
+        # ('qs_35', 'gpt4', 1, seed)
+        # for seed in range(50)
     ]
     +
     # full
     [
-        # ('QS_HYPOTHESES_COMPUTED', 'gpt4', None, None)
+        ('qs_35', 'gpt4', None, None)
     ]
 
 
@@ -62,7 +69,7 @@ submit_utils.run_args_list(
     script_name=script_name,
     # unique_seeds='seed',
     # amlt_kwargs=amlt_kwargs_cpu,
-    n_cpus=4,
+    # n_cpus=8,
     # actually_run=False,
     # repeat_failed_jobs=True,
     shuffle=True,

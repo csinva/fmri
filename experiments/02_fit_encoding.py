@@ -97,11 +97,11 @@ def add_main_args(parser):
                         default='v1',
                         choices=['v1', 'v2', 'v3', 'v3_boostexamples',
                                  'v4_boostexamples', 'v4', 'v5', 'v3_boostexamples_merged'] +
-                        ['v1neurosynth'] + QS_HYPOTHESES_COMPUTED +
-                        ['QS_HYPOTHESES_COMPUTED'],
+                        ['v1neurosynth', 'qs_35'] + QS_HYPOTHESES_COMPUTED,
                         help='''Which set of QA questions to use, if feature_space is qa_embedder.
                         If passed a single question name, uses only that question with gpt4-extracted feats.
-                        QS_HYPOTHESES_COMPUTED will use the set of all computed GPT4 questions.
+                        v1neurosynth: will use the set of GPT-4 hypotheses that were not computed with GPT-4
+                        qs_35: the set of 35 stable questions
                         ''')
     parser.add_argument("--use_random_subset_features", type=int, default=0,
                         help='Whether to use a random subset of features')
@@ -376,7 +376,8 @@ if __name__ == "__main__":
         args, args.feature_space, args.qa_embedding_model, story_names_test, use_added_wordrate_feature=args.use_added_wordrate_feature)
     stim_train_delayed = feature_utils.get_features_full(
         args, args.feature_space, args.qa_embedding_model, story_names_train, use_added_wordrate_feature=args.use_added_wordrate_feature)
-    # print('feature shape before', stim_test_delayed.shape)
+    print('feature shapes before selection',
+          stim_train_delayed.shape, stim_test_delayed.shape)
 
     # select features
     if args.feature_selection_alpha >= 0:
@@ -391,8 +392,8 @@ if __name__ == "__main__":
     elif args.single_question_idx >= 0:
         r, stim_train_delayed, stim_test_delayed = feat_select.select_single_feature(
             args, r, stim_train_delayed, stim_test_delayed)
-    # print('shape after', stim_test_delayed.shape)
-    # breakpoint()
+    print('feature shapes after selection',
+          stim_train_delayed.shape, stim_test_delayed.shape)
 
     print('loading resps...')
     if args.pc_components <= 0:

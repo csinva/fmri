@@ -37,7 +37,7 @@ params_coupled_dict = {
         ('v3_boostexamples_merged', 'ensemble2',
          get_alphas('qa_embedder')[3], None, None, None),
         ('v1neurosynth', 'ensemble2',
-         None, None, None, None),
+         None, None, None, None),  # v1neurosynth is the set of GPT-4 hypotheses that were not computed with GPT-4
     ]
     +
     # shapley features

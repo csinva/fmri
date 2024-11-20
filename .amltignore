@@ -14,3 +14,4 @@ processed
 **.jbl
 notebooks_gt_flatmaps
 **tar.gz
+**.joblib
