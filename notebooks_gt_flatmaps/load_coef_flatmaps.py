@@ -29,7 +29,11 @@ def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexample
     r = r[r['use_random_subset_features'] == 1]
     # r = r[r['use_added_wordrate_feature'] == 1]
     # print(r.shape, rr_shapley.shape)
-    print('num shapley runs', len(r))
+    if len(r) < 10:
+        # print(
+        # f'\tskipping shap with only {len(r)} runs', subject, qa_questions_version)
+        return
+    # print('num shapley runs', len(r))
     row = r.iloc[0]
 
     if qa_questions_version == 'v3_boostexamples_merged':
@@ -63,8 +67,8 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
     r = r[r.use_added_wordrate_feature == use_added_wordrate_feature]
     r = r[r.single_question_idx == -1]
     if len(r) == 0:
-        print('\tskipping', subject, qa_questions_version,
-              use_added_wordrate_feature)
+        # print('\tskipping', subject, qa_questions_version,
+        #   use_added_wordrate_feature)
         return
     assert len(r) == 1
     args0 = r[r.subject == subject].iloc[0]
@@ -90,9 +94,12 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
     if qa_questions_version == 'v3_boostexamples_merged':
         joblib.dump(corrs_test, join(PROCESSED_DIR,
                                      subject, 'corrs_test_35.pkl'))
-    else:
+    elif qa_questions_version == 'v1neurosynth':
         joblib.dump(corrs_test, join(PROCESSED_DIR,
                                      subject, 'corrs_test_neurosynth.pkl'))
+    elif qa_questions_version == 'qs_35':
+        joblib.dump(corrs_test, join(PROCESSED_DIR,
+                                     subject, 'corrs_test_qs_35.pkl'))
 
     return {q: w for q, w in zip(questions, weights)}
 

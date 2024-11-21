@@ -170,6 +170,7 @@ def get_gpt4_qa_embs_cached(
                 wordseq_idxs[0]: wordseq_idxs[1]]
         else:
             embs[:, i] = np.nan
+            print('warning, question not found in cache', q)
     if return_ngrams:
         return embs, ngrams_metadata['ngrams_list_total'][wordseq_idxs[0]: wordseq_idxs[1]]
     else:

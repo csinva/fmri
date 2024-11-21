@@ -145,7 +145,7 @@ def get_questions(version='v1', suffix=None, full=False):
     elif version == 'all':
         return get_questions(version='v6', suffix=suffix, full=True)
 
-    if not 'neurosynth' in version:
+    if not 'neurosynth' in version and not version == 'qs_35':
         qs = sum([_split_bulleted_str(ans, remove_parentheticals)
                   for ans in ans_list], [])
 

@@ -3,7 +3,7 @@ import os
 from os.path import dirname, join, expanduser
 import sys
 from imodelsx import submit_utils
-from neuro.features.questions.gpt4 import QS_HYPOTHESES, QS_HYPOTHESES_COMPUTED
+from neuro.features.questions.gpt4 import QS_35_STABLE, QS_HYPOTHESES, QS_HYPOTHESES_COMPUTED
 path_to_file = os.path.dirname(os.path.abspath(__file__))
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 sys.path.append(repo_dir)
@@ -12,7 +12,7 @@ params_shared_dict = {
     # things to average over
     'use_extract_only': [0],
     'pc_components': [100],
-    'ndelays': [4],
+    'ndelays': [1],
     'nboots': [50],
 
     # things to change
@@ -29,16 +29,16 @@ params_coupled_dict = {
     ('qa_questions_version', 'qa_embedding_model',
      'use_random_subset_features', 'seed'):
 
-    # single question
+    # single question (could also pass the other used questions here)
     [
-        # (repr(QS_HYPOTHESES_COMPUTED[i]), 'gpt4', None, None)
-        # for i in range(len(QS_HYPOTHESES_COMPUTED))
+        (repr(QS_35_STABLE[i]), 'gpt4', None, None)
+        for i in range(len(QS_35_STABLE))
     ]
     +
     # shapley features
     [
-        # ('qs_35', 'gpt4', 1, seed)
-        # for seed in range(50)
+        ('qs_35', 'gpt4', 1, seed)
+        for seed in range(50)
     ]
     +
     # full
@@ -69,9 +69,9 @@ submit_utils.run_args_list(
     script_name=script_name,
     # unique_seeds='seed',
     # amlt_kwargs=amlt_kwargs_cpu,
-    # n_cpus=8,
+    n_cpus=8,
     # actually_run=False,
     # repeat_failed_jobs=True,
-    shuffle=True,
+    shuffle=False,
     cmd_python=f'export HF_TOKEN={open(expanduser("~/.HF_TOKEN"), "r").read().strip()}; python',
 )
