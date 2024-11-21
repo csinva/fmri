@@ -18,6 +18,8 @@ import sasc.viz
 import joblib
 import dvu
 import sys
+
+from neuro.features.questions.gpt4 import QS_35_STABLE
 sys.path.append('../notebooks')
 flatmaps_per_question = __import__('06_flatmaps_per_question')
 
@@ -39,6 +41,8 @@ def _load_coefs_shapley(rr, subject='S02', qa_questions_version='v3_boostexample
     if qa_questions_version == 'v3_boostexamples_merged':
         questions = get_merged_questions_v3_boostexamples()
         questions = np.array(questions)[row.weight_enet_mask]
+    elif qa_questions_version == 'qs_35':
+        questions = QS_35_STABLE
     else:
         questions = get_questions(qa_questions_version)
 
@@ -83,6 +87,10 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
         print('\tweight_enet_mask', args0.weight_enet_mask.sum(),
               args0.weight_enet_mask.shape)
         print('\tquestions', len(questions))  # , questions[:10])
+    elif qa_questions_version == 'qs_35':
+        questions = QS_35_STABLE
+        if use_added_wordrate_feature:
+            questions = questions + ['wordrate']
     else:
         questions = get_questions(qa_questions_version)
         if use_added_wordrate_feature:
@@ -100,6 +108,7 @@ def _load_coefs_full(r, subject='S02', qa_questions_version='v3_boostexamples_me
     elif qa_questions_version == 'qs_35':
         joblib.dump(corrs_test, join(PROCESSED_DIR,
                                      subject, 'corrs_test_qs_35.pkl'))
+        print('corr', args0['corrs_test_mean'])
 
     return {q: w for q, w in zip(questions, weights)}
 
@@ -150,7 +159,15 @@ def _load_coefs_individual_gpt4(rr, subject='S02', use_added_wordrate_feature=0)
         weights_list = [w[0] for w in weights_list]
 
     weights = np.array(weights_list).squeeze()
+    corrs_test_dict = {
+        q: r.iloc[i]['corrs_test']
+        for i, q in enumerate(questions)
+    }
+    joblib.dump(corrs_test_dict, join(PROCESSED_DIR,
+                                      subject, 'corrs_test_individual_gpt4_qs_35.pkl'))
     # print('weights', weights.shape)
+
+    # print(r.columns)
 
     return {q: w for q, w in zip(questions, weights)}
 
