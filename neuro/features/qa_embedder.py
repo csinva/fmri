@@ -120,7 +120,7 @@ class QuestionEmbedder:
         # self.llm = guidance.models.Transformers("meta-llama/Llama-2-13b-hf")
         # print('PROMPT', self.prompt)
         self.llm = imodelsx.llm.get_llm(
-            self.checkpoint, CACHE_DIR=expanduser("~/cache_qa_embedder"))
+            checkpoint, CACHE_DIR=expanduser("~/cache_qa_embedder"))
         # self.llm = LLM(model=checkpoint,
         #    tensor_parallel_size=torch.cuda.device_count())
         # self.sampling_params = SamplingParams(temperature=0, max_tokens=1)
@@ -205,10 +205,11 @@ if __name__ == "__main__":
     # checkpoint = 'mistralai/Mistral-7B-v0.1'
     # checkpoint = "meta-llama/Meta-Llama-3-8B"
     # checkpoint = "meta-llama/Meta-Llama-3-8B-Instruct"
+    checkpoint = 'meta-llama/Llama-3.1-8B-Instruct'
     # checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot'
     # checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-refined'
     # checkpoint = 'meta-llama/Meta-Llama-3-70B-Instruct-refined'
-    checkpoint = 'meta-llama/Llama-3.2-11B-Vision-Instruct'
+    # checkpoint = 'meta-llama/Llama-3.2-11B-Vision-Instruct'
 
     # test
     # llm = imodelsx.llm.get_llm(checkpoint)
