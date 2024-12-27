@@ -1,8 +1,7 @@
-from questions import QS_O1_DEC26
-from treebank import STORIES_POPULAR, STORIES_UNPOPULAR, ECOG_DIR
-from questions import QS_O1_DEC26
+from neuro.treebank.questions import QS_O1_DEC26
+from neuro.treebank.config import STORIES_POPULAR, STORIES_UNPOPULAR, ECOG_DIR
 from imodelsx.qaemb.qaemb import QAEmb, get_sample_questions_and_examples
-import questions
+import neuro.treebank.questions as questions
 from math import ceil
 from numpy.linalg import norm
 from copy import deepcopy
@@ -21,35 +20,132 @@ from tqdm import tqdm
 from os.path import join
 import matplotlib.pyplot as plt
 import os
+import argparse
+from copy import deepcopy
+import logging
+import random
+from collections import defaultdict
+from os.path import join
+import numpy as np
+from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.model_selection import train_test_split
+import joblib
+import imodels
+import inspect
+import os.path
+import imodelsx.cache_save_utils
+path_to_repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-stories_to_run = STORIES_POPULAR
-qs_to_run = QS_O1_DEC26
-checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct'
-checkpoint_clean = checkpoint.replace('/', '___')
-setting = 'words'
+# initialize args
+def add_main_args(parser):
+    """Caching uses the non-default values from argparse to name the saving directory.
+    Changing the default arg an argument will break cache compatibility with previous runs.
+    """
 
-if __name__ == '__main__':
+    # dataset args
+    parser.add_argument(
+        "--checkpoint", type=str, default="meta-llama/Meta-Llama-3-8B-Instruct", help="name of QA model"
+    )
+    parser.add_argument(
+        '--setting', type=str, default='words', help='how to chunk texts'
+    )
+    # training misc args
+    parser.add_argument("--seed", type=int, default=1, help="random seed")
+    parser.add_argument(
+        "--save_dir",
+        type=str,
+        default=join(path_to_repo, "results"),
+        help="directory for saving",
+    )
+
+    return parser
+
+
+def add_computational_args(parser):
+    """Arguments that only affect computation and not the results (shouldnt use when checking cache)"""
+    parser.add_argument(
+        "--use_cache",
+        type=int,
+        default=1,
+        choices=[0, 1],
+        help="whether to check for cache",
+    )
+    parser.add_argument(
+        '--seed_stories',
+        type=int,
+        default=1,
+        help='seed for order that stories are processed in',
+    )
+    parser.add_argument(
+        '--batch_size',
+        type=int,
+        default=512,
+        help='batch size for QA model',
+    )
+    return parser
+
+
+def get_texts(features_df, setting='words', replace_nan_with_empty_string=True):
+    if setting == 'words':
+        texts = features_df['text'].values.flatten()
+    if replace_nan_with_empty_string:
+        texts = [t if isinstance(t, str) else '""' for t in texts]
+    return texts
+
+
+if __name__ == "__main__":
+    stories_to_run = STORIES_POPULAR
+    qs_to_run = QS_O1_DEC26
+
+    # get args
+    parser = argparse.ArgumentParser()
+    parser_without_computational_args = add_main_args(parser)
+    parser = add_computational_args(
+        deepcopy(parser_without_computational_args))
+    args = parser.parse_args()
+
+    # set up logging
+    logger = logging.getLogger()
+    logging.basicConfig(level=logging.INFO)
+
+    # set up saving directory + check for cache
+    already_cached, save_dir_unique = imodelsx.cache_save_utils.get_save_dir_unique(
+        parser, parser_without_computational_args, args, args.save_dir
+    )
+
+    if args.use_cache and already_cached:
+        logging.info(f"cached version exists! Successfully skipping :)\n\n\n")
+        exit(0)
+    for k in sorted(vars(args)):
+        logger.info("\t" + k + " " + str(vars(args)[k]))
+    logging.info(f"\n\n\tsaving to " + save_dir_unique + "\n")
+
+    # set seed
+    np.random.seed(args.seed)
+    random.seed(args.seed)
+
+    rng = np.random.default_rng(args.seed_stories)
+    rng.shuffle(stories_to_run)
+    rng.shuffle(qs_to_run)
+
+    checkpoint_clean = args.checkpoint.replace('/', '___')
+
     transcript_folders = os.listdir(join(ECOG_DIR, 'data', 'transcripts'))
-    output_dir_clean = join(ECOG_DIR, 'features', checkpoint_clean, setting)
-    output_dir_raw = join(ECOG_DIR, 'features_raw', checkpoint_clean, setting)
+    output_dir_clean = join(ECOG_DIR, 'features',
+                            checkpoint_clean, args.setting)
+    output_dir_raw = join(ECOG_DIR, 'features_raw',
+                          checkpoint_clean, args.setting)
     os.makedirs(output_dir_clean, exist_ok=True)
     os.makedirs(output_dir_raw, exist_ok=True)
 
     qa_embedder = QAEmb(
-        questions=[QS_O1_DEC26[0]],
-        checkpoint=checkpoint,
-        batch_size=512,
+        questions=[],
+        checkpoint=args.checkpoint,
+        batch_size=args.batch_size,
         # CACHE_DIR=expanduser("~/cache_qa_ecog"),
         CACHE_DIR=None,
     )
-
-    def get_texts(features_df, setting='words', replace_nan_with_empty_string=True):
-        if setting == 'words':
-            texts = features_df['text'].values.flatten()
-        if replace_nan_with_empty_string:
-            texts = [t if isinstance(t, str) else '""' for t in texts]
-        return texts
 
     for story in tqdm(stories_to_run, desc='stories'):
         # for story in stories_unpopular:
@@ -67,6 +163,7 @@ if __name__ == '__main__':
             join(ECOG_DIR, 'data', 'transcripts', story_fname, 'features.csv'))
 
         answers_dict = {}
+        texts = get_texts(features_df, setting=args.setting)
         for q in tqdm(qs_to_run, desc='question', leave=False):
             output_file_q = join(output_dir_raw, f'{story_fname}___{q}.pkl')
 
@@ -74,7 +171,6 @@ if __name__ == '__main__':
                 answers_dict[q] = joblib.load(output_file_q).astype(bool)
                 print(f'Loaded {output_file_q}')
             else:
-                texts = get_texts(features_df, setting='words')
                 assert len(texts) == len(
                     features_df), f'{len(texts)=} {len(features_df)=}'
                 qa_embedder.questions = [q]
@@ -90,3 +186,9 @@ if __name__ == '__main__':
         q = 'Does the text reference a person’s name?'
         print('these should be names', list(
             answers_df[answers_df[q] > 0][q].index))
+
+    # save results
+    joblib.dump(
+        {'Model succeeded'}, join(save_dir_unique, "results.pkl")
+    )  # caching requires that this is called results.pkl
+    logging.info("Succesfully completed :)\n\n")
