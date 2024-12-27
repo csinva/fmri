@@ -1,4 +1,5 @@
 import re
+from pprint import pprint
 
 PROMPT_O1_DEC26 = '''List 100 semantic questions to ask about text spoken in a movie that may help predict ECOG responses when listening to that word. Make all questions have yes or no answers.
 
@@ -212,6 +213,221 @@ QS_O1_DEC26 = [
     'Does the text mention a family relationship?',
     'Does the text suggest cooperation or collaboration?']
 
+PROMPT_O1_DEC26_2 = '''List another 100 new and non-overlapping questions about semantics '''
+
+RESPONSE_RAW_01_DEC26_2 = '''1. **Does the text mention or imply flirting or romantic advances?**  
+2. **Does the text mention or describe jealousy or envy between characters?**  
+3. **Does the text suggest that someone is ignoring or avoiding another person?**  
+4. **Does the text convey a sense of rivalry between two or more characters?**  
+5. **Does the text describe or imply emotional support given to someone?**  
+6. **Does the text mention the idea of trust or distrust between characters?**  
+7. **Does the text mention a surprise intended for someone else (e.g., a surprise party)?**  
+8. **Does the text include direct criticism or complaint about another person?**  
+9. **Does the text mention conflict resolution or making peace after a disagreement?**  
+10. **Does the text refer to someone’s personal or emotional boundaries?**  
+11. **Does the text allude to a coded message or hidden meaning (beyond simple deception)?**  
+12. **Does the text mention or describe a misunderstanding or miscommunication?**  
+13. **Does the text explicitly describe how something is said (e.g., whispered, shouted)?**  
+14. **Does the text reference a communication barrier (e.g., language differences)?**  
+15. **Does the text use an onomatopoeic word (e.g., “bang,” “sizzle,” “whoosh”)?**  
+16. **Does the text contain a trailing off in speech (e.g., “I just… can’t do it”)?**  
+17. **Does the text mention someone being bilingual or switching languages?**  
+18. **Does the text describe the speaker’s volume or pitch (“speaking softly,” “yelling”)?**  
+19. **Does the text mention directly quoting or repeating another person’s words verbatim?**  
+20. **Does the text mention physical gestures as part of communication (e.g., nodding, waving)?**  
+21. **Does the text mention a social tradition or cultural custom (e.g., a ritual)?**  
+22. **Does the text reference or describe a taboo or something considered socially unacceptable?**  
+23. **Does the text mention or describe a scenario requiring social etiquette (e.g., proper greetings)?**  
+24. **Does the text describe a charitable or philanthropic act (e.g., donating, volunteering)?**  
+25. **Does the text mention or describe a protest, demonstration, or public rally?**  
+26. **Does the text address social status or class differences (e.g., “upper class,” “working class”)?**  
+27. **Does the text mention or describe stereotypes or prejudices against a group?**  
+28. **Does the text mention or describe a negotiation or attempt at compromise?**  
+29. **Does the text mention someone being excluded or left out of a group activity?**  
+30. **Does the text describe courtesy or politeness gestures (beyond just “thank you,” “please”)?**  
+31. **Does the text describe the ambiance or atmosphere of a location (e.g., “tense,” “lively”)?**  
+32. **Does the text mention or describe interior design or decoration (e.g., “walls covered in art”)?**  
+33. **Does the text mention or describe the lighting conditions (e.g., “dimly lit,” “brightly lit”)?**  
+34. **Does the text mention or describe background sounds or noise in the environment?**  
+35. **Does the text specifically describe the temperature (e.g., “cold,” “hot”) but not the weather?**  
+36. **Does the text mention the presence or absence of other people in the setting (“the room was empty”)?**  
+37. **Does the text describe the location of an object within a scene (“on the table,” “under the chair”)?**  
+38. **Does the text distinguish between being indoors vs outdoors?**  
+39. **Does the text describe cleanliness or disarray of a place (e.g., “messy,” “spotless”)?**  
+40. **Does the text mention a sense of belonging (or not) in that environment?**  
+41. **Does the text mention or describe someone feeling bored or uninterested?**  
+42. **Does the text describe regret or remorse (not just an apology)?**  
+43. **Does the text mention or describe someone feeling lonely or isolated?**  
+44. **Does the text describe confusion or being perplexed (e.g., “I’m so confused”)?**  
+45. **Does the text reference curiosity or intrigue about a subject (“I’m curious about…”)?**  
+46. **Does the text mention or describe admiration or awe (“I’m amazed,” “That’s incredible”)?**  
+47. **Does the text describe relief or feeling relieved after tension (“Phew, that’s over!”)?**  
+48. **Does the text mention or describe determination or resolve (“I won’t quit,” “I’m determined”)?**  
+49. **Does the text mention or describe being distracted or having trouble focusing?**  
+50. **Does the text describe indifference or apathy (“I don’t care at all”)?**  
+51. **Does the text mention or describe a failed attempt at an action (“I tried but couldn’t”)?**  
+52. **Does the text reference an accidental event (“I slipped,” “the vase broke by accident”)?**  
+53. **Does the text mention or describe rescuing or saving someone from harm?**  
+54. **Does the text mention or describe a chase or pursuit (e.g., “they ran after him”)?**  
+55. **Does the text mention or describe hiding or concealment (“she hid behind the door”)?**  
+56. **Does the text mention searching for something or someone (“we’ve been looking everywhere”)?**  
+57. **Does the text mention blocking or shielding (“he blocked the punch”)?**  
+58. **Does the text mention building or constructing something (“they built a shelter”)?**  
+59. **Does the text mention destroying or breaking something intentionally?**  
+60. **Does the text describe a repeated or habitual movement (“he paced back and forth”)?**  
+61. **Does the text mention analyzing or evaluating a situation (“we assessed the risks”)?**  
+62. **Does the text describe learning or discovering new information (“I just found out”)?**  
+63. **Does the text describe teaching or instructing someone else (“I’ll show you how”)?**  
+64. **Does the text mention rationalizing or justifying an action or belief (“I did it because…”)?**  
+65. **Does the text reference something as common knowledge or widely known (“everyone knows that”)?**  
+66. **Does the text describe differentiating or distinguishing between two similar things?**  
+67. **Does the text mention a rumor being confirmed or disproven (“it turns out that…”)?**  
+68. **Does the text describe training or practice to improve a skill (not just stating a skill)?**  
+69. **Does the text mention analyzing data or statistics (e.g., “the numbers show…”)?**  
+70. **Does the text describe brainstorming or generating ideas collectively?**  
+71. **Does the text mention or describe thirst or dehydration (“I’m so thirsty”)?**  
+72. **Does the text mention a body reflex (e.g., sneezing, coughing, blinking)?**  
+73. **Does the text mention or describe aging or getting older (“I’m too old for this”)?**  
+74. **Does the text refer to genetic traits or heredity (“it runs in my family”)?**  
+75. **Does the text mention pregnancy or childbirth?**  
+76. **Does the text reference physical exercise or a workout routine?**  
+77. **Does the text describe physical fatigue or exhaustion (“I’m worn out”)?**  
+78. **Does the text mention a medical procedure (e.g., surgery, therapy)?**  
+79. **Does the text describe a phobia or intense, irrational fear (beyond basic anxiety)?**  
+80. **Does the text reference physical stamina or endurance in some context?**  
+81. **Does the text mention or discuss the idea of fate or destiny?**  
+82. **Does the text mention or discuss chaos, randomness, or chance?**  
+83. **Does the text refer to balance or equilibrium in an abstract sense?**  
+84. **Does the text discuss existential or philosophical ideas about life’s meaning?**  
+85. **Does the text reference duality?**  
+86. **Does the text mention or discuss whether reality might be an illusion or not?**  
+87. **Does the text mention or discuss something being inevitable or unavoidable?**  
+88. **Does the text refer to responsibility as an abstract principle (“it’s my responsibility”)?**  
+89. **Does the text mention or discuss an afterlife or spiritual realm (e.g., heaven, reincarnation)?**  
+90. **Does the text mention or discuss free will or personal autonomy (“I can choose my own path”)?**  
+91. **Does the text mention or reference gambling or betting (“I bet you,” “place your bets”)?**  
+92. **Does the text mention or reference a legal punishment or penalty (“fined,” “sentenced”)?**  
+93. **Does the text mention historical artifacts or antiques (not just events) (“an ancient vase”)?**  
+94. **Does the text reference a man-made disaster (e.g., oil spill, industrial accident)?**  
+95. **Does the text explicitly use or reference a pun or wordplay for humor?**  
+96. **Does the text mention illusions, hallucinations, or imaginary experiences (“I saw something unreal”)?**  
+97. **Does the text mention or reference making or receiving a phone call specifically?**  
+98. **Does the text mention or reference a dream or daydream?**  
+99. **Does the text mention or reference a test or exam (academic or otherwise)?**  
+100. **Does the text mention or reference someone’s childhood memories or events?**'''
+
+QS_O1_DEC26_2 = ['Does the text mention or describe a protest, demonstration, or public rally?',
+                 'Does the text describe the ambiance or atmosphere of a location?',
+                 'Does the text describe relief or feeling relieved after tension?',
+                 'Does the text mention or describe admiration or awe?',
+                 'Does the text mention historical artifacts or antiques ?',
+                 'Does the text describe a repeated or habitual movement?',
+                 'Does the text suggest that someone is ignoring or avoiding another person?',
+                 'Does the text mention or describe jealousy or envy between characters?',
+                 'Does the text reference a man-made disaster?',
+                 'Does the text describe physical fatigue or exhaustion?',
+                 'Does the text discuss existential or philosophical ideas about life’s '
+                 'meaning?',
+                 'Does the text mention physical gestures as part of communication?',
+                 'Does the text mention a social tradition or cultural custom?',
+                 'Does the text mention a surprise intended for someone else?',
+                 'Does the text describe a charitable or philanthropic act?',
+                 'Does the text describe or imply emotional support given to someone?',
+                 'Does the text include direct criticism or complaint about another person?',
+                 'Does the text refer to balance or equilibrium in an abstract sense?',
+                 'Does the text reference something as common knowledge or widely known?',
+                 'Does the text mention or discuss whether reality might be an illusion or '
+                 'not?',
+                 'Does the text mention or describe a scenario requiring social etiquette?',
+                 'Does the text mention pregnancy or childbirth?',
+                 'Does the text mention or describe stereotypes or prejudices against a group?',
+                 'Does the text convey a sense of rivalry between two or more characters?',
+                 'Does the text reference an accidental event?',
+                 'Does the text mention the idea of trust or distrust between characters?',
+                 'Does the text mention analyzing data or statistics?',
+                 'Does the text describe a phobia or intense, irrational fear?',
+                 'Does the text mention or discuss chaos, randomness, or chance?',
+                 'Does the text mention rationalizing or justifying an action or belief?',
+                 'Does the text explicitly use or reference a pun or wordplay for humor?',
+                 'Does the text mention the presence or absence of other people in the '
+                 'setting?',
+                 'Does the text reference a communication barrier?',
+                 'Does the text allude to a coded message or hidden meaning?',
+                 'Does the text mention or imply flirting or romantic advances?',
+                 'Does the text mention or describe the lighting conditions?',
+                 'Does the text mention or describe a failed attempt at an action?',
+                 'Does the text mention or describe a negotiation or attempt at compromise?',
+                 'Does the text mention or describe a chase or pursuit?',
+                 'Does the text mention or discuss the idea of fate or destiny?',
+                 'Does the text mention or reference gambling or betting?',
+                 'Does the text mention conflict resolution or making peace after a '
+                 'disagreement?',
+                 'Does the text mention illusions, hallucinations, or imaginary experiences?',
+                 'Does the text reference physical stamina or endurance in some context?',
+                 'Does the text refer to responsibility as an abstract principle?',
+                 'Does the text describe courtesy or politeness gestures?',
+                 'Does the text describe confusion or being perplexed?',
+                 'Does the text mention or describe thirst or dehydration?',
+                 'Does the text reference duality?',
+                 'Does the text describe training or practice to improve a skill?',
+                 'Does the text mention someone being excluded or left out of a group '
+                 'activity?',
+                 'Does the text mention blocking or shielding?',
+                 'Does the text mention or discuss free will or personal autonomy?',
+                 'Does the text mention or reference a legal punishment or penalty?',
+                 'Does the text mention or describe being distracted or having trouble '
+                 'focusing?',
+                 'Does the text refer to genetic traits or heredity?',
+                 'Does the text mention or reference a test or exam?',
+                 'Does the text mention destroying or breaking something intentionally?',
+                 'Does the text distinguish between being indoors vs outdoors?',
+                 'Does the text describe the speaker’s volume or pitch?',
+                 'Does the text describe indifference or apathy?',
+                 'Does the text mention building or constructing something?',
+                 'Does the text use an onomatopoeic word?',
+                 'Does the text describe cleanliness or disarray of a place?',
+                 'Does the text mention or describe someone feeling lonely or isolated?',
+                 'Does the text reference or describe a taboo or something considered socially '
+                 'unacceptable?',
+                 'Does the text contain a trailing off in speech?',
+                 'Does the text describe learning or discovering new information?',
+                 'Does the text refer to someone’s personal or emotional boundaries?',
+                 'Does the text describe differentiating or distinguishing between two similar '
+                 'things?',
+                 'Does the text mention a sense of belonging  in that environment?',
+                 'Does the text mention or discuss an afterlife or spiritual realm?',
+                 'Does the text mention or describe someone feeling bored or uninterested?',
+                 'Does the text describe the location of an object within a scene?',
+                 'Does the text reference curiosity or intrigue about a subject?',
+                 'Does the text describe teaching or instructing someone else?',
+                 'Does the text mention directly quoting or repeating another person’s words '
+                 'verbatim?',
+                 'Does the text mention or describe aging or getting older?',
+                 'Does the text mention or reference making or receiving a phone call '
+                 'specifically?',
+                 'Does the text mention or reference a dream or daydream?',
+                 'Does the text mention or describe interior design or decoration?',
+                 'Does the text mention searching for something or someone?',
+                 'Does the text mention or describe hiding or concealment?',
+                 'Does the text describe regret or remorse?',
+                 'Does the text mention someone being bilingual or switching languages?',
+                 'Does the text mention or describe background sounds or noise in the '
+                 'environment?',
+                 'Does the text explicitly describe how something is said?',
+                 'Does the text mention or discuss something being inevitable or unavoidable?',
+                 'Does the text mention or describe rescuing or saving someone from harm?',
+                 'Does the text specifically describe the temperature  but not the weather?',
+                 'Does the text mention or describe a misunderstanding or miscommunication?',
+                 'Does the text mention or describe determination or resolve?',
+                 'Does the text describe brainstorming or generating ideas collectively?',
+                 'Does the text mention a body reflex?',
+                 'Does the text mention analyzing or evaluating a situation?',
+                 'Does the text mention a medical procedure?',
+                 'Does the text address social status or class differences?',
+                 'Does the text mention a rumor being confirmed or disproven?',
+                 'Does the text reference physical exercise or a workout routine?',
+                 'Does the text mention or reference someone’s childhood memories or events?']
+
 
 def clean_response(RESPONSE):
 
@@ -234,12 +450,17 @@ def clean_response(RESPONSE):
         # remove space before question mark
         q = q.replace(' ?', '?')
 
+        print(q)
+
         assert q.endswith('?')
 
         qs_clean.append(q)
 
     qs_clean = list(set(qs_clean))
+    return qs_clean
 
 
 if __name__ == '__main__':
-    clean_response(RESPONSE_RAW_01_DEC26)
+    qs_1 = clean_response(RESPONSE_RAW_01_DEC26)
+    qs_2 = clean_response(RESPONSE_RAW_01_DEC26_2)
+    print(len(qs_1), len(qs_2), len(set(qs_1 + qs_2)))

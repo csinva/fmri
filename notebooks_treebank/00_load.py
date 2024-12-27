@@ -1,4 +1,4 @@
-from neuro.treebank.questions import QS_O1_DEC26
+from neuro.treebank.questions import QS_O1_DEC26, QS_O1_DEC26_2
 from neuro.treebank.config import STORIES_POPULAR, STORIES_UNPOPULAR, ECOG_DIR
 from imodelsx.qaemb.qaemb import QAEmb, get_sample_questions_and_examples
 import neuro.treebank.questions as questions
@@ -86,7 +86,7 @@ def add_computational_args(parser):
     return parser
 
 
-def get_texts(features_df, setting='words', replace_nan_with_empty_string=True):
+def get_texts(features_df, setting='words'):
     if setting == 'words':
         texts = features_df['text'].values.flatten()
     elif 'sec' in setting:
@@ -97,18 +97,19 @@ def get_texts(features_df, setting='words', replace_nan_with_empty_string=True):
             row = features_df.iloc[i]
             time_end = row['end']
             time_start = time_end - sec_window
-            ngram = features_df[(features_df['end'] >= time_start) & (
-                features_df['end'] <= time_end)]['text'].values.tolist()
-            texts.append(ngram)
+            ngram = features_df[
+                (features_df['end'] >= time_start) & (
+                    features_df['end'] <= time_end)
+            ]['text'].values.tolist()
+            assert len(ngram) > 0, f'{i=} {ngram=} {time_start=} {time_end=}'
+            texts.append(' '.join(ngram))
 
-    if replace_nan_with_empty_string:
-        texts = [t if isinstance(t, str) else '""' for t in texts]
     return texts
 
 
 if __name__ == "__main__":
-    stories_to_run = STORIES_POPULAR
-    qs_to_run = QS_O1_DEC26
+    stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
+    qs_to_run = QS_O1_DEC26 + QS_O1_DEC26_2
 
     # get args
     parser = argparse.ArgumentParser()
@@ -173,6 +174,8 @@ if __name__ == "__main__":
         assert story_fname in transcript_folders, f'{story_fname} not found'
         features_df = pd.read_csv(
             join(ECOG_DIR, 'data', 'transcripts', story_fname, 'features.csv'))
+        features_df['end'] = features_df['end'].interpolate()
+        features_df['text'] = features_df['text'].fillna('')
 
         answers_dict = {}
         texts = get_texts(features_df, setting=args.setting)
@@ -200,6 +203,7 @@ if __name__ == "__main__":
             answers_df[answers_df[q] > 0][q].index))
 
     # save results
+    os.makedirs(save_dir_unique, exist_ok=True)
     joblib.dump(
         {'Model succeeded'}, join(save_dir_unique, "results.pkl")
     )  # caching requires that this is called results.pkl
