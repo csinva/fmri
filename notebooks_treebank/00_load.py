@@ -89,6 +89,18 @@ def add_computational_args(parser):
 def get_texts(features_df, setting='words', replace_nan_with_empty_string=True):
     if setting == 'words':
         texts = features_df['text'].values.flatten()
+    elif 'sec' in setting:
+        # get num from string
+        sec_window = int(setting.split('_')[-1])
+        texts = []
+        for i in tqdm(range(0, len(features_df))):
+            row = features_df.iloc[i]
+            time_end = row['end']
+            time_start = time_end - sec_window
+            ngram = features_df[(features_df['end'] >= time_start) & (
+                features_df['end'] <= time_end)]['text'].values.tolist()
+            texts.append(ngram)
+
     if replace_nan_with_empty_string:
         texts = [t if isinstance(t, str) else '""' for t in texts]
     return texts

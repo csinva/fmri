@@ -21,6 +21,7 @@ params_shared_dict = {
     'seed_stories': range(4),
     'checkpoint': [LLAMA8B, MIST7B],
     'batch_size': [128],
+    'setting': ['words', 'sec_3'],
 }
 
 params_coupled_dict = {}
