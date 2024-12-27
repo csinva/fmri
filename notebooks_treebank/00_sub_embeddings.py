@@ -19,7 +19,7 @@ MIXTMOE = 'mistralai/Mixtral-8x7B-Instruct-v0.1'
 params_shared_dict = {
     'save_dir': ['/home/chansingh/fmri/results/ecog'],
     'seed_stories': range(4),
-    'checkpoint': [LLAMA8B],
+    'checkpoint': [LLAMA8B, MIST7B],
     'batch_size': [128],
 }
 
