@@ -10,6 +10,7 @@ sys.path.append(repo_dir)
 MIST7B = 'mistralai/Mistral-7B-Instruct-v0.2'
 LLAMA8B = 'meta-llama/Meta-Llama-3-8B-Instruct'
 LLAMA8B_fewshot = 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot'
+GEMMA7B = 'google/gemma-7b-it'
 
 # other models (also -refined models)
 LLAMA70B = 'meta-llama/Meta-Llama-3-70B-Instruct'
@@ -18,14 +19,22 @@ MIXTMOE = 'mistralai/Mixtral-8x7B-Instruct-v0.1'
 
 params_shared_dict = {
     'save_dir': ['/home/chansingh/fmri/results/ecog'],
-    'seed_stories': range(4),
-    'checkpoint': [LLAMA8B, MIST7B],
-    'batch_size': [64],
-    'setting': ['words', 'sec_3'],
+    # 'seed_stories': range(2),
+    'checkpoint': [LLAMA8B, MIST7B, GEMMA7B],
+    # 'checkpoint': [MIXTMOE],
+    'use_cache': [0],
     # 'setting': ['sec_3'],
 }
 
-params_coupled_dict = {}
+params_coupled_dict = {
+    ('setting', 'batch_size'): [
+        # ('words', 16),
+        ('sec_1.5', 16),
+        # ('sec_3', 16),
+        ('sec_6', 4),
+        ('sec_12', 4),
+    ],
+}
 
 args_list = submit_utils.get_args_list(
     params_shared_dict=params_shared_dict,
@@ -55,5 +64,6 @@ submit_utils.run_args_list(
     # gpu_ids=[[0, 1], [2, 3]],
     # actually_run=False,
     # shuffle=True,
-    cmd_python=f'export HF_TOKEN={open(expanduser("~/.HF_TOKEN"), "r").read().strip()}; python',
+    # cmd_python=f'export HF_TOKEN={open(expanduser("~/.HF_TOKEN"), "r").read().strip()}; python',
+    cmd_python='python',
 )

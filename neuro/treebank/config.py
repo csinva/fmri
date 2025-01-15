@@ -7,4 +7,7 @@ STORIES_UNPOPULAR = ['Antman', 'Aquaman', 'Avengers Infinity War', 'Black Panthe
                      'Fantastic Mr. Fox', 'Guardians Of The Galaxy 2',
                      'Guardians Of the Galaxy', 'Sesame Street Episode 3990',
                      'Spiderman Homecoming', 'The Martian', 'Thor Ragnarok', 'venom']
+STORIES_LOTR = [
+    'Lord Of The Rings 1', 'Lord Of The Rings 2',
+]
 ECOG_DIR = '/home/chansingh/mntv1/ecog/'

@@ -1,5 +1,5 @@
 from neuro.treebank.questions import QS_O1_DEC26, QS_O1_DEC26_2
-from neuro.treebank.config import STORIES_POPULAR, STORIES_UNPOPULAR, ECOG_DIR
+from neuro.treebank.config import STORIES_POPULAR, STORIES_UNPOPULAR, STORIES_LOTR, ECOG_DIR
 from imodelsx.qaemb.qaemb import QAEmb, get_sample_questions_and_examples
 import neuro.treebank.questions as questions
 from math import ceil
@@ -14,7 +14,6 @@ import joblib
 import numpy as np
 from typing import List
 import sys
-from os.path import expanduser
 import pandas as pd
 from tqdm import tqdm
 from os.path import join
@@ -24,14 +23,9 @@ import argparse
 from copy import deepcopy
 import logging
 import random
-from collections import defaultdict
 from os.path import join
 import numpy as np
-from sklearn.metrics import accuracy_score, roc_auc_score
-from sklearn.model_selection import train_test_split
 import joblib
-import imodels
-import inspect
 import os.path
 import imodelsx.cache_save_utils
 path_to_repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -91,7 +85,7 @@ def get_texts(features_df, setting='words'):
         texts = features_df['text'].values.flatten()
     elif 'sec' in setting:
         # get num from string
-        sec_window = int(setting.split('_')[-1])
+        sec_window = float(setting.split('_')[-1])
         texts = []
         for i in tqdm(range(0, len(features_df))):
             row = features_df.iloc[i]
@@ -108,7 +102,9 @@ def get_texts(features_df, setting='words'):
 
 
 if __name__ == "__main__":
-    stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
+    stories_to_run = STORIES_LOTR
+    # stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
+    # stories_to_run = STORIES_POPULAR
     qs_to_run = QS_O1_DEC26 + QS_O1_DEC26_2
 
     # get args
@@ -179,12 +175,13 @@ if __name__ == "__main__":
 
         answers_dict = {}
         texts = get_texts(features_df, setting=args.setting)
+        # print(texts[:40])
         for q in tqdm(qs_to_run, desc='question', leave=False):
             output_file_q = join(output_dir_raw, f'{story_fname}___{q}.pkl')
 
             if os.path.exists(output_file_q):
                 answers_dict[q] = joblib.load(output_file_q).astype(bool)
-                print(f'Loaded {output_file_q}')
+                # print(f'Loaded {output_file_q}')
             else:
                 assert len(texts) == len(
                     features_df), f'{len(texts)=} {len(features_df)=}'
@@ -200,7 +197,7 @@ if __name__ == "__main__":
         # spot check
         q = 'Does the text reference a person’s name?'
         print('these should be names', list(
-            answers_df[answers_df[q] > 0][q].index))
+            answers_df[answers_df[q] > 0][q].index)[:10])
 
     # save results
     os.makedirs(save_dir_unique, exist_ok=True)
