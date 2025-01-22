@@ -29,10 +29,10 @@ params_shared_dict = {
 params_coupled_dict = {
     ('setting', 'batch_size'): [
         # ('words', 16),
-        ('sec_1.5', 16),
+        # ('sec_1.5', 16),
         # ('sec_3', 16),
-        ('sec_6', 4),
-        ('sec_12', 4),
+        ('sec_6', 6),
+        # ('sec_12', 4), # too long, not necessary
     ],
 }
 

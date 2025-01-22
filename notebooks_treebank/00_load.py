@@ -102,8 +102,8 @@ def get_texts(features_df, setting='words'):
 
 
 if __name__ == "__main__":
-    stories_to_run = STORIES_LOTR
-    # stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
+    # stories_to_run = STORIES_LOTR
+    stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
     # stories_to_run = STORIES_POPULAR
     qs_to_run = QS_O1_DEC26 + QS_O1_DEC26_2
 
