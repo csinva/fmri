@@ -20,7 +20,9 @@ sys.path.append('../notebooks')
 os.environ["FSLDIR"] = "/home/chansingh/fsl"
 
 
-def compute_corrs_df(frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_subject, apply_mask):
+def compute_corrs_df(qs, frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_subject, apply_mask):
+    '''Compute correlations between QA flatmaps and GT flatmaps (with the function loads)
+    '''
     corrs_df_list = defaultdict(list)
     for subject in tqdm(subjects):
         flatmaps_gt_dict = get_neurosynth_flatmaps(subject, mni=False)
@@ -251,58 +253,4 @@ def compute_mni_corr_df(flatmaps_qa_dicts_by_subject, flatmaps_gt_dict_mni, qs):
     return df
 
 
-if __name__ == '__main__':
-    # setting = 'shapley_neurosynth'
-    # setting = 'full_neurosynth'
-    # setting = 'individual_gpt4'
-    for settings in [
-        ['full_neurosynth_pc'],
-        ['full_neurosynth_wordrate_pc'],
-        ['full_35_pc'],
-        ['full_35_wordrate_pc'],
-        ['full_neurosynth'],
-        ['full_neurosynth_wordrate'],
-        ['full_35'],
-        ['full_35_wordrate'],
-    ]:
-        print('settings', settings)
-        # settings = ['']  # shapley_neurosynth, individual_gpt4
-        subjects = ['UTS01', 'UTS02', 'UTS03']
-        # subjects = [f'UTS0{i}' for i in range(1, 9)]
-
-        # comparison hyperparams
-        apply_mask = True
-        frac_voxels_to_keep = 0.1  # 0.10
-        frac_voxels_to_keep_list = [frac_voxels_to_keep]
-        # hyperparams
-        out_dir = join(repo_dir, 'qa_results',
-                       'neurosynth_compare', '___'.join(settings))
-        os.makedirs(out_dir, exist_ok=True)
-
-        # load flatmaps
-        flatmaps_qa_dicts_by_subject = neurosynth.load_flatmaps_qa_dicts_by_subject(
-            subjects, settings)
-
-        # flatmaps_gt_dict_list_subject_mni = {subject: [convert_to_mni_space(flatmaps_gt_dict_list_subject[subject][qs[i]], subject=subject)
-        #                                                for i in tqdm(range(len(qs)))]
-        #                                      for subject in ['UTS01', 'UTS02', 'UTS03']}
-        flatmaps_gt_dict_mni = neurosynth.get_neurosynth_flatmaps(mni=True)
-        qs = list(set(flatmaps_qa_dicts_by_subject['UTS01'].keys()) & set(
-            flatmaps_gt_dict_mni.keys()))
-
-        corrs_df = compute_corrs_df(
-            frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_subject, apply_mask)
-
-        plot_corrs_df(corrs_df, frac_voxels_to_keep, out_dir)
-
-        # pvals_subject = compute_pvals_for_subject(
-        # corrs_df, 'UTS01', frac_voxels_to_keep_list)
-        # pvals_subject.style.background_gradient().format(precision=3)
-
-        corrs_df_mni = compute_mni_corr_df(
-            flatmaps_qa_dicts_by_subject, flatmaps_gt_dict_mni, qs)
-        print('avg', corrs_df_mni.loc['avg'])
-        corrs_df_mni.to_pickle(join(out_dir, 'corrs_df_mni.pkl'))
-        corrs_df_mni.style.background_gradient(axis=None, cmap="coolwarm_r", vmin=-
-                                               corrs_df_mni.abs().max().max(), vmax=corrs_df_mni.abs().max().max()).format(precision=3).to_html(
-            join(out_dir, 'corrs_df_mni.html'))
+# if __name__ == '__main__':

@@ -20,18 +20,18 @@ MIXTMOE = 'mistralai/Mixtral-8x7B-Instruct-v0.1'
 params_shared_dict = {
     'save_dir': ['/home/chansingh/fmri/results/ecog'],
     # 'seed_stories': range(2),
-    'checkpoint': [LLAMA8B, MIST7B, GEMMA7B],
-    # 'checkpoint': [MIXTMOE],
+    # 'checkpoint': [LLAMA8B, MIST7B, GEMMA7B],
+    'checkpoint': [MIXTMOE],
     'use_cache': [0],
     # 'setting': ['sec_3'],
 }
-
+FACTOR = 4
 params_coupled_dict = {
     ('setting', 'batch_size'): [
-        # ('words', 16),
-        # ('sec_1.5', 16),
-        # ('sec_3', 16),
-        ('sec_6', 6),
+        ('words', 16//FACTOR),
+        ('sec_1.5', 16//FACTOR),
+        ('sec_3', 16//FACTOR),
+        ('sec_6', 8//FACTOR),
         # ('sec_12', 4), # too long, not necessary
     ],
 }
@@ -60,8 +60,8 @@ submit_utils.run_args_list(
     unique_seeds='seed_stories',
     # amlt_kwargs=amlt_kwargs,
     # gpu_ids=[0, 1],
-    gpu_ids=[0, 1, 2, 3],
-    # gpu_ids=[[0, 1], [2, 3]],
+    # gpu_ids=[0, 1, 2, 3],
+    gpu_ids=[[0, 1], [2, 3]],
     # actually_run=False,
     # shuffle=True,
     # cmd_python=f'export HF_TOKEN={open(expanduser("~/.HF_TOKEN"), "r").read().strip()}; python',

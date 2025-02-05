@@ -3,7 +3,8 @@ import os
 from os.path import dirname, join, expanduser
 import sys
 from imodelsx import submit_utils
-from neuro.features.questions.gpt4 import QS_35_STABLE, QS_HYPOTHESES, QS_HYPOTHESES_COMPUTED
+from neuro.features.questions.gpt4 import QS_35_STABLE, QS_HYPOTHESES, QS_HYPOTHESES_COMPUTED, QUESTIONS_GPT4_COMPUTED_FULL
+QS_ALL_COMPUTED = set()
 path_to_file = os.path.dirname(os.path.abspath(__file__))
 repo_dir = dirname(dirname(os.path.abspath(__file__)))
 sys.path.append(repo_dir)
@@ -20,8 +21,9 @@ params_shared_dict = {
     # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug16_gpt4'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/oct17_neurosynth_gemv'],
     # 'subject': ['UTS01', 'UTS02', 'UTS03'],
+    'subject': ['UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08'],
     # 'use_added_wordrate_feature': [0, 1],
-    'subject': ['UTS02'],
+    # 'subject': ['UTS02'],
     'use_added_wordrate_feature': [0],
 }
 
@@ -31,14 +33,14 @@ params_coupled_dict = {
 
     # single question (could also pass the other used questions here)
     [
-        (repr(QS_35_STABLE[i]), 'gpt4', None, None)
-        for i in range(len(QS_35_STABLE))
+        (repr(QUESTIONS_GPT4_COMPUTED_FULL[i]), 'gpt4', None, None)
+        for i in range(len(QUESTIONS_GPT4_COMPUTED_FULL))
     ]
     +
     # shapley features
     [
-        ('qs_35', 'gpt4', 1, seed)
-        for seed in range(50)
+        # ('qs_35', 'gpt4', 1, seed)
+        # for seed in range(50)
     ]
     +
     # full

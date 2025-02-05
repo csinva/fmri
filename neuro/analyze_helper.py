@@ -74,6 +74,9 @@ def load_clean_results(results_dir, experiment_filename='../experiments/02_fit_e
 
 
 def abbrev_question(q):
+    q = q.replace('Is time mentioned in the input?',
+                  'Does the input mention time?')
+    q = q.replace('that leads to a change or revelation', '')
     for prefix in ['Does the sentence ', 'Is the sentence ', 'Does the input ', 'Is the input ', 'Does the text ']:
         q = q.replace(prefix, '...')
     return q
