@@ -163,7 +163,7 @@ def plot_corrs_df(corrs_df, frac_voxels_to_keep, out_dir):
     plt.savefig(join(out_dir, f'corrs_{frac_voxels_to_keep}.png'), dpi=300)
 
 
-def compute_pvals_for_subject(corrs_df, subject, frac_voxels_to_keep_list):
+def compute_pvals_for_subject(corrs_df, flatmaps_qa_dicts_by_subject, subject, frac_voxels_to_keep_list):
     corrs_df_subject = corrs_df[corrs_df['subject']
                                 == subject].set_index('questions')
 
@@ -189,14 +189,15 @@ def convert_to_mni_space(flatmap_arr, subject='UTS01'):
     flatmap_vol = cortex.Volume(
         data=flatmap_arr.flatten(), subject=subject, xfmname=f'{subject}_auto')
     flatmap_to_mni_cached = cortex.db.get_mnixfm(subject, f'{subject}_auto')
-    mni_vol = mni.transform_to_mni(flatmap_vol, flatmap_to_mni_cached)
-    mni_arr = mni_vol.get_fdata()  # the actual array, shape=(182,218,182)
+    mni_vol = mni.transform_to_mni(
+        flatmap_vol, flatmap_to_mni_cached, template='MNI152_T1_2mm_brain.nii.gz')
+    mni_arr = mni_vol.get_fdata()  # the actual array, shape=(91, 109, 91)
     return mni_arr
 
 
-def linearly_downsample_with_interpolation(arr, factor=2):
-    from scipy.ndimage import zoom
-    return zoom(arr, 1/factor, order=1)
+# def linearly_downsample_with_interpolation(arr, factor=2):
+#     from scipy.ndimage import zoom
+#     return zoom(arr, 1/factor, order=1)
 
 
 def compute_mni_corr_df(flatmaps_qa_dicts_by_subject, flatmaps_gt_dict_mni, qs):
@@ -206,9 +207,10 @@ def compute_mni_corr_df(flatmaps_qa_dicts_by_subject, flatmaps_gt_dict_mni, qs):
                                       for subject in subjects}
     # flatmaps_gt_dict_list_subject = {subject: get_neurosynth_flatmaps(subject)
     #  for subject in ['UTS01', 'UTS02', 'UTS03']}
-    flatmaps_qa_dict_list_subjects_mni = {subject: [convert_to_mni_space(flatmaps_qa_dict_list_subjects[subject][i], subject=subject)
-                                                    for i in tqdm(range(len(qs)))]
-                                          for subject in subjects}
+    flatmaps_qa_dict_list_subjects_mni = {
+        subject: [convert_to_mni_space(flatmaps_qa_dict_list_subjects[subject][i], subject=subject)
+                  for i in tqdm(range(len(qs)))]
+        for subject in subjects}
 
     corrs_avg_df = defaultdict(list)
     for question_idx in tqdm(range(len(qs))):
@@ -235,11 +237,11 @@ def compute_mni_corr_df(flatmaps_qa_dicts_by_subject, flatmaps_gt_dict_mni, qs):
             # print('corr', np.corrcoef(flatmap_qa_arr.flatten(),
             #   flatmap_gt_arr.flatten())[0, 1])
             corrs_avg_df[f'corr_{subject}'].append(
-                np.corrcoef(linearly_downsample_with_interpolation(flatmap_qa_mni).flatten(), flatmap_gt_mni.flatten())[0, 1])
+                np.corrcoef(flatmap_qa_mni.flatten(), flatmap_gt_mni.flatten())[0, 1])
 
         flatmap_avg_mni /= len(subjects)
-        flatmap_avg_mni = linearly_downsample_with_interpolation(
-            flatmap_avg_mni)
+        # flatmap_avg_mni = linearly_downsample_with_interpolation(
+        # flatmap_avg_mni)
         corrs_avg_df['questions'].append(qs[question_idx])
         # print('shapes', flatmap_avg_mni.shape, flatmap_gt_mni.shape)
         corr_avg = np.corrcoef(flatmap_avg_mni.flatten(),
