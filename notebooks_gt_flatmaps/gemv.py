@@ -1,3 +1,5 @@
+import numpy as np
+
 
 def get_matched_lists():
     # matches
@@ -63,6 +65,74 @@ def get_matched_lists():
         ('relationships between people', 'qa'),
         ('sensory experiences', 'qa'),
         ('specific objects or items', 'qa'),
-        ('technical or specialized terminology', 'qa')
+        ('technical or specialized terminology', 'qa'),
     ]
+
+    qa_list += [
+        # 'Does the sentence involve a description of physical environment or setting?',
+        # 'Does the sentence involve a description of physical environment or setting?',
+        'Does the sentence involve a description of physical environment or setting?',
+        # 'Does the sentence describe a visual experience or scene?',
+        # 'Does the sentence describe a visual experience or scene?',
+        'Does the sentence describe a visual experience or scene?',
+        'Does the sentence involve spatial reasoning?',
+        'Does the input include a comparison or metaphor?',
+        'Does the sentence express a sense of belonging or connection to a place or community?',
+        # 'Does the sentence express a sense of belonging or connection to a place or community?',
+        # 'Does the sentence express a sense of belonging or connection to a place or community?',
+        # 'Does the sentence express a sense of belonging or connection to a place or community?',
+        # 'Does the sentence express a sense of belonging or connection to a place or community?',
+        'Does the sentence describe a specific sensation or feeling?',
+        'Does the text include a planning or decision-making process?',
+        'Does the sentence include a personal anecdote or story?'
+    ]
+
+    gemv_list += [
+        # new (if "rename", see match_flatmaps function for what it really is)
+        # ('Descriptive elements of scenes or objects', None),
+        # ('Scenes and settings', None),
+        ('physical setting', 'roi_rename'),
+        # ('Descriptive elements of scenes or objects', None),
+        # ('Scenes and settings', None),
+        ('visual experience', 'roi_rename'),
+        ('Spatial positioning and directions', None),
+        ('comparison or metaphor', 'roi_rename'),
+        ('Relationships', None),
+        # ('Positive Emotional Reactions', None),
+        # ('Sexual and Romantic Interactions', None),
+        # ('personal or interactions interactions', 'qa'),
+        # ('relationships between people', 'qa'),
+        ('sensory experiences', 'qa'),
+        ('planning or organizing', 'qa'),
+
+
+    ]
+
     return qa_list, gemv_list
+
+
+def match_flatmaps(gemv_flatmaps_dict):
+    mappings = {
+        ('numbers', 'qa'): ('Numbers', None),
+        ('time', np.int64(212)): ('Times', None),
+        # ('time', np.int64(212)): ('Time and numbers', None),
+        ('industry or profession', 'qa'): ('Professions and Personal Backgrounds', None),
+        # ('locations', 368): ('Location names', None),
+        ('sensory experiences', 'qa'): ('Descriptive elements of scenes or objects', None),
+        ('sensory experiences', 'qa'): ('Body parts', None),
+        ('specific objects or items', 'qa'): ('Descriptive elements of scenes or objects', None),
+        ('specific objects or items', 'qa'): ('Descriptive elements of scenes or objects', None),
+        #  ('relationships between people', 'qa'):  ('Relationships', None),
+        #  ('measurements', np.int64(171)): ('Measurements', None),
+        # ('locations', 368):  ('Location names', None),
+
+        # these are just for renaming
+        ('specific objects or items', 'qa'): ('Descriptive elements of scenes or objects', None),
+        ('physical setting', 'roi_rename'): ('Direction and location descriptions', None),
+        ('visual experience', 'roi_rename'): ('Direction and location descriptions', None),
+        ('comparison or metaphor', 'roi_rename'): ('abstract descriptions', 'qa'),
+    }
+
+    for k, v in mappings.items():
+        gemv_flatmaps_dict[k] = gemv_flatmaps_dict[v]
+    return gemv_flatmaps_dict
