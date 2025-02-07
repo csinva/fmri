@@ -208,9 +208,14 @@ if __name__ == "__main__":
         answers_df.to_csv(join(output_dir_clean, f'{story_fname}.csv'))
 
         # spot check
-        q = 'Does the text reference a person’s name?'
-        print('these should be names', list(
-            answers_df[answers_df[q] > 0][q].index)[:10])
+        q1 = 'Does the text reference a person’s name?'
+        q2 = 'Does the text contain a number?'
+        if q1 in answers_df:
+            print('these should be names', list(
+                answers_df[answers_df[q1] > 0][q1].index)[:10])
+        elif q2 in answers_df:
+            print('these should be numbers', list(
+                answers_df[answers_df[q2] > 0][q2].index)[:10])
 
     # save results
     os.makedirs(save_dir_unique, exist_ok=True)
