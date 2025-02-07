@@ -161,4 +161,4 @@ def corr_bars(corrs: np.ndarray, questions, out_dir_save, xlab: str = '', color=
     # annotate line with mean value
     # plt.text(np.diag(corrs).mean(), 0.1,
     #  f'{np.diag(corrs).mean():.3f}', ha='left', color=color)
-    plt.xlabel(xlab + ' flatmap correlation')
+    plt.xlabel(xlab)

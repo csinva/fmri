@@ -27,6 +27,7 @@ from os.path import join
 import numpy as np
 import joblib
 import os.path
+from neuro.features.questions.gpt4 import QS_35_STABLE
 import imodelsx.cache_save_utils
 path_to_repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -51,6 +52,12 @@ def add_main_args(parser):
         type=str,
         default=join(path_to_repo, "results"),
         help="directory for saving",
+    )
+    parser.add_argument(
+        '--questions',
+        type=str,
+        default='o1_dec26',
+        help='which questions to use',
     )
 
     return parser
@@ -105,7 +112,6 @@ if __name__ == "__main__":
     # stories_to_run = STORIES_LOTR
     stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
     # stories_to_run = STORIES_POPULAR
-    qs_to_run = QS_O1_DEC26 + QS_O1_DEC26_2
 
     # get args
     parser = argparse.ArgumentParser()
@@ -113,6 +119,13 @@ if __name__ == "__main__":
     parser = add_computational_args(
         deepcopy(parser_without_computational_args))
     args = parser.parse_args()
+
+    if args.questions == 'o1_dec26':
+        qs_to_run = QS_O1_DEC26 + QS_O1_DEC26_2
+        suffix_qs = ''
+    elif args.questions == 'qs_35_stable':
+        qs_to_run = QS_35_STABLE
+        suffix_qs = '___qs_35_stable'
 
     # set up logging
     logger = logging.getLogger()
@@ -141,9 +154,9 @@ if __name__ == "__main__":
     checkpoint_clean = args.checkpoint.replace('/', '___')
 
     transcript_folders = os.listdir(join(ECOG_DIR, 'data', 'transcripts'))
-    output_dir_clean = join(ECOG_DIR, 'features',
+    output_dir_clean = join(ECOG_DIR, f'features{suffix_qs}',
                             checkpoint_clean, args.setting)
-    output_dir_raw = join(ECOG_DIR, 'features_raw',
+    output_dir_raw = join(ECOG_DIR, f'features_raw{suffix_qs}',
                           checkpoint_clean, args.setting)
     os.makedirs(output_dir_clean, exist_ok=True)
     os.makedirs(output_dir_raw, exist_ok=True)
