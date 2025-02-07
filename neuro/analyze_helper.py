@@ -76,6 +76,14 @@ def load_clean_results(results_dir, experiment_filename='../experiments/02_fit_e
 def abbrev_question(q):
     q = q.replace('Is time mentioned in the input?',
                   'Does the input mention time?')
+    q = q.replace('express a sense of belonging or connection to a place or community',
+                  'express a connection to a community')
+    q = q.replace('express the narrator\'s opinion or judgment about an event or character',
+                  'express an opinion about an event or character')
+    q = q.replace('involve a description of', 'describe a')
+    q = q.replace('involve a discussion about', 'discuss')
+    q = q.replace('involve an expression of', 'express')
+    q = q.replace('involve the mention of', 'mention')
     q = q.replace('that leads to a change or revelation', '')
     for prefix in ['Does the sentence ', 'Is the sentence ', 'Does the input ', 'Is the input ', 'Does the text ']:
         q = q.replace(prefix, '...')
