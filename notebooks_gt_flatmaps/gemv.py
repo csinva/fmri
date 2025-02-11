@@ -1,5 +1,5 @@
 import numpy as np
-
+from neuro.analyze_helper import abbrev_question
 LOOSE_MATCHES = {
     'Does the sentence involve the mention of a specific object or item?',
     'Does the input include a comparison or metaphor?',
@@ -76,12 +76,57 @@ QUESTIONS_GEMV_DICT = {
 }
 
 
-def get_matched_lists():
+def abbrev_question_to_original(q):
+    q = q.replace('*', '')
+    for k, v in QUESTIONS_GEMV_DICT.items():
+        if abbrev_question(k) == q:
+            return k
+    return None
 
+
+def get_matched_lists():
     qa_list = list(QUESTIONS_GEMV_DICT.keys())
     gemv_list = list(QUESTIONS_GEMV_DICT.values())
-
     return qa_list, gemv_list
+
+
+QS_35_SORTED_BEST_TO_WORST = [
+    'Is the input related to a specific industry or profession?',
+    'Does the input contain a measurement?',
+    'Does the sentence mention a specific location?',
+    'Does the sentence include a direct speech quotation?',
+    'Does the input contain a number?',
+    'Does the sentence include dialogue?',
+    'Does the sentence describe a specific sensation or feeling?',
+    'Does the text describe a journey?',
+    'Does the text describe a mode of communication?',
+    'Does the sentence contain a cultural reference?',
+    'Does the sentence describe a relationship between people?',
+    'Does the sentence involve the mention of a specific object or item?',
+    'Does the sentence describe a physical action?',
+    'Does the sentence describe a personal or social interaction that leads to a change or revelation?',
+    'Is time mentioned in the input?',
+    'Does the sentence contain a proper noun?',
+    'Does the sentence involve an expression of personal values or beliefs?',
+    'Does the sentence describe a physical sensation?',
+    'Does the sentence involve a discussion about personal or social values?',
+    'Does the sentence include a personal anecdote or story?',
+    'Does the sentence include technical or specialized terminology?',
+    'Does the sentence describe a visual experience or scene?',
+    'Does the input involve planning or organizing?',
+    'Does the sentence involve a description of physical environment or setting?',
+    "Does the sentence express the narrator's opinion or judgment about an event or character?",
+    'Does the sentence involve spatial reasoning?',
+    'Does the sentence describe a personal reflection or thought?',
+    'Does the sentence describe a sensory experience?',
+    'Is the sentence reflective, involving self-analysis or introspection?',
+    'Does the sentence contain a negation?',
+    'Does the input describe a specific texture or sensation?',
+    'Does the text include a planning or decision-making process?',
+    'Does the sentence express a sense of belonging or connection to a place or community?',
+    'Does the input include a comparison or metaphor?',
+    'Is the sentence abstract rather than concrete?',
+]
 
 
 if __name__ == '__main__':

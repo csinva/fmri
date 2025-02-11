@@ -20,8 +20,8 @@ params_shared_dict = {
     'use_test_setup': [0],
     # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug16_gpt4'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/oct17_neurosynth_gemv'],
-    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
-    'subject': ['UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08'],
+    'subject': ['UTS01', 'UTS02', 'UTS03'],
+    # 'subject': ['UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08'],
     # 'use_added_wordrate_feature': [0, 1],
     # 'subject': ['UTS02'],
     'use_added_wordrate_feature': [0],
@@ -45,7 +45,7 @@ params_coupled_dict = {
     +
     # full
     [
-        ('qs_35', 'gpt4', None, None)
+        # ('qs_35', 'gpt4', None, None)
     ]
 
 

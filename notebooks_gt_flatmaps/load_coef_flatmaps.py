@@ -148,6 +148,8 @@ def _load_coefs_individual_gpt4(rr, subject='S02', use_added_wordrate_feature=0)
     r = r[r.feature_space == 'qa_embedder']
     r = r[r.qa_embedding_model == 'gpt4']
     r = r[r.qa_questions_version.str.endswith('?')]  # individual question
+    print(subject, 'init shape', rr.shape, 'this shape',
+          r.shape, 'subj shape', rr[rr.subject == subject].shape)
 
     weights_list = [
         flatmaps_per_question.get_weights_top(r.iloc[i])[0]
