@@ -19,6 +19,7 @@ from tqdm import tqdm
 from os.path import join
 import matplotlib.pyplot as plt
 import os
+from os.path import expanduser
 import argparse
 from copy import deepcopy
 import logging
@@ -109,8 +110,8 @@ def get_texts(features_df, setting='words'):
 
 
 if __name__ == "__main__":
-    # stories_to_run = STORIES_LOTR
-    stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
+    stories_to_run = STORIES_LOTR
+    # stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
     # stories_to_run = STORIES_POPULAR
 
     # get args
@@ -148,8 +149,9 @@ if __name__ == "__main__":
     random.seed(args.seed)
 
     rng = np.random.default_rng(args.seed_stories)
-    rng.shuffle(stories_to_run)
-    rng.shuffle(qs_to_run)
+    if not args.checkpoint.startswith('gpt-4'):
+        rng.shuffle(stories_to_run)
+        rng.shuffle(qs_to_run)
 
     checkpoint_clean = args.checkpoint.replace('/', '___')
 
@@ -161,12 +163,16 @@ if __name__ == "__main__":
     os.makedirs(output_dir_clean, exist_ok=True)
     os.makedirs(output_dir_raw, exist_ok=True)
 
+    # breakpoint()
+    if args.checkpoint.startswith('gpt-4'):
+        CACHE_DIR = expanduser("~/cache_qa_gpt4_ecog")
+    else:
+        CACHE_DIR = None
     qa_embedder = QAEmb(
         questions=[],
         checkpoint=args.checkpoint,
         batch_size=args.batch_size,
-        # CACHE_DIR=expanduser("~/cache_qa_ecog"),
-        CACHE_DIR=None,
+        CACHE_DIR=CACHE_DIR,
     )
 
     for story in tqdm(stories_to_run, desc='stories'):

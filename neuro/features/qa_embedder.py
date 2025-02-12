@@ -1,3 +1,21 @@
+"""""""""
+
+
+
+
+
+Note: imodelsx has a more up to date version of this file
+
+
+
+
+
+
+
+
+"""
+
+
 import scipy.special
 import numpy as np
 from typing import List
@@ -147,20 +165,31 @@ class QuestionEmbedder:
         #     batch_size=self.batch_size,
         # )
 
-        # run in batches
-        answers = []
-        # pass in this multiple to pipeline, even though it still uses batch_size under the hood
-        batch_size_mult = self.batch_size * 8
-        for i in tqdm(range(0, len(programs), batch_size_mult)):
-            answers += self.llm(
-                programs[i:i+batch_size_mult],
-                max_new_tokens=1,
-                verbose=verbose,
-                use_cache=self.use_cache,
-                batch_size=self.batch_size,
-            )
+        if self.llm.checkpoint.startswith('gpt-4'):
+            answers = [
+                self.llm(
+                    programs[i],
+                    max_new_tokens=1,
+                    verbose=verbose,
+                    use_cache=self.use_cache,
+                )
+                for i in tqdm(range(len(programs)))
+            ]
+        else:
+            # run in batches
+            answers = []
+            # pass in this multiple to pipeline, even though it still uses batch_size under the hood
+            batch_size_mult = self.batch_size * 8
+            for i in tqdm(range(0, len(programs), batch_size_mult)):
+                answers += self.llm(
+                    programs[i:i+batch_size_mult],
+                    max_new_tokens=1,
+                    verbose=verbose,
+                    use_cache=self.use_cache,
+                    batch_size=self.batch_size,
+                )
 
-        # print('answers', answers)
+        print('answers', answers)
         answers = list(map(lambda x: 'yes' in x.lower(), answers))
         answers = np.array(answers).reshape(len(examples), len(self.questions))
         embeddings = np.array(answers, dtype=float)
@@ -170,21 +199,35 @@ class QuestionEmbedder:
 
 def get_big_test():
     questions = [
-        'Is the input related to food preparation?',
-        'Does the input mention laughter?',
-        'Is there an expression of surprise?',
-        'Is there a depiction of a routine or habit?',
-        'Is there stuttering or uncertainty in the input?',
-        # 'Is there a first-person pronoun in the input?',
+        # 'Is the input related to food preparation?',
+        # 'Does the input mention laughter?',
+        # 'Is there an expression of surprise?',
+        # 'Is there a depiction of a routine or habit?',
+        # 'Is there stuttering or uncertainty in the input?',
+        # 'Does the input contain a number?',
+        'Is time mentioned in the input?',
+        'Does the sentence contain a negation?',
     ]
     examples = [
-        'i sliced some cucumbers and then moved on to what was next',
-        'the kids were giggling about the silly things they did',
-        'and i was like whoa that was unexpected',
-        'walked down the path like i always did',
-        'um no um then it was all clear',
-        # 'i was walking to school and then i saw a cat',
+        # 'i sliced some cucumbers and then moved on to what was next',
+        # 'the kids were giggling about the silly things they did',
+        # 'and i was like whoa that was unexpected',
+        # 'walked down the path like i always did',
+        # 'um no um then it was all clear',
+        # 'three four five',
+        'two hours in the future',
+        'it was not a good movie',
     ]
+
+    # questions = [
+    #     'Is time mentioned in the input?',
+    #     'Does the input contain a measurement?',
+    #     'Does the input contain a number?',
+    # ]
+    # examples = [
+    #     'Stark', 'He', 'does', 'seem', 'Hello', 'Hank', 'you', "'re", 'supposed', 'to', 'be',
+
+    # ]
     return questions, examples
 
 
@@ -196,6 +239,7 @@ if __name__ == "__main__":
     # examples = ['I sliced some cucumbers',
     #             'The kids were laughing', 'walking to school I was']
     questions, examples = get_big_test()
+    checkpoint = 'gpt-4o-mini'
     # checkpoint = 'gpt2'
     # checkpoint = 'mistralai/Mistral-7B-Instruct-v0.2'
     # checkpoint = 'mistralai/Mixtral-8x7B-Instruct-v0.1'
@@ -205,7 +249,7 @@ if __name__ == "__main__":
     # checkpoint = 'mistralai/Mistral-7B-v0.1'
     # checkpoint = "meta-llama/Meta-Llama-3-8B"
     # checkpoint = "meta-llama/Meta-Llama-3-8B-Instruct"
-    checkpoint = 'meta-llama/Llama-3.1-8B-Instruct'
+    # checkpoint = 'meta-llama/Llama-3.1-8B-Instruct'
     # checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-fewshot'
     # checkpoint = 'meta-llama/Meta-Llama-3-8B-Instruct-refined'
     # checkpoint = 'meta-llama/Meta-Llama-3-70B-Instruct-refined'
@@ -236,6 +280,8 @@ if __name__ == "__main__":
                       q.split()[-1] for q in questions])
     print('examples x questions')
     print(df)
+    print('avg diag', df.values.diagonal().mean().round(2), 'avg off diag',
+          df.values[~np.eye(df.shape[0], dtype=bool)].mean().round(2))
 
     # generate prompt for llama3
     # import transformers
