@@ -57,7 +57,7 @@ def load_response_wrapper(args, stories, subject, use_brain_drive=False):
         return []
     if use_brain_drive or all([s.startswith('GenStory') for s in stories]):
         return load_response_brain_drive(stories)
-    if args.use_huge:
+    if args.use_huge and subject in ['UTS01', 'UTS02', 'UTS03']:
         return load_response_huge(stories, subject)
     else:
         return load_response(stories, subject)
