@@ -1,5 +1,3 @@
-
-
 import os
 from os.path import dirname, join, expanduser
 import sys
@@ -23,10 +21,11 @@ params_shared_dict = {
 
 
     # next, we can use selected features to fit ridge #######################################
-    'ndelays': [1, 2],
-    'subject': [f'UTS0{k}' for k in range(1, 9)],
+    'ndelays': [1, 2, 4, 8],
+    # 'subject': [f'UTS0{k}' for k in range(1, 9)],
+    'subject': [f'UTS0{k}' for k in range(1, 4)],
     'num_stories': [1, 5, 10, 15, 20],
-    'encoding_model': ['ridge', 'tabpfn'],
+    'encoding_model': ['mlp'],  # 'ridge', 'tabpfn'],
 }
 
 params_coupled_dict = {
@@ -62,7 +61,7 @@ submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     # amlt_kwargs=amlt_kwargs,
-    n_cpus=6,
+    # n_cpus=6,
     # n_cpus=2,
     # gpu_ids=[0, 1, 2, 3],
     # actually_run=False,

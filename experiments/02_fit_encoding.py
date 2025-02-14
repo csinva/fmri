@@ -321,6 +321,21 @@ def fit_regression(args, r, features_train_delayed, resp_train, features_test_de
         corrs_test[np.isnan(corrs_test)] = 0
         r[corrs_key_test] = corrs_test
         model_params_to_save = {'preds_pc': preds_pc}
+    elif args.encoding_model == 'mlp':
+        from sklearn.neural_network import MLPRegressor
+        mlp = MLPRegressor(max_iter=1000)
+        corrs_test = []
+        mlp.fit(features_train_delayed, resp_train)
+        preds = mlp.predict(features_test_delayed)
+        for i in range(resp_train.shape[1]):
+            corrs_test.append(nancorr(resp_test[:, i], preds[:, i]))
+            # print(i, 'mlp corr', corrs_test[-1])
+        corrs_test = np.array(corrs_test)
+        corrs_test[np.isnan(corrs_test)] = 0
+        r[corrs_key_test] = corrs_test
+        model_params_to_save = {
+            'preds_pc': preds,
+        }
 
     return r, model_params_to_save
 
@@ -467,7 +482,8 @@ if __name__ == "__main__":
 
     os.makedirs(save_dir_unique, exist_ok=True)
     joblib.dump(r, join(save_dir_unique, "results.pkl"))
-    joblib.dump(model_params_to_save, join(
-        save_dir_unique, "model_params.pkl"))
+    if args.encoding_model == 'ridge':
+        joblib.dump(model_params_to_save, join(
+            save_dir_unique, "model_params.pkl"))
     print(
         f"Succesfully completed in {(time.time() - t0)/60:0.1f} minutes, saved to {save_dir_unique}")

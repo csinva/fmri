@@ -18,9 +18,11 @@ def evaluate_pc_model_on_each_voxel(
             scaler.scale_ @ pca.components_
         model_params_to_save['bias'] = scaler.mean_ @ pca.components_ + pca.mean_
         # note: prediction = stim @ weights + bias
-    elif args.encoding_model == 'tabpfn':
+    elif args.encoding_model in ['tabpfn']:
         preds_pc = model_params_to_save['preds_pc']
         preds_pc = np.array(preds_pc).T
+    elif args.encoding_model == 'mlp':
+        preds_pc = model_params_to_save['preds_pc']
 
     preds_voxels = pca.inverse_transform(
         scaler.inverse_transform(preds_pc))  # (n_trs x n_voxels)
