@@ -18,6 +18,10 @@ MIXTMOE = 'mistralai/Mixtral-8x7B-Instruct-v0.1'
 
 BEST_RUN = '/home/chansingh/mntv1/deep-fMRI/encoding/results_apr7/68936a10a548e2b4ce895d14047ac49e7a56c3217e50365134f78f990036c5f7'
 
+# python 02_fit_encoding.py --encoding_model tabpfn --use_test_setup 1 --ndelays 1 --use_extract_only 0 --pc_components 100 --subject UTS03 --save_dir /home/chansingh/fmri/tabpfn_test/ --feature_space qa_embedder --qa_questions_version v3_boostexamples_merged --qa_embedding_model ensemble2 --feature_selection_alpha 0.28
+# python 02_fit_encoding.py --encoding_model ridge --use_test_setup 1 --ndelays 1 --use_extract_only 0 --pc_components 100 --subject UTS03 --save_dir /home/chansingh/fmri/tabpfn_test/ --feature_space qa_embedder --qa_questions_version v3_boostexamples_merged --qa_embedding_model ensemble2 --feature_selection_alpha 0.28
+
+
 params_shared_dict = {
     # things to average over
     # 'use_cache': [1],

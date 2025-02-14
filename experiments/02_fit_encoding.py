@@ -1,6 +1,8 @@
 from collections import defaultdict
 import os.path
 from copy import deepcopy
+
+from tqdm import tqdm
 import torch
 import random
 import logging
@@ -173,12 +175,15 @@ def add_computational_args(parser):
 
 def get_story_names(args):
     if args.use_test_setup == 1:
-        args.nboots = 2
+        args.nboots = 5
         args.use_extract_only = 0
-        args.use_huge = 0
+        args.use_huge = 1
         story_names_train = ['sloth', 'adollshouse']
         story_names_test = ['fromboyhoodtofatherhood']
-        # story_names_test = ['onapproachtopluto']
+        # story_names_train = story_names.get_story_names(
+        # args.subject, 'train', use_huge=args.use_huge)[:20]
+        # story_names_test = story_names.get_story_names(
+        # args.subject, 'test', use_huge=args.use_huge)[:20]
         args.pc_components = 100
         args.use_eval_brain_drive = 0
         # args.qa_embedding_model = 'mistralai/Mistral-7B-Instruct-v0.2'
@@ -301,6 +306,21 @@ def fit_regression(args, r, features_train_delayed, resp_train, features_test_de
         model_params_to_save = {
             'weights': rf.feature_importances_,
         }
+    elif args.encoding_model == 'tabpfn':
+        from tabpfn import TabPFNRegressor
+        rf = TabPFNRegressor(device='cuda')
+        corrs_test = []
+        preds_pc = []
+        for i in tqdm(range(resp_train.shape[1])):
+            rf.fit(features_train_delayed, resp_train[:, i])
+            preds = rf.predict(features_test_delayed)
+            corrs_test.append(nancorr(resp_test[:, i], preds))
+            # print(i, 'tabpfn corr', corrs_test[-1])
+            preds_pc.append(preds)
+        corrs_test = np.array(corrs_test)
+        corrs_test[np.isnan(corrs_test)] = 0
+        r[corrs_key_test] = corrs_test
+        model_params_to_save = {'preds_pc': preds_pc}
 
     return r, model_params_to_save
 
@@ -425,11 +445,11 @@ if __name__ == "__main__":
         model_params_to_save['scaler_train'] = scaler_train
 
         # compute weighted corrs_tune_pc
-        explained_var_weight = pca.explained_variance_[:args.pc_components]
-        explained_var_weight = explained_var_weight / \
-            explained_var_weight.sum() * len(explained_var_weight)
-        r['corrs_tune_pc_weighted_mean'] = np.mean(
-            explained_var_weight * r['corrs_tune_pc'])
+        # explained_var_weight = pca.explained_variance_[:args.pc_components]
+        # explained_var_weight = explained_var_weight / \
+        #     explained_var_weight.sum() * len(explained_var_weight)
+        # r['corrs_tune_pc_weighted_mean'] = np.mean(
+        #     explained_var_weight * r['corrs_tune_pc'])
 
     if args.use_eval_brain_drive and args.subject in story_names.TEST_BRAINDRIVE.keys():
         story_names_brain_drive = story_names.get_story_names(

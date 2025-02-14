@@ -18,9 +18,12 @@ def evaluate_pc_model_on_each_voxel(
             scaler.scale_ @ pca.components_
         model_params_to_save['bias'] = scaler.mean_ @ pca.components_ + pca.mean_
         # note: prediction = stim @ weights + bias
+    elif args.encoding_model == 'tabpfn':
+        preds_pc = model_params_to_save['preds_pc']
+        preds_pc = np.array(preds_pc).T
+
     preds_voxels = pca.inverse_transform(
-        scaler.inverse_transform(preds_pc)
-    )  # (n_trs x n_voxels)
+        scaler.inverse_transform(preds_pc))  # (n_trs x n_voxels)
     corrs = []
     for i in range(preds_voxels.shape[1]):
         corrs.append(nancorr(preds_voxels[:, i], resp[:, i]))
