@@ -79,6 +79,49 @@ def load_flatmaps_qa_dicts_by_subject(subjects, settings):
     return flatmaps_qa_dicts_by_subject
 
 
+def subj_vol_to_mni_surf(
+    subj_vol,
+    subject='S02',
+    pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/',
+):
+    subj_mapper = cortex.get_mapper("fsaverage", "atlas_2mm")
+    fs_mapper = cortex.get_mapper(
+        'UT' + subject, join(pycortex_db_dir, f'UT{subject}/transforms/UT{subject}_auto/'))
+    (ltrans, rtrans) = cortex.db.get_mri_surf2surf_matrix(
+        subject='UT' + subject,
+        surface_type="pial",
+        target_subj='fsaverage',
+    )
+    fs_surf = fs_mapper(subj_vol)
+    surf = cortex.Vertex(
+        np.hstack([ltrans@fs_surf.left, rtrans@fs_surf.right]), 'fsaverage')
+
+    mni_vol = subj_mapper.backwards(surf)
+    return mni_vol
+
+
+def mni_vol_to_subj_vol_surf(
+    mni_vol,
+    subject='S02',
+    pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/',
+):
+    fs_mapper = cortex.get_mapper("fsaverage", "atlas_2mm")
+    subj_mapper = cortex.get_mapper(
+        'UT' + subject, join(pycortex_db_dir, f'UT{subject}/transforms/UT{subject}_auto/'))
+
+    (ltrans, rtrans) = cortex.db.get_mri_surf2surf_matrix(
+        subject="fsaverage",
+        surface_type="pial",
+        target_subj='UT' + subject,
+    )
+    fs_surf = fs_mapper(mni_vol)
+    subj_surf = cortex.Vertex(
+        np.hstack([ltrans@fs_surf.left, rtrans@fs_surf.right]), 'UT' + subject)
+    subj_vol = subj_mapper.backwards(subj_surf)
+    mask = cortex.db.get_mask('UT' + subject, 'UT' + subject + '_auto')
+    return subj_vol, subj_vol.data[mask]
+
+
 def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data', mni=False):
 
     def _get_term_dict():
