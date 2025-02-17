@@ -94,11 +94,12 @@ def compute_corrs_df(qs, frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_sub
     return corrs_df
 
 
-def plot_corrs_df(corrs_df, frac_voxels_to_keep, out_dir):
+def plot_corrs_df(
+        corrs_df, out_dir, plot_val=f'corrs_0.1',
+        xlab='Flatmap correlation', ylabels=None,
+):
 
     c = corrs_df
-    xlab = f'Flatmap correlation (Top-{int(100*frac_voxels_to_keep)}% best-predicted voxels)'
-    plt.figure(figsize=(7, 5))
     # colors = {
     #     'UTS01': 'C0',
     #     'UTS02': 'C1',
@@ -107,22 +108,28 @@ def plot_corrs_df(corrs_df, frac_voxels_to_keep, out_dir):
     # }
 
     d_mean = pd.DataFrame(c.groupby('questions')[
-        f'corrs_{frac_voxels_to_keep}'].mean()).reset_index()
+        plot_val].mean()).reset_index()
     d_mean['subject'] = 'mean'
     c = pd.concat([c, d_mean])
     c = c.set_index('questions')
 
-    for subject in ['mean', 'UTS01', 'UTS02', 'UTS03']:
+    # ['mean', 'UTS01', 'UTS02', 'UTS03']:
+    subjects = sorted(c.subject.unique())
+    # move 'mean' to be first
+    subjects = ['mean'] + [s for s in subjects if s != 'mean']
+
+    for subject in subjects:
         corrs_df_subject = c[c['subject'] == subject]
         if subject == 'mean':
-            idx_sort = corrs_df_subject[f'corrs_{frac_voxels_to_keep}'].sort_values(
+            idx_sort = corrs_df_subject[plot_val].sort_values(
                 ascending=False).index
+        # print(corrs_df_subject.index)
         corrs_df_subject = corrs_df_subject.loc[idx_sort]
 
         # plot corrs
         if subject == 'mean':
             plt.errorbar(
-                corrs_df_subject[f'corrs_{frac_voxels_to_keep}'],
+                corrs_df_subject[plot_val],
                 range(len(corrs_df_subject)),
                 color='black',
                 fmt='o',
@@ -131,25 +138,28 @@ def plot_corrs_df(corrs_df, frac_voxels_to_keep, out_dir):
             )
         else:
             plt.errorbar(
-                corrs_df_subject[f'corrs_{frac_voxels_to_keep}'],
+                corrs_df_subject[plot_val],
                 range(len(corrs_df_subject)),
                 # xerr=np.sqrt(
-                # r_df[f'corrs_{frac_voxels_to_keep}'] * (1-r_df[f'corrs_{frac_voxels_to_keep}'])
+                # r_df[plot_val] * (1-r_df[plot_val])
                 # / r_df['num_test']),
                 alpha=0.5,
                 label=subject.upper(),
                 fmt='o')
-        plt.axvline(corrs_df_subject[f'corrs_{frac_voxels_to_keep}'].mean(),
+        plt.axvline(corrs_df_subject[plot_val].mean(),
                     linestyle='--',
                     # color=colors[subject],
                     zorder=-1000)
 
         print(f'{subject} corr',
-              corrs_df_subject[f'corrs_{frac_voxels_to_keep}'].mean())
+              corrs_df_subject[plot_val].mean())
 
     # add horizontal bars
-    plt.yticks(range(len(corrs_df_subject)), [
-               term_dict_rev[k] for k in idx_sort])
+    if ylabels is None:
+        plt.yticks(range(len(corrs_df_subject)), [
+            term_dict_rev[k] for k in idx_sort])
+    else:
+        plt.yticks(range(len(corrs_df_subject)), ylabels)
     plt.xlabel(xlab, fontsize='large')
     plt.grid(axis='y', alpha=0.2)
     plt.axvline(0, color='gray')
@@ -160,7 +170,8 @@ def plot_corrs_df(corrs_df, frac_voxels_to_keep, out_dir):
     # annotate with baseline and text label
     plt.legend(fontsize='large')
     plt.tight_layout()
-    plt.savefig(join(out_dir, f'corrs_{frac_voxels_to_keep}.png'), dpi=300)
+    os.makedirs(out_dir, exist_ok=True)
+    plt.savefig(join(out_dir, plot_val + '.png'), dpi=300)
 
 
 def compute_pvals_for_subject(corrs_df, flatmaps_qa_dicts_by_subject, subject, frac_voxels_to_keep_list):

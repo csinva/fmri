@@ -84,6 +84,11 @@ def subj_vol_to_mni_surf(
     subject='S02',
     pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/',
 ):
+    '''Example usage
+    subj_vol = cortex.Volume(flatmap_subject, 'UT' + subject,
+                         xfmname=f"UT{subject}_auto")
+    mni_vol = neurosynth.subj_vol_to_mni_surf(subj_vol, subject)
+    '''
     subj_mapper = cortex.get_mapper("fsaverage", "atlas_2mm")
     fs_mapper = cortex.get_mapper(
         'UT' + subject, join(pycortex_db_dir, f'UT{subject}/transforms/UT{subject}_auto/'))
@@ -105,6 +110,13 @@ def mni_vol_to_subj_vol_surf(
     subject='S02',
     pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/',
 ):
+    '''Example usage
+    term = 'location'
+    mni_filename = f'/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data/all_association-test_z/{term}_association-test_z.nii.gz'
+    mni_vol = cortex.Volume(mni_filename, "fsaverage", "atlas_2mm")
+    subj_vol, subj_arr = neurosynth.mni_vol_to_subj_vol_surf(
+        mni_vol, subject=subject)
+    '''
     fs_mapper = cortex.get_mapper("fsaverage", "atlas_2mm")
     subj_mapper = cortex.get_mapper(
         'UT' + subject, join(pycortex_db_dir, f'UT{subject}/transforms/UT{subject}_auto/'))
