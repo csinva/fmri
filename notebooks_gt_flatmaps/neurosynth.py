@@ -62,45 +62,132 @@ term_dict = {
 term_dict_rev = {v: k for k, v in term_dict.items()}
 '''
 
-term_dict_rev = {
-    'Does the sentence describe a physical sensation?': 'sensation',
-    'Does the input involve planning or organizing?': 'planning',
-    'Does the sentence contain a negation?': 'negative',
-    'Does the sentence describe a personal reflection or thought?': 'thought',
-    'Does the sentence describe a sensory experience?': 'sensory',
-    'Does the sentence mention a specific location?': 'location',
-    'Does the text describe a mode of communication?': 'communication',
-    'Is the sentence abstract rather than concrete?': 'abstract',
-    'Does the sentence contain a proper noun?': 'nouns',
-    'Does the sentence describe a physical action?': 'action',
-    'Does the sentence describe a personal or social interaction that leads to a change or revelation?': 'social-interaction',
-    'Does the sentence involve the mention of a specific object or item?': 'object',
-    'Does the sentence involve a description of physical environment or setting?': 'location',
-    'Does the sentence describe a relationship between people?': 'social',
-    'Is time mentioned in the input?': 'time-task',  # 'timing'
-    "Does the sentence express the narrator's opinion or judgment about an event or character?": 'judgment',
-    'Does the sentence include dialogue?': 'communication',
-    'Does the sentence describe a visual experience or scene?': 'visual-information',
-    'Does the sentence involve spatial reasoning?': 'spatial',
-    'Does the sentence involve an expression of personal values or beliefs?': 'beliefs',
-    'Does the input contain a number?': 'arithmetic',
-    'Does the sentence describe a specific sensation or feeling?': 'sensation',
-    'Does the text include a planning or decision-making process?': 'planning',
-    'Does the sentence include a personal anecdote or story?': 'personal',
-    'Does the sentence involve a discussion about personal or social values?': 'values',
-    'Does the input contain a measurement?': 'arithmetic',
-    'Does the sentence include a direct speech quotation?': 'communication',
-    'Is the sentence reflective, involving self-analysis or introspection?': 'thought',
-    'Does the input describe a specific texture or sensation?': 'sensation',
-    # 'Does the sentence contain a cultural reference?': 'reference',
-    # 'Is the input related to a specific industry or profession?',
-    # 'Does the sentence include technical or specialized terminology?',
-    # 'Does the input include a comparison or metaphor?',
-    # 'Does the sentence express a sense of belonging or connection to a place or community?',
-    # 'Does the text describe a journey?',
+term_dict_rev = [
+    ('Does the input contain a measurement?', 'arithmetic'),
+    # ('Does the input contain a measurement?', 'size'),
+    # ('Does the input contain a measurement?', 'sizes'),
+    ('Does the input contain a number?', 'arithmetic'),
+    ('Does the input describe a specific texture or sensation?', 'sensation'),
+    # ('Does the input describe a specific texture or sensation?', 'sensations'),
+    # ('Does the input describe a specific texture or sensation?', 'tactile'),
+    ('Does the input involve planning or organizing?', 'planning'),
+    ('Does the sentence contain a negation?', 'negative'),
+    # ('Does the sentence contain a negation?', 'negative-positive'),
+    # ('Does the sentence contain a negation?', 'negativity'),
+    # ('Does the sentence contain a proper noun?', 'names'),
+    # ('Does the sentence contain a proper noun?', 'naming'),
+    ('Does the sentence contain a proper noun?', 'nouns'),
+    ('Does the sentence describe a personal or social interaction that leads to a change or revelation?',
+     'social-interaction'),
+    # ('Does the sentence describe a personal or social interaction that leads to a change or revelation?',
+    #  'social-interactions'),
+    # ('Does the sentence describe a personal reflection or thought?', 'thinking'),
+    # ('Does the sentence describe a personal reflection or thought?', 'thought'),
+    ('Does the sentence describe a personal reflection or thought?', 'thoughts'),
+    ('Does the sentence describe a physical action?', 'action'),
+    # ('Does the sentence describe a physical action?', 'action-observation'),
+    # ('Does the sentence describe a physical action?', 'actions'),
+    # ('Does the sentence describe a physical sensation?', 'sensation'),
+    # ('Does the sentence describe a physical sensation?', 'sensations'),
+    # ('Does the sentence describe a physical sensation?', 'tactile'),
+    ('Does the sentence describe a physical sensation?', 'touch'),
+    ('Does the sentence describe a relationship between people?', 'social'),
+    # ('Does the sentence describe a relationship between people?',
+    #  'social-interaction'),
+    # ('Does the sentence describe a relationship between people?',
+    #  'social-interactions'),
+    # ('Does the sentence describe a sensory experience?', 'sensation'),
+    # ('Does the sentence describe a sensory experience?', 'sensations'),
+    # ('Does the sentence describe a sensory experience?', 'sensory'),
+    # ('Does the sentence describe a sensory experience?',
+    #  'sensory-information'),
+    # ('Does the sentence describe a specific sensation or feeling?', 'feeling'),
+    # ('Does the sentence describe a specific sensation or feeling?', 'feelings'),
+    ('Does the sentence describe a specific sensation or feeling?', 'sensation'),
+    # ('Does the sentence describe a specific sensation or feeling?', 'sensations'),
+    ('Does the sentence describe a visual experience or scene?',
+     'visual-information'),
+    # ('Does the sentence describe a visual experience or scene?',
+    #  'visual-perception'),
+    # ("Does the sentence express the narrator's opinion or judgment about an event or character?",
+    #  'judgment'),
+    # ("Does the sentence express the narrator's opinion or judgment about an event or character?",
+    #  'judgment-task'),
+    ("Does the sentence express the narrator's opinion or judgment about an event or character?",
+     'judgments'),
+    ('Does the sentence include a direct speech quotation?', 'communication'),
+    # ('Does the sentence include a direct speech quotation?', 'speakers'),
+    # ('Does the sentence include a direct speech quotation?', 'speaking'),
+    ('Does the sentence include a personal anecdote or story?', 'personal'),
+    ('Does the sentence include dialogue?', 'communication'),
+    # ('Does the sentence include dialogue?', 'speakers'),
+    # ('Does the sentence include dialogue?', 'speaking'),
+    ('Does the sentence involve a description of physical environment or setting?',
+     'location'),
+    # ('Does the sentence involve a description of physical environment or setting?',
+    #  'locations'),
+    # ('Does the sentence involve a description of physical environment or setting?',
+    #  'visual-perception'),
+    # ('Does the sentence involve a discussion about personal or social values?',
+    #  'belief'),
+    # ('Does the sentence involve a discussion about personal or social values?',
+    #  'beliefs'),
+    # ('Does the sentence involve a discussion about personal or social values?',
+    #  'personal'),
+    ('Does the sentence involve a discussion about personal or social values?',
+     'social'),
+    # ('Does the sentence involve a discussion about personal or social values?',
+    #  'value'),
+    # ('Does the sentence involve a discussion about personal or social values?',
+    #  'values'),
+    # ('Does the sentence involve an expression of personal values or beliefs?',
+    #  'belief'),
+    # ('Does the sentence involve an expression of personal values or beliefs?',
+    #  'beliefs'),
+    # ('Does the sentence involve an expression of personal values or beliefs?',
+    #  'value'),
+    # ('Does the sentence involve an expression of personal values or beliefs?',
+    #  'values'),
+    ('Does the sentence involve spatial reasoning?', 'spatial'),
+    # ('Does the sentence involve spatial reasoning?', 'spatial-information'),
+    # ('Does the sentence involve spatial reasoning?', 'spatially'),
+    # ('Does the sentence involve spatial reasoning?', 'visuo-spatial'),
+    # ('Does the sentence involve spatial reasoning?', 'visuospatial'),
+    # ('Does the sentence involve the mention of a specific object or item?',
+    #  'item'),
+    # ('Does the sentence involve the mention of a specific object or item?',
+    #  'items'),
+    ('Does the sentence involve the mention of a specific object or item?',
+     'object'),
+    # ('Does the sentence involve the mention of a specific object or item?',
+    #  'object-recognition'),
+    # ('Does the sentence involve the mention of a specific object or item?',
+    #  'objects'),
+    ('Does the sentence mention a specific location?', 'location'),
+    # ('Does the sentence mention a specific location?', 'locations'),
+    ('Does the text describe a mode of communication?', 'communication'),
+    ('Does the text include a planning or decision-making process?', 'planning'),
+    ('Is the sentence abstract rather than concrete?', 'abstract'),
+    # ('Is the sentence abstract rather than concrete?', 'conceptual'),
+    # ('Is the sentence abstract rather than concrete?', 'concrete'),
+    # ('Is the sentence reflective, involving self-analysis or introspection?',
+    #  'thinking'),
+    # ('Is the sentence reflective, involving self-analysis or introspection?',
+    #  'thought'),
+    ('Is the sentence reflective, involving self-analysis or introspection?',
+     'thoughts'),
+    ('Is time mentioned in the input?', 'time-task'),
+    # ('Is time mentioned in the input?', 'timing'),
+    # ('Does the sentence contain a cultural reference?', 'reference'),
+    # ('Is the input related to a specific industry or profession?', ''),
+    # ('Does the sentence include technical or specialized terminology?', ''),
+    # ('Does the input include a comparison or metaphor?', ''),
+    # ('Does the sentence express a sense of belonging or connection to a place or community?', ''),
+    # ('Does the text describe a journey?', ''),
+]
 
-}
-term_dict = {v: k for k, v in term_dict_rev.items()}
+# term_dict = {v: k for k, v in term_dict_rev.items()}
+term_dict = [(v, k) for (k, v) in term_dict_rev]
 
 
 def load_flatmaps_qa_dicts_by_subject(subjects, settings):
@@ -178,7 +265,7 @@ def mni_vol_to_subj_vol_surf(
 
 
 def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data', mni=False):
-
+    '''
     def _get_term_dict():
         subject_s = 'S01'  # subject.replace('UT', '')
         # neurosynth_dir = '/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data/all_association-test_z'
@@ -188,17 +275,23 @@ def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mnt
             '_association-test_z', '') for k in os.listdir(join(neurosynth_dir, f'all_in_{subject_s}-BOLD'))]
 
         # filter dict for files that were in neurosynth
-        term_dict_ = {k: v for k, v in term_dict.items() if k in term_names}
-        # for k in term_dict.keys():
-        #     if k not in term_names:
+        # term_dict_ = {k: v for k, v in term_dict.items() if k in term_names}
+        for k in term_dict.keys():
+            assert k in term_names, f'{k} not in term names!'
+        term_dict_ = term_dict
+        # if k not in term_names:
         #         print(k)
 
         # filter dict for files that had questions run
         questions_run = [k.replace('.pkl', '') for k in os.listdir(
             '/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')]
-        term_dict_ = {k: v for k, v in term_dict_.items()
-                      if v in questions_run}
+        for k in term_dict_rev:
+            assert k in questions_run, f'{k} not in questions run!'
+        # term_dict_ = {k: v for k, v in term_dict_.items()
+            #   if v in questions_run}
+        term_dict_ = term_dict_
         return term_dict_
+    '''
 
     def _load_flatmap_mni(term, neurosynth_dir):
         # import nibabel as nib
@@ -219,15 +312,27 @@ def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mnt
         mask = cortex.db.get_mask(subject, subject + '_auto')
         return vol[mask]
 
-    term_dict_ = _get_term_dict()
+    # term_dict_ = _get_term_dict()
 
     if mni:
-        return {q: _load_flatmap_mni(
-            term, neurosynth_dir) for (term, q) in term_dict_.items()}
+        # return {q: _load_flatmap_mni(
+        # term, neurosynth_dir) for (term, q) in term_dict_.items()}
+        # return {q: _load_flatmap_mni(
+        #     # term, neurosynth_dir) for (q, term) in term_dict_rev.items()}
+        # return {(q, term): _load_flatmap(
+        # term, neurosynth_dir, subject) for (q, term) in term_dict_rev.items()}
+        return {(q, term): _load_flatmap(
+            term, neurosynth_dir, subject) for (q, term) in term_dict_rev}
 
     else:
-        return {q: _load_flatmap(
-            term, neurosynth_dir, subject) for (term, q) in term_dict_.items()}
+        # return {q: _load_flatmap(
+        # term, neurosynth_dir, subject) for (term, q) in term_dict_.items()}
+        # return {q: _load_flatmap(
+        # term, neurosynth_dir, subject) for (q, term) in term_dict_rev.items()}
+        # return {(q, term): _load_flatmap(
+        # term, neurosynth_dir, subject) for (q, term) in term_dict_rev.items()}
+        return {(q, term): _load_flatmap(
+            term, neurosynth_dir, subject) for (q, term) in term_dict_rev}
 
 
 if __name__ == '__main__':

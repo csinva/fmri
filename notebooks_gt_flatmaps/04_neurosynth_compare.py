@@ -21,7 +21,7 @@ sys.path.append('../notebooks')
 os.environ["FSLDIR"] = "/home/chansingh/fsl"
 
 
-def compute_corrs_df(qs, frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_subject, apply_mask):
+def compute_corrs_df(frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_subject, apply_mask):
     '''Compute correlations between QA flatmaps and GT flatmaps (with the function loads)
     '''
     corrs_df_list = defaultdict(list)
@@ -37,6 +37,8 @@ def compute_corrs_df(qs, frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_sub
         #     flatmaps_gt_dict[k] = subj_arr
 
         # flatmaps_gt_dict = get_neurosynth_flatmaps(subject, mni=True)
+        # flatmaps_gt_dict = {k[0]: v for k,
+        # v in flatmaps_gt_dict.items() if k[0] in qs}
         flatmaps_qa_dict = flatmaps_qa_dicts_by_subject[subject]
 
         if apply_mask:
@@ -57,14 +59,16 @@ def compute_corrs_df(qs, frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_sub
         # common_keys = set(flatmaps_gt_masked.keys()) & set(
             # flatmaps_qa_dict_masked.keys())
         d = defaultdict(list)
-        for k in qs:
+        # for k in qs:
+        for k_tup in flatmaps_gt_masked:
+            k = k_tup[0]
             assert k in flatmaps_qa_dict_masked, f'{k} not in flatmaps_qa_dict_masked'
-            assert k in flatmaps_gt_masked, f'{k} not in flatmaps_gt_masked'
-            d['questions'].append(k)
+            # assert k in flatmaps_gt_masked, f'{k} not in flatmaps_gt_masked'
+            d['questions'].append(k_tup)
             d['corr'].append(np.corrcoef(flatmaps_qa_dict_masked[k],
-                                         flatmaps_gt_masked[k])[0, 1])
+                                         flatmaps_gt_masked[k_tup])[0, 1])
             d['flatmap_qa'].append(flatmaps_qa_dict_masked[k])
-            d['flatmap_neurosynth'].append(flatmaps_gt_masked[k])
+            d['flatmap_neurosynth'].append(flatmaps_gt_masked[k_tup])
         d = pd.DataFrame(d).sort_values('corr', ascending=False)
 
         corrs = viz._calc_corrs(
@@ -175,7 +179,8 @@ def plot_corrs_df(
         # plt.yticks(range(len(corrs_df_subject)), [
         # term_dict_rev[k] for k in idx_sort])
         # corrs_df_subject.index)
-    ylabels = [analyze_helper.abbrev_question(q) for q in idx_sort]
+    ylabels = [analyze_helper.abbrev_question(q[0]) for q in idx_sort]
+    # ylabels = idx_sort
     plt.yticks(range(len(corrs_df_subject)), ylabels)
     # else:
     # this raises issues! things get sorted!
