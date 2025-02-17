@@ -10,15 +10,16 @@ from tqdm import tqdm
 
 from neuro.config import PROCESSED_DIR
 
+'''
 term_dict = {
-    'actions': 'Does the input mention anything related to an action?',
+    # 'actions': 'Does the input mention anything related to an action?',
     'arithmetic': 'Does the input mention anything related to arithmetic?',
-    'ambiguous': 'Does the input contain a sense of ambiguity?',
+    # 'ambiguous': 'Does the input contain a sense of ambiguity?',
     'anger': 'Does the input mention anything related to anger?',
     # 'argue': 'Does the input mention anything related to arguing?',
     'calculation': 'Does the input mention anything related to calculation?',
     'color': 'Does the input mention anything related to color?',
-    'conflict': 'Does the input mention anything related to conflict?',
+    # 'conflict': 'Does the input mention anything related to conflict?',
     # 'debate': 'Does the input mention anything related to debate?',
     'disgust': 'Does the input mention anything related to disgust?',
     'empathy': 'Does the input mention anything related to empathy?',
@@ -32,8 +33,8 @@ term_dict = {
     'hands': 'Does the input mention anything related to hands?',
     'alcohol': 'Does the input mention anything related to alcohol?',
     'age': 'Does the input mention anything related to age?',
-    'children': 'Does the input mention anything related to children?',
-    'diseases': 'Does the input mention anything related to diseases?',
+    # 'children': 'Does the input mention anything related to children?',
+    # 'diseases': 'Does the input mention anything related to diseases?',
     'eyes': 'Does the input mention anything related to eyes?',
     'knowledge': 'Does the input mention anything related to knowledge?',
     'gender': 'Does the input mention anything related to gender?',
@@ -58,6 +59,48 @@ term_dict = {
     'communication': 'Does the text describe a mode of communication?',
     'abstract': 'Is the sentence abstract rather than concrete?',
 }
+term_dict_rev = {v: k for k, v in term_dict.items()}
+'''
+
+term_dict_rev = {
+    'Does the sentence describe a physical sensation?': 'sensation',
+    'Does the input involve planning or organizing?': 'planning',
+    'Does the sentence contain a negation?': 'negative',
+    'Does the sentence describe a personal reflection or thought?': 'thought',
+    'Does the sentence describe a sensory experience?': 'sensory',
+    'Does the sentence mention a specific location?': 'location',
+    'Does the text describe a mode of communication?': 'communication',
+    'Is the sentence abstract rather than concrete?': 'abstract',
+    'Does the sentence contain a proper noun?': 'nouns',
+    'Does the sentence describe a physical action?': 'action',
+    'Does the sentence describe a personal or social interaction that leads to a change or revelation?': 'social-interaction',
+    'Does the sentence involve the mention of a specific object or item?': 'object',
+    'Does the sentence involve a description of physical environment or setting?': 'location',
+    'Does the sentence describe a relationship between people?': 'social',
+    'Is time mentioned in the input?': 'time-task',  # 'timing'
+    "Does the sentence express the narrator's opinion or judgment about an event or character?": 'judgment',
+    'Does the sentence include dialogue?': 'communication',
+    'Does the sentence describe a visual experience or scene?': 'visual-information',
+    'Does the sentence involve spatial reasoning?': 'spatial',
+    'Does the sentence involve an expression of personal values or beliefs?': 'beliefs',
+    'Does the input contain a number?': 'arithmetic',
+    'Does the sentence describe a specific sensation or feeling?': 'sensation',
+    'Does the text include a planning or decision-making process?': 'planning',
+    'Does the sentence include a personal anecdote or story?': 'personal',
+    'Does the sentence involve a discussion about personal or social values?': 'values',
+    'Does the input contain a measurement?': 'arithmetic',
+    'Does the sentence include a direct speech quotation?': 'communication',
+    'Is the sentence reflective, involving self-analysis or introspection?': 'thought',
+    'Does the input describe a specific texture or sensation?': 'sensation',
+    # 'Does the sentence contain a cultural reference?': 'reference',
+    # 'Is the input related to a specific industry or profession?',
+    # 'Does the sentence include technical or specialized terminology?',
+    # 'Does the input include a comparison or metaphor?',
+    # 'Does the sentence express a sense of belonging or connection to a place or community?',
+    # 'Does the text describe a journey?',
+
+}
+term_dict = {v: k for k, v in term_dict_rev.items()}
 
 
 def load_flatmaps_qa_dicts_by_subject(subjects, settings):
@@ -187,19 +230,22 @@ def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mnt
             term, neurosynth_dir, subject) for (term, q) in term_dict_.items()}
 
 
-term_dict_rev = {v: k for k, v in term_dict.items()}
-
 if __name__ == '__main__':
-    computed_gpt4_qs = [
-        x.replace('.pkl', '') for x in os.listdir('/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')
-        if '?' in x
-    ]
-    print('num qs', len(computed_gpt4_qs))
-    computed_matched_gpt4_qs = [
-        k for k in computed_gpt4_qs if k in term_dict.values()]
-    print('num matched qs', len(computed_matched_gpt4_qs))
+    # computed_gpt4_qs = [
+    #     x.replace('.pkl', '') for x in os.listdir('/home/chansingh/mntv1/deep-fMRI/qa/cache_gpt')
+    #     if '?' in x
+    # ]
+    # print('num qs', len(computed_gpt4_qs))
+    # computed_matched_gpt4_qs = [
+    #     k for k in computed_gpt4_qs if k in term_dict.values()]
+    # print('num matched qs', len(computed_matched_gpt4_qs))
 
-    print('UNMATCHED QS')
-    for q in computed_gpt4_qs:
-        if q not in term_dict.values():
-            print(q)
+    # print('UNMATCHED QS')
+    # for q in computed_gpt4_qs:
+    #     if q not in term_dict.values():
+    #         print(q)
+
+    s = [k.split('.')[0] for k in os.listdir(
+        '/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data/all_in_S01-BOLD')]
+    for k in term_dict.keys():
+        assert k in s, k

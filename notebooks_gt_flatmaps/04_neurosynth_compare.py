@@ -4,6 +4,7 @@ import viz
 from neurosynth import term_dict, term_dict_rev, get_neurosynth_flatmaps
 # from neuro import viz
 from neuro.config import repo_dir, PROCESSED_DIR
+from neuro import analyze_helper
 import sys
 import pandas as pd
 import os
@@ -26,6 +27,16 @@ def compute_corrs_df(qs, frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_sub
     corrs_df_list = defaultdict(list)
     for subject in tqdm(subjects):
         flatmaps_gt_dict = get_neurosynth_flatmaps(subject, mni=False)
+        # flatmaps_gt_dict = {}
+        # flatmaps_gt_dict_mni = get_neurosynth_flatmaps(subject, mni=True)
+        # for k in tqdm(flatmaps_gt_dict_mni.keys()):
+        #     mni_vol = cortex.Volume(
+        #         flatmaps_gt_dict_mni[k], "fsaverage", "atlas_2mm")
+        #     subj_vol, subj_arr = neurosynth.mni_vol_to_subj_vol_surf(
+        #         mni_vol, subject=subject.replace('UT', ''))
+        #     flatmaps_gt_dict[k] = subj_arr
+
+        # flatmaps_gt_dict = get_neurosynth_flatmaps(subject, mni=True)
         flatmaps_qa_dict = flatmaps_qa_dicts_by_subject[subject]
 
         if apply_mask:
@@ -47,6 +58,8 @@ def compute_corrs_df(qs, frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_sub
             # flatmaps_qa_dict_masked.keys())
         d = defaultdict(list)
         for k in qs:
+            assert k in flatmaps_qa_dict_masked, f'{k} not in flatmaps_qa_dict_masked'
+            assert k in flatmaps_gt_masked, f'{k} not in flatmaps_gt_masked'
             d['questions'].append(k)
             d['corr'].append(np.corrcoef(flatmaps_qa_dict_masked[k],
                                          flatmaps_gt_masked[k])[0, 1])
@@ -96,16 +109,19 @@ def compute_corrs_df(qs, frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_sub
 
 def plot_corrs_df(
         corrs_df, out_dir, plot_val=f'corrs_0.1',
-        xlab='Flatmap correlation', ylabels=None,
+        xlab='Flatmap correlation'
 ):
 
     c = corrs_df
-    # colors = {
-    #     'UTS01': 'C0',
-    #     'UTS02': 'C1',
-    #     'UTS03': 'C2',
-    #     'mean': 'black'
-    # }
+    colors = {
+        'UTS01': 'C0',
+        'UTS02': 'C1',
+        'UTS03': 'C2',
+        'S01': 'C0',
+        'S02': 'C1',
+        'S03': 'C2',
+        'mean': 'black'
+    }
 
     d_mean = pd.DataFrame(c.groupby('questions')[
         plot_val].mean()).reset_index()
@@ -148,27 +164,31 @@ def plot_corrs_df(
                 fmt='o')
         plt.axvline(corrs_df_subject[plot_val].mean(),
                     linestyle='--',
-                    # color=colors[subject],
+                    color=colors[subject],
                     zorder=-1000)
 
         print(f'{subject} corr',
               corrs_df_subject[plot_val].mean())
 
     # add horizontal bars
-    if ylabels is None:
-        plt.yticks(range(len(corrs_df_subject)), [
-            term_dict_rev[k] for k in idx_sort])
-    else:
-        plt.yticks(range(len(corrs_df_subject)), ylabels)
-    plt.xlabel(xlab, fontsize='large')
+    # if ylabels is None:
+        # plt.yticks(range(len(corrs_df_subject)), [
+        # term_dict_rev[k] for k in idx_sort])
+        # corrs_df_subject.index)
+    ylabels = [analyze_helper.abbrev_question(q) for q in idx_sort]
+    plt.yticks(range(len(corrs_df_subject)), ylabels)
+    # else:
+    # this raises issues! things get sorted!
+    # plt.yticks(range(len(corrs_df_subject)), ylabels)
+    plt.xlabel(xlab)
     plt.grid(axis='y', alpha=0.2)
     plt.axvline(0, color='gray')
 
     abs_lim = max(np.abs(plt.xlim()))
-    plt.xlim(-abs_lim, abs_lim)
+    # plt.xlim(-abs_lim, abs_lim)
 
     # annotate with baseline and text label
-    plt.legend(fontsize='large')
+    plt.legend()
     plt.tight_layout()
     os.makedirs(out_dir, exist_ok=True)
     plt.savefig(join(out_dir, plot_val + '.png'), dpi=300)
@@ -264,6 +284,3 @@ def compute_mni_corr_df(flatmaps_qa_dicts_by_subject, flatmaps_gt_dict_mni, qs):
     # add avg row to bottom
     df.loc['avg'] = df.mean()
     return df
-
-
-# if __name__ == '__main__':
