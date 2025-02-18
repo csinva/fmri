@@ -21,6 +21,18 @@ sys.path.append('../notebooks')
 os.environ["FSLDIR"] = "/home/chansingh/fsl"
 
 
+def get_masked_flatmaps_dict(flatmaps_dict, frac_voxels_to_keep, subject):
+    corrs_test = joblib.load(join(PROCESSED_DIR, subject.replace(
+        'UT', ''), 'corrs_test_35.pkl')).values[0]
+    # threshold
+    if frac_voxels_to_keep < 1:
+        corrs_test_mask = (corrs_test > np.percentile(
+            corrs_test, 100 * (1 - frac_voxels_to_keep))).astype(bool)
+    else:
+        corrs_test_mask = np.ones_like(corrs_test).astype(bool)
+    return {k: v[corrs_test_mask] for k, v in flatmaps_dict.items()}
+
+
 def compute_corrs_df(frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_subject, apply_mask):
     '''Compute correlations between QA flatmaps and GT flatmaps (with the function loads)
     '''
@@ -42,33 +54,25 @@ def compute_corrs_df(frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_subject
         flatmaps_qa_dict = flatmaps_qa_dicts_by_subject[subject]
 
         if apply_mask:
-            corrs_test = joblib.load(join(PROCESSED_DIR, subject.replace(
-                'UT', ''), 'corrs_test_35.pkl')).values[0]
-            # threshold
-            if frac_voxels_to_keep < 1:
-                corrs_test_mask = (corrs_test > np.percentile(
-                    corrs_test, 100 * (1 - frac_voxels_to_keep))).astype(bool)
-            else:
-                corrs_test_mask = np.ones_like(corrs_test).astype(bool)
-            flatmaps_qa_dict_masked = {k: flatmaps_qa_dict[k][corrs_test_mask]
-                                       for k in flatmaps_qa_dict.keys()}
-            flatmaps_gt_masked = {k: flatmaps_gt_dict[k][corrs_test_mask]
-                                  for k in flatmaps_gt_dict.keys()}
+            flatmaps_qa_dict_masked = get_masked_flatmaps_dict(
+                flatmaps_qa_dict, frac_voxels_to_keep, subject)
+            flatmaps_gt_dict_masked = get_masked_flatmaps_dict(
+                flatmaps_gt_dict, frac_voxels_to_keep, subject)
 
-        # get common flatmaps and put into d
-        # common_keys = set(flatmaps_gt_masked.keys()) & set(
-            # flatmaps_qa_dict_masked.keys())
+      # get common flatmaps and put into d
+      # common_keys = set(flatmaps_gt_masked.keys()) & set(
+          # flatmaps_qa_dict_masked.keys())
         d = defaultdict(list)
         # for k in qs:
-        for k_tup in flatmaps_gt_masked:
+        for k_tup in flatmaps_gt_dict_masked:
             k = k_tup[0]
             assert k in flatmaps_qa_dict_masked, f'{k} not in flatmaps_qa_dict_masked'
             # assert k in flatmaps_gt_masked, f'{k} not in flatmaps_gt_masked'
             d['questions'].append(k_tup)
             d['corr'].append(np.corrcoef(flatmaps_qa_dict_masked[k],
-                                         flatmaps_gt_masked[k_tup])[0, 1])
+                                         flatmaps_gt_dict_masked[k_tup])[0, 1])
             d['flatmap_qa'].append(flatmaps_qa_dict_masked[k])
-            d['flatmap_neurosynth'].append(flatmaps_gt_masked[k_tup])
+            d['flatmap_neurosynth'].append(flatmaps_gt_dict_masked[k_tup])
         d = pd.DataFrame(d).sort_values('corr', ascending=False)
 
         corrs = viz._calc_corrs(
@@ -83,27 +87,27 @@ def compute_corrs_df(frac_voxels_to_keep, subjects, flatmaps_qa_dicts_by_subject
         corrs_df_list['questions'].extend(d['questions'].values.tolist())
         corrs_df_list['subject'].extend([subject] * len(d['questions'].values))
 
-        # viz.corr_bars(
-        #     corrs,
-        #     out_dir_save=join(repo_dir, 'qa_results', 'neurosynth', setting),
-        #     xlab='Neurosynth',
-        # )
+    # viz.corr_bars(
+    #     corrs,
+    #     out_dir_save=join(repo_dir, 'qa_results', 'neurosynth', setting),
+    #     xlab='Neurosynth',
+    # )
 
-        # save flatmaps
-        # for i in tqdm(range(len(d))):
-        #     sasc.viz.quickshow(
-        #         d.iloc[i]['flatmap_qa'],
-        #         subject=subject,
-        #         fname_save=join(repo_dir, 'qa_results', 'neurosynth', subject,
-        #                         setting, f'{d.iloc[i]["questions"]}.png')
-        #     )
+    # save flatmaps
+    # for i in tqdm(range(len(d))):
+    #     sasc.viz.quickshow(
+    #         d.iloc[i]['flatmap_qa'],
+    #         subject=subject,
+    #         fname_save=join(repo_dir, 'qa_results', 'neurosynth', subject,
+    #                         setting, f'{d.iloc[i]["questions"]}.png')
+    #     )
 
-        #     sasc.viz.quickshow(
-        #         d.iloc[i]['flatmap_neurosynth'],
-        #         subject=subject,
-        #         fname_save=join(repo_dir, 'qa_results', 'neurosynth', subject,
-        #                         'neurosynth', f'{d.iloc[i]["questions"]}.png')
-        #     )
+    #     sasc.viz.quickshow(
+    #         d.iloc[i]['flatmap_neurosynth'],
+    #         subject=subject,
+    #         fname_save=join(repo_dir, 'qa_results', 'neurosynth', subject,
+    #                         'neurosynth', f'{d.iloc[i]["questions"]}.png')
+    #     )
 
     corrs_df = pd.DataFrame(corrs_df_list)
     # corrs_df.to_pickle(join(repo_dir, 'qa_results',
@@ -179,7 +183,10 @@ def plot_corrs_df(
         # plt.yticks(range(len(corrs_df_subject)), [
         # term_dict_rev[k] for k in idx_sort])
         # corrs_df_subject.index)
-    ylabels = [analyze_helper.abbrev_question(q[0]) for q in idx_sort]
+    idx_sort = [
+        q[0] if isinstance(q, tuple) else q for q in idx_sort
+    ]
+    ylabels = [analyze_helper.abbrev_question(q) for q in idx_sort]
     # ylabels = idx_sort
     plt.yticks(range(len(corrs_df_subject)), ylabels)
     # else:
@@ -193,7 +200,7 @@ def plot_corrs_df(
     # plt.xlim(-abs_lim, abs_lim)
 
     # annotate with baseline and text label
-    plt.legend()
+    plt.legend(loc='lower left')
     plt.tight_layout()
     os.makedirs(out_dir, exist_ok=True)
     plt.savefig(join(out_dir, plot_val + '.png'), dpi=300)

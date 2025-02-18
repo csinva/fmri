@@ -22,7 +22,7 @@ sys.path.append('../notebooks')
 flatmaps_per_question = __import__('06_flatmaps_per_question')
 
 
-def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_dir: str, mask_corrs=None):
+def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, flatmaps_null, mask_corrs=None):
     '''
     Params
     ------
@@ -32,14 +32,17 @@ def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_d
         fraction of voxels to keep
     corrs_gt_arr: np.array of size D
         array of ground truth correlations 
-    eng100_dir: str
-        path to flatmaps of eng1000 for a particular subject
+    flatmaps_null: np.ndarray
+        (n_flatmaps, n_voxels) array of null flatmaps for a particular subject
+        e.g. eng1000 weights
     mask_corrs: np.ndarray
         if passed, use this as mask rather than mask extreme
     '''
-    print(eng1000_dir)
-    flatmaps_eng1000 = joblib.load(eng1000_dir)
+    # print(eng1000_dir)
+    # flatmaps_eng1000 = joblib.load(eng1000_dir)
     pvals = []
+    baseline_distr = []
+
     for i in range(len(flatmaps_qa_list)):
         if frac_voxels_to_keep < 1:
 
@@ -60,18 +63,19 @@ def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, eng1000_d
         # else:
         #     mask_extreme = np.ones(flatmaps_qa_list[i].shape).astype(bool)
 
-        flatmaps_eng1000_masked = flatmaps_eng1000[:, mask]
+        flatmaps_null_masked = flatmaps_null[:, mask]
         flatmaps_qa_masked = flatmaps_qa_list[i][mask]
 
         # calculate correlation between each row of flatmaps_qa_masked and flatmaps_eng1000_masked
-        flatmaps_eng1000_masked_norm = StandardScaler(
-        ).fit_transform(flatmaps_eng1000_masked.T).T
+        flatmaps_null_masked_norm = StandardScaler(
+        ).fit_transform(flatmaps_null_masked.T).T
         flatmaps_qa_masked_norm = (
             flatmaps_qa_masked - flatmaps_qa_masked.mean()) / flatmaps_qa_masked.std()
-        corrs_perm_eng100_arr = flatmaps_eng1000_masked_norm @ flatmaps_qa_masked_norm / \
+        corrs_perm_eng100_arr = flatmaps_null_masked_norm @ flatmaps_qa_masked_norm / \
             flatmaps_qa_masked_norm.shape[0]
         pvals.append((corrs_perm_eng100_arr > corrs_gt_arr[i]).mean())
-    return pvals
+        baseline_distr.append(corrs_perm_eng100_arr)
+    return pvals, baseline_distr
 
 
 def _calc_corrs(flatmaps_qa, flatmaps_gt, titles_qa, titles_gt, preproc=None):

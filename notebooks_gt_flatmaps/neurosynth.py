@@ -165,6 +165,7 @@ term_dict_rev = [
     #  'objects'),
     ('Does the sentence mention a specific location?', 'location'),
     # ('Does the sentence mention a specific location?', 'locations'),
+    ('Does the sentence mention a specific location?', 'place'),
     ('Does the text describe a mode of communication?', 'communication'),
     ('Does the text include a planning or decision-making process?', 'planning'),
     ('Is the sentence abstract rather than concrete?', 'abstract'),
