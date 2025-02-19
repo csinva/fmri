@@ -43,7 +43,7 @@ def compute_pvals(flatmaps_qa_list, frac_voxels_to_keep, corrs_gt_arr, flatmaps_
     pvals = []
     baseline_distr = []
 
-    for i in range(len(flatmaps_qa_list)):
+    for i in tqdm(range(len(flatmaps_qa_list))):
         if frac_voxels_to_keep < 1:
 
             # mask based on corrs

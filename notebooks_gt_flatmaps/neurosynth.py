@@ -210,16 +210,7 @@ def load_flatmaps_qa_dicts_by_subject(subjects, settings):
     return flatmaps_qa_dicts_by_subject
 
 
-def subj_vol_to_mni_surf(
-    subj_vol,
-    subject='S02',
-    pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/',
-):
-    '''Example usage
-    subj_vol = cortex.Volume(flatmap_subject, 'UT' + subject,
-                         xfmname=f"UT{subject}_auto")
-    mni_vol = neurosynth.subj_vol_to_mni_surf(subj_vol, subject)
-    '''
+def subj_vol_to_mni_surf_setup(subject='S02', pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/'):
     subj_mapper = cortex.get_mapper("fsaverage", "atlas_2mm")
     fs_mapper = cortex.get_mapper(
         'UT' + subject, join(pycortex_db_dir, f'UT{subject}/transforms/UT{subject}_auto/'))
@@ -228,10 +219,29 @@ def subj_vol_to_mni_surf(
         surface_type="pial",
         target_subj='fsaverage',
     )
+    return subj_mapper, fs_mapper, (ltrans, rtrans)
+
+
+def subj_vol_to_mni_surf(
+    subj_vol,
+    subject='S02',
+    pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/',
+    cached_tuple=None,
+):
+    '''Example usage
+    subj_vol = cortex.Volume(flatmap_subject, 'UT' + subject,
+                         xfmname=f"UT{subject}_auto")
+    mni_vol = neurosynth.subj_vol_to_mni_surf(subj_vol, subject)
+    '''
+    if cached_tuple is None:
+        subj_mapper, fs_mapper, (ltrans, rtrans) = subj_vol_to_mni_surf_setup(
+            subject, pycortex_db_dir)
+    else:
+        subj_mapper, fs_mapper, (ltrans, rtrans) = cached_tuple
+
     fs_surf = fs_mapper(subj_vol)
     surf = cortex.Vertex(
         np.hstack([ltrans@fs_surf.left, rtrans@fs_surf.right]), 'fsaverage')
-
     mni_vol = subj_mapper.backwards(surf)
     return mni_vol
 

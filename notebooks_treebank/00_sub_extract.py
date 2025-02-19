@@ -33,9 +33,9 @@ FACTOR = 4
 # FACTOR = 1
 params_coupled_dict = {
     ('setting', 'batch_size'): [
-        ('words', int(32/FACTOR)),
-        ('sec_1.5', int(16/FACTOR)),
-        ('sec_3', int(8/FACTOR)),
+        # ('words', int(32/FACTOR)),
+        # ('sec_1.5', int(16/FACTOR)),
+        # ('sec_3', int(8/FACTOR)),
         ('sec_6', int(8/FACTOR)),
         # ('sec_12', 4), # too long, not necessary
     ],

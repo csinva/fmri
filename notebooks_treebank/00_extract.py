@@ -110,7 +110,8 @@ def get_texts(features_df, setting='words'):
 
 
 if __name__ == "__main__":
-    stories_to_run = STORIES_LOTR
+    stories_to_run = STORIES_LOTR[:1]
+    # stories_to_run = STORIES_LOTR
     # stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
     # stories_to_run = STORIES_POPULAR
 
@@ -130,7 +131,8 @@ if __name__ == "__main__":
 
     # set up logging
     logger = logging.getLogger()
-    logging.basicConfig(level=logging.INFO)
+    # logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.ERROR)
 
     # set up saving directory + check for cache
     already_cached, save_dir_unique = imodelsx.cache_save_utils.get_save_dir_unique(
