@@ -208,11 +208,11 @@ def fit_and_evaluate(data, subject, num_coefs_to_keep=None, label_num=None):
 
 def _load_result(subject):
     if subject == 'mean':
-        dfs = [pd.read_pickle(join(data_dir, f'r_df_{subject}.pkl'))
+        dfs = [pd.read_pickle(join(data_dir, 'test_acc', f'r_df_{subject}.pkl'))
                for subject in ['uts01', 'uts02', 'uts03']]
         return pd.concat(dfs, axis=0).groupby('label').mean().reset_index()
     else:
-        return pd.read_pickle(join(data_dir, f'r_df_{subject}.pkl'))
+        return pd.read_pickle(join(data_dir, 'test_acc', f'r_df_{subject}.pkl'))
 
 
 if __name__ == '__main__':
@@ -231,7 +231,7 @@ if __name__ == '__main__':
             for subject in ['S01', 'S02', 'S03']:
                 subject_dec = 'ut' + subject.lower()
                 out_file = join(
-                    data_dir, f'r_df_{subject_dec}_nvoxels={n_voxels_keep}{suffix}.pkl')
+                    data_dir, 'test_acc', f'r_df_{subject_dec}_nvoxels={n_voxels_keep}{suffix}.pkl')
                 if os.path.exists(out_file):
                     print('exists', out_file)
                     continue
