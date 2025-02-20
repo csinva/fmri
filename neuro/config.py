@@ -33,3 +33,11 @@ def setup_freesurfer():
     }
     for k in FREESURFER_VARS.keys():
         os.environ[k] = FREESURFER_VARS[k]
+
+
+VOX_COUNTS = {
+    'S01': 81126,
+    'S02': 94251,
+    'S03': 95556,
+    'Mean': 90311
+}
