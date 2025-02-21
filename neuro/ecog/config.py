@@ -10,4 +10,7 @@ STORIES_UNPOPULAR = ['Antman', 'Aquaman', 'Avengers Infinity War', 'Black Panthe
 STORIES_LOTR = [
     'Lord Of The Rings 1', 'Lord Of The Rings 2',
 ]
+STORIES_PODCASTS = [
+    '___podcasts-story___',
+]
 ECOG_DIR = '/home/chansingh/mntv1/ecog/'

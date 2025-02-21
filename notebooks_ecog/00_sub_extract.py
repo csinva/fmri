@@ -48,7 +48,7 @@ args_list = submit_utils.get_args_list(
 
 # args_list = args_list[:1]
 
-script_name = join(repo_dir, 'notebooks_treebank', '00_extract.py')
+script_name = join(repo_dir, 'notebooks_ecog', '00_extract.py')
 amlt_kwargs = {
     # change this to run a cpu job
     'amlt_file': join(repo_dir, 'scripts', 'launch.yaml'),

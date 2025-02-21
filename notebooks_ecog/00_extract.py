@@ -1,7 +1,7 @@
-from neuro.treebank.questions import QS_O1_DEC26, QS_O1_DEC26_2
-from neuro.treebank.config import STORIES_POPULAR, STORIES_UNPOPULAR, STORIES_LOTR, ECOG_DIR
+from neuro.ecog.questions import QS_O1_DEC26, QS_O1_DEC26_2
+from neuro.ecog.config import STORIES_POPULAR, STORIES_UNPOPULAR, STORIES_LOTR, ECOG_DIR
 from imodelsx.qaemb.qaemb import QAEmb, get_sample_questions_and_examples
-import neuro.treebank.questions as questions
+import neuro.ecog.questions as questions
 from math import ceil
 from numpy.linalg import norm
 from copy import deepcopy
@@ -110,8 +110,9 @@ def get_texts(features_df, setting='words'):
 
 
 if __name__ == "__main__":
-    stories_to_run = ['Cars 2']
-    # stories_to_run = STORIES_LOTR[:1]
+    stories_to_run = ['___podcasts-story___']
+    # stories_to_run = ['Cars 2'] # this is partially completed
+    # stories_to_run = STORIES_LOTR[:1] # this is completed
     # stories_to_run = STORIES_LOTR
     # stories_to_run = STORIES_POPULAR + STORIES_UNPOPULAR
     # stories_to_run = STORIES_POPULAR
