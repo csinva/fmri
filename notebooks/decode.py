@@ -56,8 +56,8 @@ def get_fmri_and_labs(data_dir, story_name='onapproachtopluto', train_or_test='t
         )
 
     dfs = []
-    # for offset in [1, 2, 3, 4]:
-    for offset in [1]:
+    for offset in [1, 2, 3, 4]:
+        # for offset in [1,]:
         df_offset = df.shift(-offset)
         df_offset.columns = [col + f'_{offset}' for col in df.columns]
         dfs.append(df_offset)
