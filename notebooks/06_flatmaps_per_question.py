@@ -20,7 +20,7 @@ path_to_repo = dirname(dirname(os.path.abspath(__file__)))
 dvu.set_style()
 
 
-def get_weights_top(args):
+def get_weights_top(args, avg_over_delays=True):
     '''Return weights without delays out_size x
     '''
 
@@ -34,15 +34,16 @@ def get_weights_top(args):
     assert weights.shape[0] % ndelays == 0
     emb_size = weights.shape[0] / ndelays
     weights = weights.reshape(ndelays, int(emb_size), -1)
-    weights = weights.mean(axis=0)
+    if avg_over_delays:
+        weights = weights.mean(axis=0)
 
     if hasattr(model_params, 'weights_pc'):
         weights_pc = model_params['weights_pc']
         assert weights_pc.shape[0] % ndelays == 0
         qs_size = weights_pc.shape[0] / ndelays
         weights_pc = weights_pc.reshape(ndelays, int(qs_size), -1)
-        weights_pc = weights_pc.mean(axis=0)
-
+        if avg_over_delays:
+            weights_pc = weights_pc.mean(axis=0)
     else:
         weights_pc = None
 

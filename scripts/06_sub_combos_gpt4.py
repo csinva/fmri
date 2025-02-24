@@ -13,15 +13,17 @@ params_shared_dict = {
     # things to average over
     'use_extract_only': [0],
     'pc_components': [100],
-    'ndelays': [1],
+    # 'ndelays': [1],
+    'ndelays': [4],  # [8, 16],
     'nboots': [50],
 
     # things to change
     'use_test_setup': [0],
     # 'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/aug16_gpt4'],
     'save_dir': ['/home/chansingh/mntv1/deep-fMRI/encoding/oct17_neurosynth_gemv'],
-    'subject': ['UTS01', 'UTS02', 'UTS03'],
+    # 'subject': ['UTS01', 'UTS02', 'UTS03'],
     # 'subject': ['UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08'],
+    'subject': ['UTS01', 'UTS02', 'UTS03', 'UTS04', 'UTS05', 'UTS06', 'UTS07', 'UTS08'],
     # 'use_added_wordrate_feature': [0, 1],
     # 'subject': ['UTS02'],
     'use_added_wordrate_feature': [0],
@@ -33,8 +35,10 @@ params_coupled_dict = {
 
     # single question (could also pass the other used questions here)
     [
-        (repr(QUESTIONS_GPT4_COMPUTED_FULL[i]), 'gpt4', None, None)
-        for i in range(len(QUESTIONS_GPT4_COMPUTED_FULL))
+        # (repr(QUESTIONS_GPT4_COMPUTED_FULL[i]), 'gpt4', None, None)
+        # for i in range(len(QUESTIONS_GPT4_COMPUTED_FULL))
+        (repr(QS_35_STABLE[i]), 'gpt4', None, None)
+        for i in range(len(QS_35_STABLE))
     ]
     +
     # shapley features

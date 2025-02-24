@@ -88,3 +88,7 @@ def abbrev_question(q):
     for prefix in ['Does the sentence ', 'Is the sentence ', 'Does the input ', 'Is the input ', 'Does the text ']:
         q = q.replace(prefix, '...')
     return q
+
+
+def abbrev_questions(qs):
+    return [abbrev_question(q) for q in qs]

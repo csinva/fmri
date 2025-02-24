@@ -141,7 +141,7 @@ def _load_coefs_individual(r, subject='S02', qa_questions_version='v3_boostexamp
     return {q: w for q, w in zip(questions, weights)}
 
 
-def _load_coefs_individual_gpt4(rr, subject='S02', use_added_wordrate_feature=0):
+def _load_coefs_individual_gpt4(rr, subject='S02', use_added_wordrate_feature=0, avg_over_delays=True):
     r = rr
     r = r[r.subject == subject]
     r = r[r.use_added_wordrate_feature == use_added_wordrate_feature]
@@ -152,7 +152,7 @@ def _load_coefs_individual_gpt4(rr, subject='S02', use_added_wordrate_feature=0)
           r.shape, 'subj shape', rr[rr.subject == subject].shape)
 
     weights_list = [
-        flatmaps_per_question.get_weights_top(r.iloc[i])[0]
+        flatmaps_per_question.get_weights_top(r.iloc[i], avg_over_delays)[0]
         for i in tqdm(range(len(r)))
     ]
     questions = r['qa_questions_version']
@@ -165,13 +165,12 @@ def _load_coefs_individual_gpt4(rr, subject='S02', use_added_wordrate_feature=0)
         q: r.iloc[i]['corrs_test']
         for i, q in enumerate(questions)
     }
-    joblib.dump(corrs_test_dict, join(PROCESSED_DIR,
-                                      subject, 'corrs_test_individual_gpt4_qs_35.pkl'))
+
     # print('weights', weights.shape)
 
     # print(r.columns)
 
-    return {q: w for q, w in zip(questions, weights)}
+    return {q: w for q, w in zip(questions, weights)}, corrs_test_dict
 
 
 def _load_coefs_individual_wordrate(rr, subject='S02'):
