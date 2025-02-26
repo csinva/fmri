@@ -204,6 +204,7 @@ def plot_corrs_df(
     plt.tight_layout()
     os.makedirs(out_dir, exist_ok=True)
     plt.savefig(join(out_dir, plot_val + '.png'), dpi=300)
+    plt.savefig(join(out_dir, plot_val + '.pdf'))
 
 
 def compute_pvals_for_subject(corrs_df, flatmaps_qa_dicts_by_subject, subject, frac_voxels_to_keep_list):
