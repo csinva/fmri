@@ -158,7 +158,7 @@ def plot_corrs_df(
                 color='black',
                 fmt='o',
                 zorder=1000,
-                label=subject.capitalize(),
+                label=subject.capitalize().replace('UT', ''),
             )
         else:
             plt.errorbar(
@@ -168,7 +168,7 @@ def plot_corrs_df(
                 # r_df[plot_val] * (1-r_df[plot_val])
                 # / r_df['num_test']),
                 alpha=0.5,
-                label=subject.upper(),
+                label=subject.upper().replace('UT', ''),
                 fmt='o')
         plt.axvline(corrs_df_subject[plot_val].mean(),
                     linestyle='--',

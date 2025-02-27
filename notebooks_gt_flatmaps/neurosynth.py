@@ -252,6 +252,7 @@ def mni_vol_to_subj_vol_surf(
     pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/',
 ):
     '''Example usage
+    # mni_vol = cortex.Volume(mni_arr, "fsaverage", "atlas_2mm")
     term = 'location'
     mni_filename = f'/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data/all_association-test_z/{term}_association-test_z.nii.gz'
     mni_vol = cortex.Volume(mni_filename, "fsaverage", "atlas_2mm")
@@ -273,6 +274,41 @@ def mni_vol_to_subj_vol_surf(
     subj_vol = subj_mapper.backwards(subj_surf)
     mask = cortex.db.get_mask('UT' + subject, 'UT' + subject + '_auto')
     return subj_vol, subj_vol.data[mask]
+
+
+def subj_vol_to_subj_surf(
+    subj_vol,
+    subject_input='S02',
+    subject_target='S03',
+    pycortex_db_dir='/home/chansingh/mntv1/deep-fMRI/data/ds003020/derivative/pycortex-db/',
+):
+    '''Example usage
+    subject_input = 'S02'
+    subject_target = 'S03'
+    subj_vol = cortex.Volume(subject_arr, subject='UT' + subject_input,
+                            xfmname=f"UT{subject_input}_auto")
+    target_arr = neurosynth.subj_vol_to_subj_surf(
+        subj_vol, subject_input, subject_target)
+    '''
+
+    # subj_mapper = cortex.get_mapper("fsaverage", "atlas_2mm")
+    subj_mapper = cortex.get_mapper(
+        'UT' + subject_target, join(pycortex_db_dir, f'UT{subject_target}/transforms/UT{subject_target}_auto/'))
+    fs_mapper = cortex.get_mapper(
+        'UT' + subject_input, join(pycortex_db_dir, f'UT{subject_input}/transforms/UT{subject_input}_auto/'))
+    (ltrans, rtrans) = cortex.db.get_mri_surf2surf_matrix(
+        subject='UT' + subject_input,
+        surface_type="pial",
+        target_subj='UT' + subject_target,
+    )
+
+    fs_surf = fs_mapper(subj_vol)
+    surf = cortex.Vertex(
+        np.hstack([ltrans@fs_surf.left, rtrans@fs_surf.right]), 'UT' + subject_target)
+    subject_target_vol = subj_mapper.backwards(surf)
+    mask_target = cortex.db.get_mask(
+        'UT' + subject_target, 'UT' + subject_target + '_auto')
+    return subject_target_vol.data[mask_target]
 
 
 def get_neurosynth_flatmaps(subject='UTS01', neurosynth_dir='/home/chansingh/mntv1/deep-fMRI/qa/neurosynth_data', mni=False):
