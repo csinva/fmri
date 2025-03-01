@@ -1,0 +1,36 @@
+q,term
+...contain a measurement?,arithmetic
+...contain a number?,arithmetic
+...describe a specific texture or sensation?,sensation
+...involve planning or organizing?,planning
+...contain a negation?,negative
+...contain a proper noun?,nouns
+...describe a personal or social interaction ?,social-interaction
+...describe a personal reflection or thought?,thoughts
+...describe a physical action?,action
+...describe a physical sensation?,touch
+...describe a relationship between people?,social
+...describe a specific sensation or feeling?,sensation
+...describe a visual experience or scene?,visual-information
+...express an opinion about an event or character?,judgments
+...include a direct speech quotation?,communication
+...include a personal anecdote or story?,personal
+...include dialogue?,communication
+...describe a physical environment or setting?,location
+...discuss personal or social values?,social
+...involve spatial reasoning?,spatial
+...mention a specific object or item?,object
+...mention a specific location?,location
+...describe a mode of communication?,communication
+...include a planning or decision-making process?,planning
+...abstract rather than concrete?,abstract
+"...reflective, involving self-analysis or introspection?",thoughts
+...mention time?,time-task
+...related to a specific industry or profession?,NO MATCH
+...express personal values or beliefs?,NO MATCH
+...describe a sensory experience?,NO MATCH
+...include technical or specialized terminology?,NO MATCH
+...contain a cultural reference?,NO MATCH
+...include a comparison or metaphor?,NO MATCH
+...express a connection to a community?,NO MATCH
+...describe a journey?,NO MATCH
