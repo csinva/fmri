@@ -12,7 +12,7 @@ figs
 ref
 processed
 **.jbl
-notebooks_gt_flatmaps
+notebooks*
 **tar.gz
 **.joblib
 **.wav
