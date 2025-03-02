@@ -195,23 +195,25 @@ if __name__ == "__main__":
     # for k in ['v1', 'v3', 'v6', 'v3_boostbasic', 'v3_boostexamples', 'v4-ending', 'v3_boostbasic-ending', 'v4_boostexamples']:
     # print(k, get_kwargs_list_for_version_str(k))
 
-    for v in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v1_neurosynth']:
-        print(v, len(get_questions(v)))  # , get_questions(v)[:10])
-    print('total questions', len(get_questions('all')))
+    # for v in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v1_neurosynth']:
+    #     print(v, len(get_questions(v)))  # , get_questions(v)[:10])
+    # print('total questions', len(get_questions('all')))
 
-    # boosting
-    for v in ['v3_boostbasic', 'v3_boostexamples', 'v4_boostexamples']:
-        print(v, len(get_questions(v)))
+    # # boosting
+    # for v in ['v3_boostbasic', 'v3_boostexamples', 'v4_boostexamples']:
+    #     print(v, len(get_questions(v)))
 
-    # write all questions to a json file
-    with open(join(path_to_file, 'questions/all_questions.json'), 'w') as f:
-        json.dump(get_questions('all'), f, indent=4)
-    with open(join(path_to_file, 'questions/base_questions.json'), 'w') as f:
-        json.dump(get_questions('base'), f, indent=4)
-    with open(join(path_to_file, 'questions/v3_boostexamples.json'), 'w') as f:
-        json.dump(get_questions('v3_boostexamples', full=True), f, indent=4)
+    # # write all questions to a json file
+    # with open(join(path_to_file, 'questions/all_questions.json'), 'w') as f:
+    #     json.dump(get_questions('all'), f, indent=4)
+    # with open(join(path_to_file, 'questions/base_questions.json'), 'w') as f:
+    #     json.dump(get_questions('base'), f, indent=4)
+    # with open(join(path_to_file, 'questions/v3_boostexamples.json'), 'w') as f:
+    #     json.dump(get_questions('v3_boostexamples', full=True), f, indent=4)
 
     # for q in get_questions('v4_boostexamples'):
-        # print(q)
+    # print(q)
 
     print(get_kwargs_list_for_version_str('v3_boostexamples_merged'))
+    idxs_to_keep = _get_merged_keep_indices_v3_boostexamples()
+    print(idxs_to_keep.size)

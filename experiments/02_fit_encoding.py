@@ -423,7 +423,6 @@ if __name__ == "__main__":
     if args.use_random_subset_features:
         r, stim_train_delayed, stim_test_delayed = feat_select.select_random_feature_subset(
             args, r, stim_train_delayed, stim_test_delayed)
-
     elif args.single_question_idx >= 0:
         r, stim_train_delayed, stim_test_delayed = feat_select.select_single_feature(
             args, r, stim_train_delayed, stim_test_delayed)

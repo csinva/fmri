@@ -58,3 +58,4 @@ qa_results/finetune*
 huth
 ***.tar.gz
 *.joblib
+**.wav

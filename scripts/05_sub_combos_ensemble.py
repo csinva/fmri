@@ -1,3 +1,4 @@
+from neuro.features import qa_questions
 from neuro.features.feat_select import get_alphas
 import os
 from os.path import dirname, join, expanduser
@@ -13,7 +14,7 @@ params_shared_dict = {
     'use_extract_only': [0],
     'pc_components': [100],  # [100, -1],
     'use_eval_brain_drive': [0],
-    'ndelays': [4, 8],
+    'ndelays': [4],
     'nboots': [50],
     'feature_selection_stability_seeds': [5],
 
@@ -34,10 +35,11 @@ params_coupled_dict = {
 
     # run full models
     [
-        ('v3_boostexamples_merged', 'ensemble2',
-         get_alphas('qa_embedder')[3], None, None, None),
-        ('v1neurosynth', 'ensemble2',
-         None, None, None, None),  # v1neurosynth is the set of GPT-4 hypotheses that were not computed with GPT-4
+        # ('v3_boostexamples_merged', 'ensemble2',
+        #  get_alphas('qa_embedder')[3], None, None, None),
+        # ('v1neurosynth', 'ensemble2',
+        #  # v1neurosynth is the set of GPT-4 hypotheses that were not computed with GPT-4
+        #  None, None, None, None),
     ]
     +
     # shapley features
@@ -53,17 +55,25 @@ params_coupled_dict = {
         # for seed in range(50)
     ]
     +
-    # single question
+    # single question for the hypotheses
+    # [
+    #     ('v3_boostexamples_merged', 'ensemble2',
+    #      get_alphas('qa_embedder')[3], None, None, i)
+    #     for i in range(len(QS_HYPOTHESES))
+    # ]
+    # +
+    # [
+    #     ('v1neurosynth', 'ensemble2',
+    #      None, None, None, i)
+    #     for i in range(len(QS_HYPOTHESES))
+    # ]
+    # +
+    # single question for everything
     [
         ('v3_boostexamples_merged', 'ensemble2',
-         get_alphas('qa_embedder')[3], None, None, i)
-        for i in range(len(QS_HYPOTHESES))
-    ]
-    +
-    [
-        ('v1neurosynth', 'ensemble2',
          None, None, None, i)
-        for i in range(len(QS_HYPOTHESES))
+        # for i in range(len(QS_HYPOTHESES))
+        for i in range(qa_questions._get_merged_keep_indices_v3_boostexamples().size)
     ]
 
 }
@@ -90,8 +100,8 @@ submit_utils.run_args_list(
     args_list,
     script_name=script_name,
     unique_seeds='seed',
-    # amlt_kwargs=amlt_kwargs_cpu,
-    n_cpus=8,
+    amlt_kwargs=amlt_kwargs_cpu,
+    # n_cpus=8,
     # actually_run=False,
     # repeat_failed_jobs=True,
     # shuffle=True,

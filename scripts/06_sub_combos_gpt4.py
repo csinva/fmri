@@ -35,10 +35,10 @@ params_coupled_dict = {
 
     # single question (could also pass the other used questions here)
     [
-        # (repr(QUESTIONS_GPT4_COMPUTED_FULL[i]), 'gpt4', None, None)
-        # for i in range(len(QUESTIONS_GPT4_COMPUTED_FULL))
-        (repr(QS_35_STABLE[i]), 'gpt4', None, None)
-        for i in range(len(QS_35_STABLE))
+        (repr(QUESTIONS_GPT4_COMPUTED_FULL[i]), 'gpt4', None, None)
+        for i in range(len(QUESTIONS_GPT4_COMPUTED_FULL))
+        # (repr(QS_35_STABLE[i]), 'gpt4', None, None)
+        # for i in range(len(QS_35_STABLE))
     ]
     +
     # shapley features

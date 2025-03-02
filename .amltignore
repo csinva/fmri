@@ -15,3 +15,4 @@ processed
 notebooks_gt_flatmaps
 **tar.gz
 **.joblib
+**.wav
