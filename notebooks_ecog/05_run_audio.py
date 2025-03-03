@@ -10,14 +10,13 @@ from tqdm import tqdm
 questions = [
     # 'What is the text in the recording?',
     # 'Does the recording have a rising pitch contour?',
-    # 'Is the recording spoken clearly without mumbling?',
+    'Is the recording spoken clearly without mumbling?',
     # 'Is there an echo present in the audio?',
-    # 'Does the speaker’s voice sound breathy?',
+    'Does the speaker’s voice sound breathy?',
     # 'Does the speaker have a happy tone?',
     # 'Does the the speaker sound relaxed?',
-
-
-
+    'Does the audio contain significant pitch variation?',
+    "Does the speaker's tone indicate confidence?",
     'Does the recording have a male voice?',
     'Does the audio contain background music?',
 ]
@@ -58,5 +57,5 @@ for wav_file in tqdm(wav_files):
                 audio_str=encoded_string,
             )
         )
-        print(d)
-pd.DataFrame(d, index=wav_files).T.to_csv(f'annots_{question}.csv')
+        # print(d)
+pd.DataFrame(d, index=wav_files).T.to_csv(f'annots_podcast_audio.csv')

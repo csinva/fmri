@@ -252,7 +252,8 @@ def get_llm_vectors(
             questions = qa_questions.get_questions(
                 version=qa_questions_version)
             return QuestionEmbedder(
-                checkpoint=qa_embedding_model, questions=questions, use_cache=False)  # dont cache calls locally
+                # dont cache calls locally
+                checkpoint=qa_embedding_model, questions=questions, use_cache=False)
         elif checkpoint.startswith('finetune_'):
             return FinetunedQAEmbedder(
                 checkpoint.replace('finetune_', '').replace('_binary', ''), qa_questions_version=qa_questions_version)
@@ -357,16 +358,17 @@ def get_llm_vectors(
 
 def _get_kwargs_extra(args):
     kwargs = {}
-    if args.input_chunking_type == 'ngram':
-        kwargs['num_ngrams_context'] = args.input_chunking_size
-    elif args.input_chunking_type == 'tr':
-        kwargs['num_trs_context'] = args.input_chunking_size
-    elif args.input_chunking_type == 'sec':
-        kwargs['num_secs_context_per_word'] = args.input_chunking_size
+    if hasattr(args, 'input_chunking_type'):
+        if args.input_chunking_type == 'ngram':
+            kwargs['num_ngrams_context'] = args.input_chunking_size
+        elif args.input_chunking_type == 'tr':
+            kwargs['num_trs_context'] = args.input_chunking_size
+        elif args.input_chunking_type == 'sec':
+            kwargs['num_secs_context_per_word'] = args.input_chunking_size
     kwargs['checkpoint'] = args.feature_space
 
     # also pass layer
-    if args.embedding_layer >= 0:
+    if hasattr(args, 'embedding_layer') and args.embedding_layer >= 0:
         kwargs['layer_idx'] = args.embedding_layer
     return kwargs
 

@@ -11,7 +11,8 @@ import pandas as pd
 
 def get_features_full(
         args, feature_space, qa_embedding_model, story_names,
-        extract_only=False, use_brain_drive=False, use_added_wordrate_feature=False):
+        extract_only=False, use_brain_drive=False, use_added_wordrate_feature=False,
+        use_added_delays=True):
     '''
     Params
     - -----
@@ -61,7 +62,8 @@ def get_features_full(
             story_names=story_names,
             qa_embedding_model=qa_embedding_model,
             # use_huge=args.use_huge,
-            use_huge=True,  # always use_huge, since it's just faster
+            # always use_huge, since it's just faster (for loading feats)
+            use_huge=True,
             use_brain_drive=use_brain_drive,
             # use_cache=False,
             **kwargs)
@@ -77,7 +79,7 @@ def get_features_full(
     features_downsampled = np.hstack(features_downsampled_list)
 
     # apply averaging over answers if relevant (and drop some questions)
-    if '_merged' in args.qa_questions_version and feature_space == 'qa_embedder':
+    if feature_space == 'qa_embedder' and '_merged' in args.qa_questions_version:
         assert args.qa_questions_version == 'v3_boostexamples_merged', f'Only v3_boostexamples_merged is supported but got {args.qa_questions_version}'
         # apply averaging over stim
         questions = np.array(qa_questions.get_questions(
@@ -91,8 +93,11 @@ def get_features_full(
         idxs_to_keep = qa_questions._get_merged_keep_indices_v3_boostexamples()
         features_downsampled = features_downsampled[:, idxs_to_keep]
 
-    features_delayed = make_delayed(features_downsampled,
-                                    delays=range(1, args.ndelays+1))
+    if use_added_delays:
+        features_delayed = make_delayed(features_downsampled,
+                                        delays=range(1, args.ndelays+1))
+    else:
+        features_delayed = features_downsampled
 
     if use_added_wordrate_feature:
         features_delayed_wordrate = get_features_full(

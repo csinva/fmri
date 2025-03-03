@@ -96,6 +96,7 @@ amlt_kwargs_cpu = {
 }
 
 # args_list = args_list[:1]
+# args_list = args_list[-1000:-500][::-1]
 submit_utils.run_args_list(
     args_list,
     script_name=script_name,
