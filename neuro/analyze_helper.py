@@ -86,7 +86,7 @@ def abbrev_question(q):
     q = q.replace('involve the mention of', 'mention')
     q = q.replace('that leads to a change or revelation', '')
     q = q.replace(' ?', '?')
-    for prefix in ['Does the sentence ', 'Is the sentence ', 'Does the input ', 'Is the input ', 'Does the text ']:
+    for prefix in ['Does the sentence ', 'Is the sentence ', 'Does the input ', 'Is the input ', 'Does the text ', 'Is there a ', 'Is an ', 'Is a ', 'Is there ',]:
         q = q.replace(prefix, '...')
     return q
 

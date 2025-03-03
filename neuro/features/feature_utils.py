@@ -38,7 +38,8 @@ def get_features_full(
                 story_names,
                 extract_only=extract_only,
                 use_brain_drive=use_brain_drive,
-                use_added_wordrate_feature=use_added_wordrate_feature
+                use_added_wordrate_feature=use_added_wordrate_feature,
+                use_added_delays=use_added_delays,
             )
             features_delayed_list.append(features_delayed)
         features_delayed_avg = np.mean(features_delayed_list, axis=0)
