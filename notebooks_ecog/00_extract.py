@@ -28,7 +28,7 @@ from os.path import join
 import numpy as np
 import joblib
 import os.path
-from neuro.features.questions.gpt4 import QS_35_STABLE
+from neuro.features.questions.gpt4 import QS_35_STABLE, QS_36_56_STABLE
 import imodelsx.cache_save_utils
 path_to_repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -130,6 +130,9 @@ if __name__ == "__main__":
     elif args.questions == 'qs_35_stable':
         qs_to_run = QS_35_STABLE
         suffix_qs = '___qs_35_stable'
+    elif args.questions == 'qs_56_stable':
+        qs_to_run = QS_35_STABLE + QS_36_56_STABLE
+        suffix_qs = '___qs_56_stable'
 
     # set up logging
     logger = logging.getLogger()

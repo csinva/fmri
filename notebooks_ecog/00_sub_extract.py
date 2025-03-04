@@ -26,7 +26,8 @@ params_shared_dict = {
     'use_cache': [0],
     # 'setting': ['sec_3'],
     # 'questions': ['o1_dec26'],
-    'questions': ['qs_35_stable'],
+    # 'questions': ['qs_35_stable'],
+    'questions': ['qs_56_stable'],
 }
 FACTOR = 4
 # FACTOR = 1

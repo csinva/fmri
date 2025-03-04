@@ -6,15 +6,19 @@ from os.path import join
 from collections import defaultdict
 import pandas as pd
 from tqdm import tqdm
+from neuro.ecog.config import ECOG_DIR
+bids_root = join(ECOG_DIR, 'podcasts_data', 'ds005574/')
 
 questions = [
     # 'What is the text in the recording?',
     # 'Does the recording have a rising pitch contour?',
-    'Is the recording spoken clearly without mumbling?',
     # 'Is there an echo present in the audio?',
-    'Does the speaker’s voice sound breathy?',
     # 'Does the speaker have a happy tone?',
     # 'Does the the speaker sound relaxed?',
+    'Is the speaker asking a question?',
+    'Does the speaker sound happy?',
+    'Is the recording spoken clearly without mumbling?',
+    'Does the speaker’s voice sound breathy?',
     'Does the audio contain significant pitch variation?',
     "Does the speaker's tone indicate confidence?",
     'Does the recording have a male voice?',
@@ -22,19 +26,16 @@ questions = [
 ]
 
 # wav_folder = 'segments_1.5sec'
-wav_folder = 'segments_3sec'
-# wav_files = [join(wav_folder, f)
-#  for f in os.listdir(wav_folder) if f.endswith('.wav')]
-
-wav_files = [
-    join(wav_folder, f)
-    # for i in np.arange(5, 60, 2)
-    for f in sorted(os.listdir(wav_folder)) if f.endswith('.wav')
-]
+story_name = '___podcasts-story___'
+setting = 'sec_3'  # ['words', 'sec_6', 'sec_3', 'sec_1.5']'segments_3sec'
+checkpoint = "gpt-4o-audio-preview"
+wav_folder = join('segments', setting)
+wav_files = [join(wav_folder, f)
+             for f in os.listdir(wav_folder) if f.endswith('.wav')]
 
 # sort in numeric order
 wav_files = sorted(wav_files, key=lambda x: int(
-    x.split('_')[-1].split('.')[0]))
+    x.split('segment_')[-1].split('.')[0]))
 
 
 lm = LLM_Chat_Audio(
@@ -58,4 +59,24 @@ for wav_file in tqdm(wav_files):
             )
         )
         # print(d)
-pd.DataFrame(d, index=wav_files).T.to_csv(f'annots_podcast_audio.csv')
+
+
+out_dir = join(ECOG_DIR, 'features_audio', checkpoint, setting)
+os.makedirs(out_dir, exist_ok=True)
+
+
+# merge with word df
+df_word = pd.read_csv(join(ECOG_DIR, 'podcasts_data',
+                      'df_word_with_wav_timings.csv'))
+
+df_out = pd.DataFrame(
+    d,
+    index=[x.split('/')[-1].replace('.wav', '')
+           for x in wav_files]
+)
+for c in df_out:
+    df_word[c] = df_out[c].values
+
+print('saved to', out_dir)
+df_word.to_csv(join(out_dir, f'{story_name}.csv'))
+df_word.to_pickle(join(out_dir, f'{story_name}.pkl'))
